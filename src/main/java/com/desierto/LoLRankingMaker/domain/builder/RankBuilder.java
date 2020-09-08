@@ -1,9 +1,9 @@
-package domain.builder;
+package com.desierto.LoLRankingMaker.domain.builder;
 
-import static domain.Rank.Tier.IRON;
+import static com.desierto.LoLRankingMaker.domain.valueobject.Rank.Tier.IRON;
 
-import domain.Rank;
-import domain.Rank.Tier;
+import com.desierto.LoLRankingMaker.domain.valueobject.Rank;
+import com.desierto.LoLRankingMaker.domain.valueobject.Rank.Tier;
 
 public class RankBuilder {
 

@@ -1,4 +1,4 @@
-package domain;
+package com.desierto.LoLRankingMaker.domain.valueobject;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;

@@ -1,9 +1,12 @@
-package domain;
+package com.desierto.LoLRankingMaker.domain;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
-import domain.Rank.Tier;
-import domain.builder.RankBuilder;
+import com.desierto.LoLRankingMaker.domain.builder.RankBuilder;
+import com.desierto.LoLRankingMaker.domain.entity.Account;
+import com.desierto.LoLRankingMaker.domain.entity.Ranking;
+import com.desierto.LoLRankingMaker.domain.valueobject.Rank;
+import com.desierto.LoLRankingMaker.domain.valueobject.Rank.Tier;
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 
@@ -15,12 +18,12 @@ public class RankingTest {
     Rank gold1 = rankBuilder.tier(Tier.GOLD).division(1).build();
     Rank silver3 = rankBuilder.tier(Tier.SILVER).division(3).build();
     Rank silver4 = rankBuilder.tier(Tier.SILVER).division(4).build();
-    Account gold1Account = Account.builder().id(1).name("Mikel").leagueOfLegendsId("MAIKY")
+    Account gold1Account = Account.builder().id(1).name("MAIKY")
         .rank(gold1).build();
-    Account silver3Account = Account.builder().id(2).name("Naza").leagueOfLegendsId("naza30sec")
+    Account silver3Account = Account.builder().id(2).name("naza30sec")
         .rank(silver3).build();
-    Account silver4Account = Account.builder().id(3).name("Asier")
-        .leagueOfLegendsId("AficionadoAlFallGuys").rank(silver4).build();
+    Account silver4Account = Account.builder().id(3).name("AficionadoAlFallGuys")
+        .rank(silver4).build();
     Ranking ranking = new Ranking();
     ranking.addAccount(silver4Account);
     ranking.addAccount(gold1Account);

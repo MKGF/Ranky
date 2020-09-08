@@ -1,9 +1,10 @@
-package domain;
+package com.desierto.LoLRankingMaker.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import domain.Rank.Tier;
-import domain.builder.RankBuilder;
+import com.desierto.LoLRankingMaker.domain.builder.RankBuilder;
+import com.desierto.LoLRankingMaker.domain.valueobject.Rank;
+import com.desierto.LoLRankingMaker.domain.valueobject.Rank.Tier;
 import org.junit.jupiter.api.Test;
 
 public class RankTest {
@@ -13,7 +14,7 @@ public class RankTest {
     Rank gold3 = new RankBuilder().tier(Tier.GOLD).division(3).build();
     Rank silver1 = new RankBuilder().tier(Tier.SILVER).division(1).build();
 
-    assertEquals(gold3.compareTo(silver1), 1);
+    assertEquals(gold3.compareTo(silver1), -1);
   }
 
   @Test
@@ -29,6 +30,6 @@ public class RankTest {
     Rank master = new RankBuilder().tier(Tier.MASTER).division(1).build();
     Rank challenger = new RankBuilder().tier(Tier.CHALLENGER).division(1).build();
 
-    assertEquals(master.compareTo(challenger), -1);
+    assertEquals(master.compareTo(challenger), 1);
   }
 }
