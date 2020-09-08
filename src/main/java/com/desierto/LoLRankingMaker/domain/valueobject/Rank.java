@@ -1,5 +1,6 @@
 package com.desierto.LoLRankingMaker.domain.valueobject;
 
+import javax.persistence.Embeddable;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @EqualsAndHashCode
+@Embeddable
 public class Rank implements Comparable<Rank> {
 
   @Override

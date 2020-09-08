@@ -3,6 +3,7 @@ package com.desierto.LoLRankingMaker.domain.entity;
 
 import com.desierto.LoLRankingMaker.domain.valueobject.Rank;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -23,7 +24,7 @@ public class Account implements Comparable<Account> {
   private int id;
   @Column(nullable = false)
   private String name;
-  @Column(nullable = false)
+  @Embedded
   private Rank rank;
 
   @Override
