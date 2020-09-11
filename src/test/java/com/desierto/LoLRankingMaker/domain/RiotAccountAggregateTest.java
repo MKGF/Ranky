@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+import net.rithms.riot.api.RiotApiException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -26,7 +27,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {Configuration.class})
-public class RiotAccountAggregateTest {
+public class RiotAccountAggregateTest extends BaseTest {
 
   @Mock
   private RiotAccountRepository riotAccountRepository;
@@ -35,7 +36,7 @@ public class RiotAccountAggregateTest {
   private Validator validator;
 
   @Test
-  public void givenAnAccount_shouldReturnAccountInformation() {
+  public void givenAnAccount_shouldReturnAccountInformation() throws RiotApiException {
     Rank gold2 = new RankBuilder().division(2).tier(Tier.GOLD).build();
     Account account = Account.builder().name("MAIKY")
         .rank(gold2).build();
@@ -53,7 +54,7 @@ public class RiotAccountAggregateTest {
   }
 
   @Test
-  public void whenRequestingAccountInformation_triggersValidation() {
+  public void whenRequestingAccountInformation_triggersValidation() throws RiotApiException {
     Rank gold2 = new RankBuilder().division(2).tier(Tier.GOLD).build();
     Account account = Account.builder().name("MAIKY")
         .rank(gold2).build();

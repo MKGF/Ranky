@@ -16,7 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {Configuration.class})
-public class AccountInformationTest {
+public class AccountInformationTest extends BaseTest {
 
   @Autowired
   private Validator validator;

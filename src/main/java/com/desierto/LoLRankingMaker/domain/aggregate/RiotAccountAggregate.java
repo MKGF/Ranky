@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import net.rithms.riot.api.RiotApiException;
 
 @AllArgsConstructor
 @Getter
@@ -17,7 +18,7 @@ public class RiotAccountAggregate {
   private RiotAccountRepository riotAccountRepository;
 
   @Valid
-  public AccountInformation getAccountInformation() {
+  public AccountInformation getAccountInformation() throws RiotApiException {
     return riotAccountRepository.getAccountInformation(account);
   }
 }
