@@ -1,5 +1,5 @@
 Create domain (Rank, Ranking, Account...) DONE
-Connect with Riot API (domain use case) QUEDA HACER LA IMPLEMENTACION DE LA INTERFAZ
+Connect with Riot API (domain use case) DONE
 List use cases (application use cases) DONE
   - Crear un ranking
   - Añadir cuentas a un ranking
@@ -9,6 +9,6 @@ List use cases (application use cases) DONE
   - Actualizar el ranking (refrescar datos de cada perfil del ranking)
   - Establecer una deadline al ranking (XX/XX/XXXX acaba el ranking)
   - Congelar el ranking pasada la deadline
-Implement use cases
+Implement use cases WIP
 Deploy?
 Design frontend for the application (client side (react???))
