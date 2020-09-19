@@ -1,24 +1,24 @@
 package com.desierto.LoLRankingMaker.infrastructure.repository;
 
+import static com.desierto.LoLRankingMaker.domain.enumerates.QueueType.SOLOQ;
+
 import com.desierto.LoLRankingMaker.domain.builder.RankBuilder;
 import com.desierto.LoLRankingMaker.domain.entity.Account;
-import com.desierto.LoLRankingMaker.domain.exception.AccountHasNoLeaguesException;
 import com.desierto.LoLRankingMaker.domain.repository.RiotAccountRepository;
 import com.desierto.LoLRankingMaker.domain.valueobject.AccountInformation;
+import com.desierto.LoLRankingMaker.domain.valueobject.Rank;
 import com.desierto.LoLRankingMaker.domain.valueobject.Rank.Tier;
 import com.desierto.LoLRankingMaker.domain.valueobject.Winrate;
 import com.desierto.LoLRankingMaker.infrastructure.configuration.ConfigLoader;
-import java.math.BigDecimal;
+import com.merakianalytics.orianna.Orianna;
+import com.merakianalytics.orianna.types.common.Region;
+import com.merakianalytics.orianna.types.core.league.LeaguePositions;
+import com.merakianalytics.orianna.types.core.summoner.Summoner;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
-import net.rithms.riot.api.ApiConfig;
-import net.rithms.riot.api.RiotApi;
-import net.rithms.riot.api.RiotApiException;
-import net.rithms.riot.api.endpoints.league.dto.LeaguePosition;
-import net.rithms.riot.api.endpoints.summoner.dto.Summoner;
-import net.rithms.riot.constant.Platform;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -27,32 +27,72 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
 
   private final ConfigLoader configLoader;
 
+  @PostConstruct
+  public void setUp() {
+    Orianna.setRiotAPIKey(configLoader.getApiKey());
+    Orianna.setDefaultRegion(Region.EUROPE_WEST);
+  }
+
   @Override
-  public AccountInformation getAccountInformation(Account account) throws RiotApiException {
-    ApiConfig config = new ApiConfig().setKey(configLoader.getApiKey());
-    RiotApi api = new RiotApi(config);
-    Summoner summoner = api.getSummonerByName(Platform.EUW, account.getName());
+  public List<AccountInformation> getAccountInformation(Account account) {
+    LeaguePositions leaguePositions = Orianna.leaguePositionsForSummoner(
+        Orianna.summonerNamed(account.getName()).get()
+    )
+        .get();
 
-    Set<LeaguePosition> leagues = api
-        .getLeaguePositionsBySummonerId(Platform.EUW, summoner.getId());
-
-    List<AccountInformation> accountInformationList = leagues.stream().map(
-        leaguePosition -> AccountInformation.builder()
-            .leaguePoints(leaguePosition.getLeaguePoints())
-            .winrate(
-                Winrate.builder()
-                    .wins(BigDecimal.valueOf(leaguePosition.getWins()))
-                    .losses(BigDecimal.valueOf(leaguePosition.getLosses()))
-                    .build()
+    return leaguePositions.stream().map(leagueEntry ->
+        AccountInformation.builder()
+            .rank(new RankBuilder()
+                .division(leagueEntry.getDivision().ordinal())
+                .tier(Tier.valueOf(leagueEntry.getTier().name()))
+                .build()
             )
-            .rank(
-                new RankBuilder()
-                    .tier(Tier.valueOf(leaguePosition.getTier()))
-                    .division(Integer.valueOf(leaguePosition.getRank()))
-                    .build()
+            .winrate(Winrate.builder()
+                .wins(leagueEntry.getWins())
+                .losses(leagueEntry.getLosses())
+                .build()
             )
+            .leaguePoints(leagueEntry.getLeaguePoints())
+            .queueType(leagueEntry.getLeague().getQueue().getTag())
             .build()
     ).collect(Collectors.toList());
-    return accountInformationList.stream().findAny().orElseThrow(AccountHasNoLeaguesException::new);
+  }
+
+  @Override
+  public Optional<Account> getAccount(String name) {
+    Summoner summoner = Orianna.summonerNamed(name).get();
+    if (summoner.exists()) {
+      LeaguePositions leaguePositions = Orianna.leaguePositionsForSummoner(
+          Orianna.summonerNamed(name).get()
+      )
+          .get();
+
+      AccountInformation soloQ = leaguePositions.stream()
+          .filter(leagueEntry -> leagueEntry.getQueue().getTag().equalsIgnoreCase(SOLOQ.getValue()))
+          .map(leagueEntry -> AccountInformation.builder()
+              .rank(new RankBuilder()
+                  .division(leagueEntry.getDivision().ordinal() + 1)
+                  .tier(Tier.valueOf(leagueEntry.getTier().name()))
+                  .build()
+              )
+              .winrate(Winrate.builder()
+                  .wins(leagueEntry.getWins())
+                  .losses(leagueEntry.getLosses())
+                  .build()
+              )
+              .leaguePoints(leagueEntry.getLeaguePoints())
+              .queueType(leagueEntry.getLeague().getQueue().getTag())
+              .build()).findAny().orElse(
+              AccountInformation.builder().rank(Rank.unranked()).leaguePoints(0)
+                  .queueType(SOLOQ.getValue())
+                  .winrate(Winrate.unranked()).build()
+          );
+      return Optional.of(Account.builder()
+          .name(leaguePositions.getSummoner().getName())
+          .accountInformation(soloQ)
+          .build());
+    } else {
+      return Optional.empty();
+    }
   }
 }

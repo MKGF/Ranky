@@ -10,8 +10,8 @@ public class WinrateTest {
 
   @Test
   public void givenSomeWinsAndLosses_calculatesPercentage() {
-    Winrate winrate = Winrate.builder().wins(valueOf(130)).losses(
-        valueOf(126)).build();
+    Winrate winrate = Winrate.builder().wins(130).losses(
+        126).build();
 
     assertEquals(valueOf(50.78), winrate.getPercentage());
   }

@@ -12,7 +12,6 @@ public class CreateRankingService {
   private final RankingRepository rankingRepository;
 
   public Ranking execute() {
-    Ranking ranking = new Ranking();
-    return rankingRepository.save(ranking);
+    return rankingRepository.save(new Ranking());
   }
 }

@@ -1,21 +1,27 @@
 package com.desierto.LoLRankingMaker.application.service.dto;
 
 import com.desierto.LoLRankingMaker.domain.valueobject.AccountInformation;
-import com.desierto.LoLRankingMaker.domain.valueobject.Rank;
-import com.desierto.LoLRankingMaker.domain.valueobject.Winrate;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @AllArgsConstructor
 @Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode
 public class AccountInformationDTO {
 
-  Rank rank;
-  Winrate winrate;
+  RankDTO rank;
+  WinrateDTO winrate;
   int leaguePoints;
+  String queueType;
 
   public static AccountInformationDTO fromDomain(AccountInformation accountInformation) {
-    return new AccountInformationDTO(accountInformation.getRank(), accountInformation.getWinrate(),
-        accountInformation.getLeaguePoints());
+    return new AccountInformationDTO(RankDTO.fromDomain(accountInformation.getRank()),
+        WinrateDTO.fromDomain(accountInformation.getWinrate()),
+        accountInformation.getLeaguePoints(), accountInformation.getQueueType());
   }
 }

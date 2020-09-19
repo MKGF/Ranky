@@ -1,16 +1,32 @@
 package com.desierto.LoLRankingMaker.domain.valueobject;
 
+import javax.persistence.Embeddable;
+import javax.persistence.Embedded;
 import javax.validation.constraints.Max;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Value;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Builder
-@Value
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
+@Embeddable
+@ToString
 public class AccountInformation {
 
+  @Embedded
   Rank rank;
+  @Embedded
   Winrate winrate;
   @Max(value = 100)
   int leaguePoints;
+  String queueType;
 
 }

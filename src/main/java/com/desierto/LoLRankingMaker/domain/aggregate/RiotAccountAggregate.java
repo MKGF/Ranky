@@ -3,11 +3,11 @@ package com.desierto.LoLRankingMaker.domain.aggregate;
 import com.desierto.LoLRankingMaker.domain.entity.Account;
 import com.desierto.LoLRankingMaker.domain.repository.RiotAccountRepository;
 import com.desierto.LoLRankingMaker.domain.valueobject.AccountInformation;
+import java.util.List;
 import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import net.rithms.riot.api.RiotApiException;
 
 @AllArgsConstructor
 @Getter
@@ -18,7 +18,7 @@ public class RiotAccountAggregate {
   private RiotAccountRepository riotAccountRepository;
 
   @Valid
-  public AccountInformation getAccountInformation() throws RiotApiException {
+  public List<AccountInformation> getAccountInformation() {
     return riotAccountRepository.getAccountInformation(account);
   }
 }

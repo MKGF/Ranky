@@ -2,8 +2,8 @@ package com.desierto.LoLRankingMaker.infrastructure.controller;
 
 import com.desierto.LoLRankingMaker.application.service.GetAccountInformationService;
 import com.desierto.LoLRankingMaker.application.service.dto.AccountInformationDTO;
+import java.util.List;
 import lombok.AllArgsConstructor;
-import net.rithms.riot.api.RiotApiException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,8 +17,7 @@ public class AccountInformationController {
   private final GetAccountInformationService getAccountInformationService;
 
   @GetMapping("/{accountId}")
-  public AccountInformationDTO getAccountInformation(@PathVariable long accountId)
-      throws RiotApiException {
+  public List<AccountInformationDTO> getAccountInformation(@PathVariable long accountId) {
     return getAccountInformationService.execute(accountId);
   }
 }
