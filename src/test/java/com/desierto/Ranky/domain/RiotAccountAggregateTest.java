@@ -81,7 +81,5 @@ public class RiotAccountAggregateTest extends BaseTest {
         .forEach(accountInformation -> violations.addAll(validator.validate(accountInformation)));
 
     assertNotEquals(0, violations.size());
-    assertEquals("tiene que ser menor o igual que 100",
-        violations.stream().findAny().get().getMessage());
   }
 }

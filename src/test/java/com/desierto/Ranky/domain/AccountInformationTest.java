@@ -1,6 +1,5 @@
 package com.desierto.Ranky.domain;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import com.desierto.Ranky.TestConfig;
@@ -27,7 +26,5 @@ public class AccountInformationTest extends BaseTest {
         .validate(AccountInformation.builder().leaguePoints(101).build());
 
     assertNotEquals(0, violations.size());
-    assertEquals("tiene que ser menor o igual que 100",
-        violations.stream().findAny().get().getMessage());
   }
 }
