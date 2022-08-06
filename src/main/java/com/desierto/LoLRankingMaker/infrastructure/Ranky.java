@@ -13,14 +13,14 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.ConfigurableApplicationContext;
 
 @SpringBootApplication
-public class LoLRankingMakerApplication extends SpringBootServletInitializer {
+public class Ranky extends SpringBootServletInitializer {
 
   public static JDA bot = null;
   public static String prefix = "/";
 
   public static void main(String[] args) {
     ConfigurableApplicationContext context = SpringApplication
-        .run(LoLRankingMakerApplication.class, args);
+        .run(Ranky.class, args);
     try {
       bot = JDABuilder.createDefault(System.getenv("DISCORD_API_KEY"))
           .setActivity(Activity.of(ActivityType.WATCHING, "QUE MIRAS CERDO")).build();
@@ -35,6 +35,6 @@ public class LoLRankingMakerApplication extends SpringBootServletInitializer {
 
   @Override
   protected SpringApplicationBuilder configure(SpringApplicationBuilder applicationBuilder) {
-    return applicationBuilder.sources(LoLRankingMakerApplication.class);
+    return applicationBuilder.sources(Ranky.class);
   }
 }

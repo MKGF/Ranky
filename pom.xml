@@ -10,10 +10,10 @@
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
   <groupId>com.desierto</groupId>
-  <artifactId>LoLRankingMaker</artifactId>
+  <artifactId>Ranky</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>LoLRankingMaker</name>
-  <description>LoLRankingMaker is an application to create custom League of Legend soloQ rankings.
+  <name>Ranky</name>
+  <description>Ranky is a bot to create custom League of Legend soloQ rankings.
   </description>
 
   <properties>
