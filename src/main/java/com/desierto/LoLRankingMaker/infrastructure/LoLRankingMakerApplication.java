@@ -16,7 +16,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class LoLRankingMakerApplication extends SpringBootServletInitializer {
 
   public static JDA bot = null;
-  public static String prefix = "/";
+  public static String prefix = "/a";
 
   public static void main(String[] args) {
     ConfigurableApplicationContext context = SpringApplication
