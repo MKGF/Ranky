@@ -10,5 +10,11 @@ List use cases (application use cases) DONE
   - Establecer una deadline al ranking (XX/XX/XXXX acaba el ranking)
   - Congelar el ranking pasada la deadline
 Implement use cases WIP
-Deploy?
-Design frontend for the application (client side (react???))
+Deploy -> AWS
+Design frontend for the application -> DISCORD BOT
+Bot commands
+ - /create
+ - /setDeadline (default value = 30 days since /create)
+ - /addAccount
+ - /removeAccount
+ - /ranking
