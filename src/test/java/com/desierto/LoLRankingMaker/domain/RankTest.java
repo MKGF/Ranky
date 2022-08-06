@@ -32,4 +32,6 @@ public class RankTest {
 
     assertEquals(master.compareTo(challenger), 1);
   }
+
+  
 }
