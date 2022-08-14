@@ -64,14 +64,14 @@ public class RankyListener extends ListenerAdapter {
 
       }
       if (command.contains(RANKING_COMMAND)) {
-        queryRanking(event, gson, bot, command);
+        queryRanking(event, bot, command);
       }
 
 
     }
   }
 
-  private void createRanking(MessageReceivedEvent event, Gson gson, JDA bot, String command) {
+  protected void createRanking(MessageReceivedEvent event, Gson gson, JDA bot, String command) {
     TextChannel channel = null;
     try {
       channel = getConfigChannel(bot);
@@ -93,7 +93,7 @@ public class RankyListener extends ListenerAdapter {
     }
   }
 
-  private void queryRanking(MessageReceivedEvent event, Gson gson, JDA bot, String command) {
+  protected void queryRanking(MessageReceivedEvent event, JDA bot, String command) {
     String rankingName = getRankingName(command);
     TextChannel configChannel = getConfigChannel(bot);
     if (rankingExists(configChannel, rankingName)) {
@@ -115,9 +115,9 @@ public class RankyListener extends ListenerAdapter {
     }
   }
 
-  private void addAccount(MessageReceivedEvent event, Gson gson, JDA bot, String command) {
+  protected void addAccount(MessageReceivedEvent event, Gson gson, JDA bot, String command) {
     String rankingName = getRankingName(command);
-    String accountToAdd = getAccountToAdd(command);
+    String accountToAdd = getAccountToAdd(command, rankingName);
     TextChannel configChannel = getConfigChannel(bot);
     if (rankingExists(configChannel, rankingName)) {
       RankingConfigurationWithMessageId ranking = getRankingWithMessageId(configChannel,
@@ -127,11 +127,11 @@ public class RankyListener extends ListenerAdapter {
       configChannel
           .editMessageById(ranking.getMessageId(), gson.toJson(ranking.getRankingConfiguration()))
           .queue();
-      event.getChannel().sendMessage("Account successfully added to the ranking").queue();
+      event.getChannel().sendMessage("Account successfully added to the ranking.").queue();
     }
   }
 
-  private void addAccounts(MessageReceivedEvent event, Gson gson, JDA bot, String command) {
+  protected void addAccounts(MessageReceivedEvent event, Gson gson, JDA bot, String command) {
     String rankingName = getRankingName(command);
     List<String> accountsToAdd = getAccountsToAdd(command, rankingName);
     TextChannel configChannel = getConfigChannel(bot);
@@ -143,17 +143,17 @@ public class RankyListener extends ListenerAdapter {
       configChannel
           .editMessageById(ranking.getMessageId(), gson.toJson(ranking.getRankingConfiguration()))
           .queue();
-      event.getChannel().sendMessage("Account successfully added to the ranking").queue();
+      event.getChannel().sendMessage("Accounts successfully added to the ranking.").queue();
     }
   }
 
-  private void rethrowExceptionAfterNoticingTheServer(MessageReceivedEvent event,
+  protected void rethrowExceptionAfterNoticingTheServer(MessageReceivedEvent event,
       RuntimeException e) throws ConfigChannelNotFoundException, RankingAlreadyExistsException {
     event.getChannel().sendMessage(e.getMessage()).queue();
     throw e;
   }
 
-  private boolean rankingExists(TextChannel channel, String rankingName) {
+  protected boolean rankingExists(TextChannel channel, String rankingName) {
     return channel.getHistory().retrievePast(RANKING_LIMIT).complete().stream()
         .anyMatch(message -> {
           Optional<RankingConfiguration> optionalRanking = RankingConfiguration
@@ -166,7 +166,7 @@ public class RankyListener extends ListenerAdapter {
         });
   }
 
-  private RankingConfiguration getRanking(TextChannel channel, String rankingName) {
+  protected RankingConfiguration getRanking(TextChannel channel, String rankingName) {
     return RankingConfiguration
         .fromMessage(channel.getHistory().retrievePast(RANKING_LIMIT).complete().stream()
             .filter(message -> {
@@ -182,7 +182,7 @@ public class RankyListener extends ListenerAdapter {
                 RankingNotFoundException::new));
   }
 
-  private RankingConfigurationWithMessageId getRankingWithMessageId(TextChannel channel,
+  protected RankingConfigurationWithMessageId getRankingWithMessageId(TextChannel channel,
       String rankingName) {
     return RankingConfigurationWithMessageId
         .fromMessage(channel.getHistory().retrievePast(RANKING_LIMIT).complete().stream()
@@ -199,25 +199,24 @@ public class RankyListener extends ListenerAdapter {
                 RankingNotFoundException::new));
   }
 
-  private String getRankingName(String command) {
+  protected String getRankingName(String command) {
     String[] words = command.split("\"");
     return words[1];
   }
 
-  private String getAccountToAdd(String command) {
-    String[] words = command.split("\"");
-    List<String> accountName = Arrays.asList(words).subList(2, words.length);
-    return String.join(" ", accountName);
+  protected String getAccountToAdd(String command, String rankingName) {
+    return command
+        .substring(command.indexOf(rankingName) + rankingName.length() + 2);
   }
 
-  private List<String> getAccountsToAdd(String command, String rankingName) {
+  protected List<String> getAccountsToAdd(String command, String rankingName) {
     String concatedAccounts = command
         .substring(command.indexOf(rankingName) + rankingName.length() + 2);
     String[] accounts = concatedAccounts.split(",");
     return Arrays.asList(accounts);
   }
 
-  private TextChannel getConfigChannel(JDA bot) {
+  protected TextChannel getConfigChannel(JDA bot) {
     return bot.getTextChannelsByName(PRIVATE_CONFIG_CHANNEL, true).stream()
         .findFirst().orElseThrow(
             ConfigChannelNotFoundException::new);

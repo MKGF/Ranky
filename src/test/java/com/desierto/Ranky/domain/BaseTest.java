@@ -1,11 +1,11 @@
 package com.desierto.Ranky.domain;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.springframework.test.context.ActiveProfiles;
 
+@ActiveProfiles(profiles = "test")
 public class BaseTest {
 
-  @BeforeAll
-  static void setUp() {
+  static {
     System.setProperty("api.key", "none");
     System.setProperty("riot.base.url", "none");
   }
