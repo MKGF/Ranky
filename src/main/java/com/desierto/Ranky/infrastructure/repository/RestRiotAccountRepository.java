@@ -68,7 +68,8 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
           .get();
 
       AccountInformation soloQ = leaguePositions.stream()
-          .filter(leagueEntry -> leagueEntry.getQueue().getTag().equalsIgnoreCase(SOLOQ.getValue()))
+          .filter(leagueEntry -> leagueEntry.getQueue() != null && leagueEntry.getQueue().getTag()
+              .equalsIgnoreCase(SOLOQ.getValue()))
           .map(leagueEntry -> AccountInformation.builder()
               .rank(new RankBuilder()
                   .division(leagueEntry.getDivision().ordinal() + 1)
@@ -95,4 +96,5 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
       return Optional.empty();
     }
   }
+
 }

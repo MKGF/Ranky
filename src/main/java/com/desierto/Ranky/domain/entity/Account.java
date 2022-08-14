@@ -31,6 +31,19 @@ public class Account implements Comparable<Account> {
 
   @Override
   public int compareTo(Account account) {
-    return this.accountInformation.getRank().compareTo(account.accountInformation.getRank());
+    if (this.accountInformation.getRank().compareTo(account.accountInformation.getRank()) != 0) {
+      return this.accountInformation.getRank().compareTo(account.accountInformation.getRank());
+    }
+
+    return Integer.compare(this.accountInformation.getLeaguePoints(),
+        account.accountInformation.getLeaguePoints()) * -1;
+  }
+
+  public String getFormattedForRanking() {
+    return name + " | " + accountInformation.getRank().toString() + " | " + accountInformation
+        .getLeaguePoints()
+        + "LP | " + accountInformation.getWinrate().getWins() + "W/" + accountInformation
+        .getWinrate()
+        .getLosses() + "L | " + accountInformation.getWinrate().getPercentage().toString();
   }
 }

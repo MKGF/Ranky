@@ -10,4 +10,5 @@ public interface RiotAccountRepository {
   List<AccountInformation> getAccountInformation(Account account);
 
   Optional<Account> getAccount(String name);
+
 }

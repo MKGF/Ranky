@@ -1,7 +1,8 @@
 package com.desierto.Ranky.infrastructure;
 
-import com.desierto.Ranky.application.service.dto.CommandDTO;
+import com.desierto.Ranky.application.service.RankyListener;
 import com.desierto.Ranky.domain.exception.BotCredentialsMissingException;
+import com.desierto.Ranky.domain.repository.RiotAccountRepository;
 import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -27,7 +28,7 @@ public class Ranky extends SpringBootServletInitializer {
     try {
       bot = JDABuilder.createDefault(args[1])
           .setActivity(Activity.of(ActivityType.WATCHING, "QUE MIRAS CERDO")).build();
-      bot.addEventListener(new CommandDTO());
+      bot.addEventListener(new RankyListener(context.getBean(RiotAccountRepository.class)));
     } catch (LoginException e) {
       throw new BotCredentialsMissingException(e.getMessage());
     } finally {

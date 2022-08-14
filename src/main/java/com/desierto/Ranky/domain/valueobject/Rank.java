@@ -67,4 +67,9 @@ public class Rank implements Comparable<Rank> {
   public static Rank unranked() {
     return new Rank(UNRANKED, 0);
   }
+
+  @Override
+  public String toString() {
+    return tier.toString() + " " + division;
+  }
 }

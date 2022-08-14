@@ -48,4 +48,33 @@ public class RankingTest {
     assertArrayEquals(sortedAccounts.toArray(new Account[0]),
         ranking.getAccounts().toArray(new Account[0]));
   }
+
+  @Test
+  public void ranking_with_gold1_0lp_and_gold1_20lp_is_sorted_by_rank() {
+    RankBuilder rankBuilder = new RankBuilder();
+    Rank gold1 = rankBuilder.tier(Tier.GOLD).division(1).build();
+    Account gold10lpAccount = Account.builder().id(1).name("MAIKY").accountInformation(
+        AccountInformation.builder().rank(gold1).leaguePoints(0).build())
+        .build();
+    Account gold120lpAccount = Account.builder().id(2).name("naza30sec").accountInformation(
+        AccountInformation.builder().rank(gold1).leaguePoints(20).build())
+        .build();
+    Ranking ranking = new Ranking();
+    ranking.addAccount(gold10lpAccount);
+    ranking.addAccount(gold120lpAccount);
+    ArrayList<Account> notSortedAccounts = new ArrayList<>();
+    notSortedAccounts.add(gold10lpAccount);
+    notSortedAccounts.add(gold120lpAccount);
+    ArrayList<Account> sortedAccounts = new ArrayList<>();
+    sortedAccounts.add(gold120lpAccount);
+    sortedAccounts.add(gold10lpAccount);
+    gold10lpAccount.compareTo(gold120lpAccount);
+
+    assertArrayEquals(notSortedAccounts.toArray(new Account[0]),
+        ranking.getAccounts().toArray(new Account[0]));
+    ranking.sortByRank();
+    assertArrayEquals(sortedAccounts.toArray(new Account[0]),
+        ranking.getAccounts().toArray(new Account[0]));
+  }
+
 }
