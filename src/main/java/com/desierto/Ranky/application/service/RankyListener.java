@@ -22,7 +22,10 @@ import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +41,7 @@ public class RankyListener extends ListenerAdapter {
   public static final String RANKING_COMMAND = "/ranking";
   public static final String HELP_COMMAND = "/helpRanky";
   public static final String PRIVATE_CONFIG_CHANNEL = "config-channel";
+  public static final String RANKY_USER_ROLE = "ranky";
   public static final int RANKING_LIMIT = 100;
 
   @Autowired
@@ -48,21 +52,32 @@ public class RankyListener extends ListenerAdapter {
   public void onMessageReceived(MessageReceivedEvent event) {
     Gson gson = new Gson();
     JDA bot = event.getJDA();
+    Guild guild = event.getGuild();
+    User user = event.getAuthor();
+    Member member = guild.getMember(user);
+
     if (event.getMessage().getContentRaw().startsWith(Ranky.prefix)) {
       String command = event.getMessage().getContentRaw();
       if (command.contains(HELP_COMMAND)) {
         help(event);
-      } else if (command.contains(CREATE_COMMAND)) {
+      } else if (command.contains(CREATE_COMMAND) && member != null && member
+          .getRoles().stream().anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
         createRanking(event, gson, bot, command);
       } else
 //      if (command.contains(DEADLINE_COMMAND)) {
 //        setDeadline(event, gson, bot, command);
 //      }
-        if (command.contains(ADD_ACCOUNT_COMMAND)) {
+        if (command.contains(ADD_ACCOUNT_COMMAND) && member != null && member
+            .getRoles().stream()
+            .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
           addAccount(event, gson, bot, command);
-        } else if (command.contains(ADD_MULTIPLE_COMMAND)) {
+        } else if (command.contains(ADD_MULTIPLE_COMMAND) && member != null && member
+            .getRoles().stream()
+            .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
           addAccounts(event, gson, bot, command);
-        } else if (command.contains(REMOVE_ACCOUNT_COMMAND)) {
+        } else if (command.contains(REMOVE_ACCOUNT_COMMAND) && member != null && member
+            .getRoles().stream()
+            .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
           removeAccount(event, gson, bot, command);
         } else if (command.contains(RANKING_COMMAND)) {
           queryRanking(event, bot, command);
