@@ -20,13 +20,15 @@ public class Ranky extends SpringBootServletInitializer {
   public static JDA bot = null;
   public static String prefix = "/";
   public static final String RIOT_API_KEY = "api.key";
+  public static final String RIOT_BASE_URL = "riot.base.url";
 
   public static void main(String[] args) {
-    System.setProperty(RIOT_API_KEY, args[0]);
+    System.setProperty(RIOT_API_KEY, System.getenv("RIOT_API_KEY"));
+    System.setProperty(RIOT_BASE_URL, "https://euw1.api.riotgames.com");
     ConfigurableApplicationContext context = SpringApplication
         .run(Ranky.class, args);
     try {
-      bot = JDABuilder.createDefault(args[1])
+      bot = JDABuilder.createDefault(System.getenv("DISCORD_API_KEY"))
           .setActivity(Activity.of(ActivityType.WATCHING, "QUE MIRAS CERDO")).build();
       bot.addEventListener(new RankyListener(context.getBean(RiotAccountRepository.class)));
     } catch (LoginException e) {
