@@ -3,6 +3,7 @@ package com.desierto.Ranky.infrastructure;
 import com.desierto.Ranky.application.service.RankyListener;
 import com.desierto.Ranky.domain.exception.BotCredentialsMissingException;
 import com.desierto.Ranky.domain.repository.RiotAccountRepository;
+import java.util.logging.Logger;
 import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -21,8 +22,13 @@ public class Ranky extends SpringBootServletInitializer {
   public static String prefix = "/";
   public static final String RIOT_API_KEY = "api.key";
   public static final String RIOT_BASE_URL = "riot.base.url";
+  public static final Logger log = Logger.getLogger("Ranky.class");
 
   public static void main(String[] args) {
+    log.info("----------------------------");
+    log.info(System.getenv("RIOT_API_KEY"));
+    log.info(System.getenv("DISCORD_API_KEY"));
+    log.info("----------------------------");
     System.setProperty(RIOT_API_KEY, System.getenv("RIOT_API_KEY"));
     System.setProperty(RIOT_BASE_URL, "https://euw1.api.riotgames.com");
     ConfigurableApplicationContext context = SpringApplication
