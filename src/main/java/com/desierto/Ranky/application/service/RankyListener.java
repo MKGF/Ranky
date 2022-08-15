@@ -215,7 +215,7 @@ public class RankyListener extends ListenerAdapter {
       configChannel
           .editMessageById(ranking.getMessageId(), gson.toJson(ranking.getRankingConfiguration()))
           .queue();
-      event.getChannel().sendMessage("Account successfully added to the ranking.").queue();
+      event.getChannel().sendMessage("Account successfully removed from the ranking.").queue();
     }
   }
 
