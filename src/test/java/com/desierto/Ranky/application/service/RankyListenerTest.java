@@ -5,6 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.desierto.Ranky.TestConfig;
 import com.desierto.Ranky.domain.BaseTest;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
@@ -36,15 +39,19 @@ public class RankyListenerTest extends BaseTest {
   }
 
   @Test
-  public void getAccountToAddTest() {
+  public void getParameterTest() {
     String firstTest = "/command \"RANKING NAME\" account name";
     String secondTest = "/anotherCommand \"ANOTHER RANKING NAME\" THIS IS A LONG NAMED ACCOUNT";
     String thirdTest = "I actually do not care about commands since \"as long as the syntax is respected\" my account will always be present in the ranking";
-    assertEquals("account name", ranky.getAccountToAdd(firstTest, "RANKING NAME"));
+    String fourthTest = "/command \"RANKING NAME\" 15-08-2022";
+    DateTimeFormatter df = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    assertEquals("account name", ranky.getParameter(firstTest, "RANKING NAME"));
     assertEquals("THIS IS A LONG NAMED ACCOUNT",
-        ranky.getAccountToAdd(secondTest, "ANOTHER RANKING NAME"));
+        ranky.getParameter(secondTest, "ANOTHER RANKING NAME"));
     assertEquals("my account will always be present in the ranking",
-        ranky.getAccountToAdd(thirdTest, "as long as the syntax is respected"));
+        ranky.getParameter(thirdTest, "as long as the syntax is respected"));
+    assertEquals(LocalDateTime.of(2022, 8, 15, 0, 0),
+        LocalDate.parse(ranky.getParameter(fourthTest, "RANKING NAME"), df).atStartOfDay());
   }
 
   @Test

@@ -1,6 +1,7 @@
 package com.desierto.Ranky.domain.valueobject;
 
 import com.google.gson.Gson;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -18,9 +19,12 @@ public class RankingConfiguration {
 
   List<String> accounts;
 
+  LocalDateTime deadline;
+
   public RankingConfiguration(String name) {
     this.name = name;
     this.accounts = new ArrayList<>();
+    this.deadline = null;
   }
 
   public static RankingConfiguration fromMessage(Message message) {
@@ -43,5 +47,13 @@ public class RankingConfiguration {
 
   public void addAccounts(List<String> accounts) {
     this.accounts.addAll(accounts);
+  }
+
+  public void removeAccount(String account) {
+    accounts.remove(account);
+  }
+
+  public void setDeadline(LocalDateTime deadline) {
+    this.deadline = deadline;
   }
 }

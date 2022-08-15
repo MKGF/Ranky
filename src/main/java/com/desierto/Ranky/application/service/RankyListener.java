@@ -10,6 +10,10 @@ import com.desierto.Ranky.domain.repository.RiotAccountRepository;
 import com.desierto.Ranky.domain.valueobject.RankingConfiguration;
 import com.desierto.Ranky.infrastructure.Ranky;
 import com.google.gson.Gson;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +36,8 @@ public class RankyListener extends ListenerAdapter {
   public static final String ADD_MULTIPLE_COMMAND = "/addMultiple";
   public static final String REMOVE_ACCOUNT_COMMAND = "/removeAccount";
   public static final String RANKING_COMMAND = "/ranking";
-  public static final String PRIVATE_CONFIG_CHANNEL = "desarrollo-ranky";
+  public static final String HELP_COMMAND = "/helpRanky";
+  public static final String PRIVATE_CONFIG_CHANNEL = "config-channel";
   public static final int RANKING_LIMIT = 100;
 
   @Autowired
@@ -45,30 +50,48 @@ public class RankyListener extends ListenerAdapter {
     JDA bot = event.getJDA();
     if (event.getMessage().getContentRaw().startsWith(Ranky.prefix)) {
       String command = event.getMessage().getContentRaw();
-      if (command.contains(CREATE_COMMAND)) {
+      if (command.contains(HELP_COMMAND)) {
+        help(event);
+      } else if (command.contains(CREATE_COMMAND)) {
         createRanking(event, gson, bot, command);
-      }
-
-      if (command.contains(DEADLINE_COMMAND)) {
-
-      }
-      if (command.contains(ADD_ACCOUNT_COMMAND)) {
-        addAccount(event, gson, bot, command);
-      }
-
-      if (command.contains(ADD_MULTIPLE_COMMAND)) {
-        addAccounts(event, gson, bot, command);
-      }
-
-      if (command.contains(REMOVE_ACCOUNT_COMMAND)) {
-
-      }
-      if (command.contains(RANKING_COMMAND)) {
-        queryRanking(event, bot, command);
-      }
-
-
+      } else
+//      if (command.contains(DEADLINE_COMMAND)) {
+//        setDeadline(event, gson, bot, command);
+//      }
+        if (command.contains(ADD_ACCOUNT_COMMAND)) {
+          addAccount(event, gson, bot, command);
+        } else if (command.contains(ADD_MULTIPLE_COMMAND)) {
+          addAccounts(event, gson, bot, command);
+        } else if (command.contains(REMOVE_ACCOUNT_COMMAND)) {
+          removeAccount(event, gson, bot, command);
+        } else if (command.contains(RANKING_COMMAND)) {
+          queryRanking(event, bot, command);
+        }
     }
+  }
+
+  protected void help(MessageReceivedEvent event) {
+    String helpMessage =
+        "This is Ranky. This Discord bot will use one of your channels as storage for different soloQ rankings made in the server.\n\n"
+            +
+            "This channel is referred to as #config-channel and only uses the last 100 messages as storage. So please do not spam in it. If something escapes the threshold it won't be able to retrieve it anymore.\n\n"
+            +
+            "- /create \"RANKINGNAME\" creates a ranking with that name.\n"
+            +
+            "- /addAccount \"RANKINGNAME\" ACCOUNT adds the account to the ranking if it exists. Supports spaces in the name.\n"
+            +
+            "- /addMultiple \"RANKINGNAME\" ACCOUNT1,ACCOUNT2... adds all the accounts to the ranking if they exist.\n"
+            +
+            "- /removeAccount \"RANKINGNAME\" ACCOUNT removes the account from the ranking if it exists.\n"
+            +
+            "- /ranking \"RANKINGNAME\" gives the soloQ information of the accounts in the ranking ordered by rank.";
+    EmbedBuilder embed = new EmbedBuilder();
+    embed.setTitle("RANKY HELP");
+    embed.setDescription(helpMessage);
+    embed.addField("Creator", "Maiky", false);
+    embed.setColor(0x000000);
+    event.getChannel().sendMessageEmbeds(embed.build()).queue();
+    embed.clear();
   }
 
   protected void createRanking(MessageReceivedEvent event, Gson gson, JDA bot, String command) {
@@ -109,21 +132,41 @@ public class RankyListener extends ListenerAdapter {
       ranking.setDescription(accountsToText);
       ranking.addField("Creator", "Maiky", false);
       ranking.setColor(0x000000);
-      event.getChannel().sendTyping().queue();
       event.getChannel().sendMessageEmbeds(ranking.build()).queue();
       ranking.clear();
     }
   }
 
+  protected void setDeadline(MessageReceivedEvent event, Gson gson, JDA bot, String command) {
+    String rankingName = getRankingName(command);
+    String deadlineString = getParameter(command, rankingName);
+    TextChannel configChannel = getConfigChannel(bot);
+    if (rankingExists(configChannel, rankingName)) {
+      RankingConfigurationWithMessageId ranking = getRankingWithMessageId(configChannel,
+          rankingName);
+      try {
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        LocalDate deadlineLocalDate = LocalDate.parse(deadlineString, df);
+        LocalDateTime deadline = deadlineLocalDate.atTime(23, 59, 59);
+        ranking.setDeadline(deadline);
+        configChannel
+            .editMessageById(ranking.getMessageId(), gson.toJson(ranking.getRankingConfiguration()))
+            .queue();
+        event.getChannel().sendMessage("Account successfully added to the ranking.").queue();
+      } catch (DateTimeParseException e) {
+        rethrowExceptionAfterNoticingTheServer(event, e);
+      }
+    }
+  }
+
   protected void addAccount(MessageReceivedEvent event, Gson gson, JDA bot, String command) {
     String rankingName = getRankingName(command);
-    String accountToAdd = getAccountToAdd(command, rankingName);
+    String accountToAdd = getParameter(command, rankingName);
     TextChannel configChannel = getConfigChannel(bot);
     if (rankingExists(configChannel, rankingName)) {
       RankingConfigurationWithMessageId ranking = getRankingWithMessageId(configChannel,
           rankingName);
       ranking.addAccount(accountToAdd);
-      event.getChannel().sendTyping().queue();
       configChannel
           .editMessageById(ranking.getMessageId(), gson.toJson(ranking.getRankingConfiguration()))
           .queue();
@@ -139,11 +182,25 @@ public class RankyListener extends ListenerAdapter {
       RankingConfigurationWithMessageId ranking = getRankingWithMessageId(configChannel,
           rankingName);
       ranking.addAccounts(accountsToAdd);
-      event.getChannel().sendTyping().queue();
       configChannel
           .editMessageById(ranking.getMessageId(), gson.toJson(ranking.getRankingConfiguration()))
           .queue();
       event.getChannel().sendMessage("Accounts successfully added to the ranking.").queue();
+    }
+  }
+
+  protected void removeAccount(MessageReceivedEvent event, Gson gson, JDA bot, String command) {
+    String rankingName = getRankingName(command);
+    String accountToRemove = getParameter(command, rankingName);
+    TextChannel configChannel = getConfigChannel(bot);
+    if (rankingExists(configChannel, rankingName)) {
+      RankingConfigurationWithMessageId ranking = getRankingWithMessageId(configChannel,
+          rankingName);
+      ranking.removeAccount(accountToRemove);
+      configChannel
+          .editMessageById(ranking.getMessageId(), gson.toJson(ranking.getRankingConfiguration()))
+          .queue();
+      event.getChannel().sendMessage("Account successfully added to the ranking.").queue();
     }
   }
 
@@ -204,7 +261,7 @@ public class RankyListener extends ListenerAdapter {
     return words[1];
   }
 
-  protected String getAccountToAdd(String command, String rankingName) {
+  protected String getParameter(String command, String rankingName) {
     return command
         .substring(command.indexOf(rankingName) + rankingName.length() + 2);
   }
