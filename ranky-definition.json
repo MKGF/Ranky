@@ -28,11 +28,11 @@
       "environment": [
         {
           "name": "RIOT_API_KEY",
-          "value": "arn:aws:secretsmanager:eu-west-2:541391805792:secret:apiKeys-lwryUh"
+          "valueFrom": "arn:aws:secretsmanager:eu-west-2:541391805792:secret:apiKeys-lwryUh"
         },
         {
           "name": "DISCORD_API_KEY",
-          "value": "arn:aws:secretsmanager:eu-west-2:541391805792:secret:apiKeys-lwryUh"
+          "valueFrom": "arn:aws:secretsmanager:eu-west-2:541391805792:secret:apiKeys-lwryUh"
         }
       ],
       "resourceRequirements": null,
