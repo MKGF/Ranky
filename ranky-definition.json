@@ -25,7 +25,16 @@
       "command": [],
       "linuxParameters": null,
       "cpu": 1024,
-      "environment": [],
+      "environment": [
+        {
+          "name": "RIOT_API_KEY",
+          "valueFrom": "arn:aws:secretsmanager:eu-west-2:541391805792:secret:apiKeys-lwryUh:secret:apiKeys"
+        },
+        {
+          "name": "DISCORD_API_KEY",
+          "valueFrom": "arn:aws:secretsmanager:eu-west-2:541391805792:secret:apiKeys-lwryUh:secret:apiKeys"
+        }
+      ],
       "resourceRequirements": null,
       "ulimits": null,
       "dnsServers": null,
