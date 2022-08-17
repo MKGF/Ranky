@@ -33,6 +33,7 @@ public class Ranky extends SpringBootServletInitializer {
       bot = JDABuilder.createDefault(System.getenv("DISCORD_API_KEY"))
           .setActivity(Activity.of(ActivityType.WATCHING, "YA FUNCIONO SOLO")).build();
       bot.addEventListener(new RankyListener(context.getBean(RiotAccountRepository.class)));
+      
     } catch (LoginException e) {
       throw new BotCredentialsMissingException(e.getMessage());
     } finally {

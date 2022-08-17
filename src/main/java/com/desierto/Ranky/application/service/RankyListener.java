@@ -22,10 +22,12 @@ import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.BaseGuildMessageChannel;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +43,7 @@ public class RankyListener extends ListenerAdapter {
   public static final String RANKING_COMMAND = "/ranking";
   public static final String HELP_COMMAND = "/helpRanky";
   public static final String PRIVATE_CONFIG_CHANNEL = "config-channel";
-  public static final String RANKY_USER_ROLE = "ranky";
+  public static final String RANKY_USER_ROLE = "Ranky";
   public static final int RANKING_LIMIT = 100;
 
   @Autowired
@@ -85,9 +87,76 @@ public class RankyListener extends ListenerAdapter {
     }
   }
 
+  @Override
+  public void onGuildJoin(GuildJoinEvent event) {
+    event.getGuild().createTextChannel(PRIVATE_CONFIG_CHANNEL).clearPermissionOverrides().queue();
+    event.getGuild().createRole().setName(RANKY_USER_ROLE).queue();
+    String welcomeMessage =
+        "Hello to you that invited me, people of " + event.getGuild().getName() + "!. \n"
+            +
+            "I'm Ranky and I'm here to help you creating your own customized soloQ rankings. \n"
+            +
+            "I will explain my functioning right now, but you can get this information anytime again as long as you type in the /helpRanky command.\n"
+            +
+            "This Discord bot will use one of your channels as storage for different soloQ rankings made in the server.\n\n"
+            +
+            "The complete use of my commands is only given to the users with a role named 'Ranky' (which I already created myself) in them. Otherwise, just '/helpRanky' and '/ranking' are open to the users.\n"
+            +
+            "This channel is referred to as #config-channel (I already created it as well) and only uses the last 100 messages as storage. So please do not spam in it. If something escapes the threshold it won't be able to retrieve it anymore.\n\n"
+            +
+            "- /create \"RANKINGNAME\" creates a ranking with that name.\n"
+            +
+            "- /addAccount \"RANKINGNAME\" ACCOUNT adds the account to the ranking if it exists. Supports spaces in the name.\n"
+            +
+            "- /addMultiple \"RANKINGNAME\" ACCOUNT1,ACCOUNT2... adds all the accounts to the ranking if they exist.\n"
+            +
+            "- /removeAccount \"RANKINGNAME\" ACCOUNT removes the account from the ranking if it exists.\n"
+            +
+            "- /ranking \"RANKINGNAME\" gives the soloQ information of the accounts in the ranking ordered by rank.";
+
+    BaseGuildMessageChannel textChannel = event.getGuild().getDefaultChannel();
+    if (textChannel == null) {
+      if (event.getGuild().getSystemChannel() != null) {
+        event.getGuild().getSystemChannel().sendMessage(welcomeMessage).queue();
+      } else {
+        event.getGuild().getTextChannels().get(0).sendMessage(welcomeMessage).queue();
+      }
+    } else {
+      textChannel.sendMessage(welcomeMessage).queue();
+    }
+    if (event.getGuild().getOwner() != null) {
+      String ownerMessage = "Hello " + event.getGuild().getOwner().getUser().getName() + "!. \n"
+          +
+          "I'm Ranky and I was just invited to the server named " + event.getGuild().getName()
+          + " where you are the owner. \n"
+          +
+          "First of all, I just created the necessary #config-channel for me to store all the information of the rankings and the role 'Ranky' so users can be assigned the role and interact with me.\n"
+          +
+          "I (hopefully) left a message in your server explaining how I can be used. But anyway I will leave the instructions here as well. You can get this information anytime again as long as you type in the /helpRanky command.\n"
+          +
+          "This Discord bot will use one of your channels as storage for different soloQ rankings made in the server.\n\n"
+          +
+          "The complete use of my commands is only given to the users with a role named 'Ranky' in them. Otherwise, just '/helpRanky' and '/ranking' are open to the users.\n"
+          +
+          "This channel is referred to as #config-channel and only uses the last 100 messages as storage. So please do not spam in it. If something escapes the threshold it won't be able to retrieve it anymore.\n\n"
+          +
+          "- /create \"RANKINGNAME\" creates a ranking with that name.\n"
+          +
+          "- /addAccount \"RANKINGNAME\" ACCOUNT adds the account to the ranking if it exists. Supports spaces in the name.\n"
+          +
+          "- /addMultiple \"RANKINGNAME\" ACCOUNT1,ACCOUNT2... adds all the accounts to the ranking if they exist.\n"
+          +
+          "- /removeAccount \"RANKINGNAME\" ACCOUNT removes the account from the ranking if it exists.\n"
+          +
+          "- /ranking \"RANKINGNAME\" gives the soloQ information of the accounts in the ranking ordered by rank.";
+      event.getGuild().getOwner().getUser().openPrivateChannel().complete()
+          .sendMessage(ownerMessage).queue();
+    }
+  }
+
   protected void help(MessageReceivedEvent event) {
     String helpMessage =
-        "This is Ranky. This Discord bot will use one of your channels as storage for different soloQ rankings made in the server.\n\n"
+        "This Discord bot will use one of your channels as storage for different soloQ rankings made in the server.\n\n"
             +
             "This channel is referred to as #config-channel and only uses the last 100 messages as storage. So please do not spam in it. If something escapes the threshold it won't be able to retrieve it anymore.\n\n"
             +
