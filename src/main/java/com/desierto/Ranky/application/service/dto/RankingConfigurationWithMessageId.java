@@ -2,7 +2,6 @@ package com.desierto.Ranky.application.service.dto;
 
 import com.desierto.Ranky.domain.valueobject.RankingConfiguration;
 import com.google.gson.Gson;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,7 +36,7 @@ public class RankingConfigurationWithMessageId {
     rankingConfiguration.removeAccount(account);
   }
 
-  public void setDeadline(LocalDateTime deadline) {
-    rankingConfiguration.setDeadline(deadline);
-  }
+//  public void setDeadline(LocalDateTime deadline) {
+//    rankingConfiguration.setDeadline(deadline);
+//  }
 }

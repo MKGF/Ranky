@@ -16,7 +16,7 @@ import lombok.ToString;
 @ToString
 public class AccountDTO {
 
-  int id;
+  String id;
   String name;
   AccountInformationDTO accountInformation;
 

@@ -65,7 +65,7 @@ public class RestRiotAccountRepositoryIT extends BaseIT {
           .build();
 
       assertEquals(expectedAccount,
-          restRiotAccountRepository.getAccount(name).get());
+          restRiotAccountRepository.getAccountByName(name).get());
     }
   }
 }

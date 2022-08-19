@@ -59,11 +59,11 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
   }
 
   @Override
-  public Optional<Account> getAccount(String name) {
+  public Optional<Account> getAccountByName(String name) {
     Summoner summoner = Orianna.summonerNamed(name).get();
     if (summoner.exists()) {
       LeaguePositions leaguePositions = Orianna.leaguePositionsForSummoner(
-          Orianna.summonerNamed(name).get()
+          summoner
       )
           .get();
 
@@ -89,6 +89,7 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
                   .winrate(Winrate.unranked()).build()
           );
       return Optional.of(Account.builder()
+          .id(summoner.getAccountId())
           .name(leaguePositions.getSummoner().getName())
           .accountInformation(soloQ)
           .build());
@@ -96,5 +97,46 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
       return Optional.empty();
     }
   }
+
+  @Override
+  public Optional<Account> getAccountById(String id) {
+    Summoner summoner = Orianna.summonerWithId(id).get();
+    if (summoner.exists()) {
+      LeaguePositions leaguePositions = Orianna.leaguePositionsForSummoner(
+          summoner
+      )
+          .get();
+
+      AccountInformation soloQ = leaguePositions.stream()
+          .filter(leagueEntry -> leagueEntry.getQueue() != null && leagueEntry.getQueue().getTag()
+              .equalsIgnoreCase(SOLOQ.getValue()))
+          .map(leagueEntry -> AccountInformation.builder()
+              .rank(new RankBuilder()
+                  .division(leagueEntry.getDivision().ordinal() + 1)
+                  .tier(Tier.valueOf(leagueEntry.getTier().name()))
+                  .build()
+              )
+              .winrate(Winrate.builder()
+                  .wins(leagueEntry.getWins())
+                  .losses(leagueEntry.getLosses())
+                  .build()
+              )
+              .leaguePoints(leagueEntry.getLeaguePoints())
+              .queueType(leagueEntry.getLeague().getQueue().getTag())
+              .build()).findAny().orElse(
+              AccountInformation.builder().rank(Rank.unranked()).leaguePoints(0)
+                  .queueType(SOLOQ.getValue())
+                  .winrate(Winrate.unranked()).build()
+          );
+      return Optional.of(Account.builder()
+          .id(summoner.getAccountId())
+          .name(leaguePositions.getSummoner().getName())
+          .accountInformation(soloQ)
+          .build());
+    } else {
+      return Optional.empty();
+    }
+  }
+
 
 }

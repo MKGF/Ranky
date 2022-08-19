@@ -19,13 +19,13 @@ public class RankingTest {
     Rank gold1 = rankBuilder.tier(Tier.GOLD).division(1).build();
     Rank silver3 = rankBuilder.tier(Tier.SILVER).division(3).build();
     Rank silver4 = rankBuilder.tier(Tier.SILVER).division(4).build();
-    Account gold1Account = Account.builder().id(1).name("MAIKY").accountInformation(
+    Account gold1Account = Account.builder().id("1").name("MAIKY").accountInformation(
         AccountInformation.builder().rank(gold1).build())
         .build();
-    Account silver3Account = Account.builder().id(2).name("naza30sec").accountInformation(
+    Account silver3Account = Account.builder().id("2").name("naza30sec").accountInformation(
         AccountInformation.builder().rank(silver3).build())
         .build();
-    Account silver4Account = Account.builder().id(3).name("AficionadoAlFallGuys")
+    Account silver4Account = Account.builder().id("3").name("AficionadoAlFallGuys")
         .accountInformation(
             AccountInformation.builder().rank(silver4).build())
         .build();
@@ -53,10 +53,10 @@ public class RankingTest {
   public void ranking_with_gold1_0lp_and_gold1_20lp_is_sorted_by_rank() {
     RankBuilder rankBuilder = new RankBuilder();
     Rank gold1 = rankBuilder.tier(Tier.GOLD).division(1).build();
-    Account gold10lpAccount = Account.builder().id(1).name("MAIKY").accountInformation(
+    Account gold10lpAccount = Account.builder().id("1").name("MAIKY").accountInformation(
         AccountInformation.builder().rank(gold1).leaguePoints(0).build())
         .build();
-    Account gold120lpAccount = Account.builder().id(2).name("naza30sec").accountInformation(
+    Account gold120lpAccount = Account.builder().id("2").name("naza30sec").accountInformation(
         AccountInformation.builder().rank(gold1).leaguePoints(20).build())
         .build();
     Ranking ranking = new Ranking();
