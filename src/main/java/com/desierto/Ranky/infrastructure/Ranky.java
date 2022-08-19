@@ -34,7 +34,7 @@ public class Ranky extends SpringBootServletInitializer {
     try {
       bot = JDABuilder.createDefault(System.getenv("DISCORD_API_KEY"))
           .enableIntents(GatewayIntent.GUILD_MEMBERS)
-          .setActivity(Activity.of(ActivityType.CUSTOM_STATUS, "TESTING")).build();
+          .setActivity(Activity.of(ActivityType.PLAYING, "AL TETO")).build();
       bot.addEventListener(new RankyGuildJoinListener());
       bot.addEventListener(new RankyMessageListener(context.getBean(RiotAccountRepository.class)));
 
