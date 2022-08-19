@@ -160,6 +160,7 @@ public class RankyListener extends ListenerAdapter {
   }
 
   static void sendMessage(User user, String content) {
+    log.info("ENTERED MESSAGE SENDING METHOD.");
     user.openPrivateChannel().queue(channel -> {
       channel.sendMessage(content).complete();
       log.info("SENT MESSAGE: \n" + content);
