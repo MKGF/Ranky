@@ -79,29 +79,29 @@ public class RankyMessageListener extends ListenerAdapter {
       } else if (command.contains(MIGRATE_COMMAND) && member != null && member
           .getRoles().stream()
           .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
-        migrateRanking(event, gson, bot, command);
+        migrateRanking(event, gson, command);
       } else if (command.contains(CREATE_COMMAND) && member != null && member
           .getRoles().stream()
           .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
-        createRanking(event, gson, bot, command);
+        createRanking(event, gson, command);
       } else
 //      if (command.contains(DEADLINE_COMMAND)) {
-//        setDeadline(event, gson, bot, command);
+//        setDeadline(event, gson, command);
 //      }
         if (command.contains(ADD_ACCOUNT_COMMAND) && member != null && member
             .getRoles().stream()
             .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
-          addAccount(event, gson, bot, command);
+          addAccount(event, gson, command);
         } else if (command.contains(ADD_MULTIPLE_COMMAND) && member != null && member
             .getRoles().stream()
             .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
-          addAccounts(event, gson, bot, command);
+          addAccounts(event, gson, command);
         } else if (command.contains(REMOVE_ACCOUNT_COMMAND) && member != null && member
             .getRoles().stream()
             .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
-          removeAccount(event, gson, bot, command);
+          removeAccount(event, gson, command);
         } else if (command.contains(RANKING_COMMAND)) {
-          queryRanking(event, bot, command);
+          queryRanking(event, command);
         }
     }
   }
@@ -131,10 +131,10 @@ public class RankyMessageListener extends ListenerAdapter {
     embed.clear();
   }
 
-  protected void createRanking(MessageReceivedEvent event, Gson gson, JDA bot, String command) {
+  protected void createRanking(MessageReceivedEvent event, Gson gson, String command) {
     TextChannel channel = null;
     try {
-      channel = getConfigChannel(bot);
+      channel = getConfigChannel(event.getGuild());
     } catch (ConfigChannelNotFoundException e) {
       rethrowExceptionAfterNoticingTheServer(event, e);
     }
@@ -153,10 +153,13 @@ public class RankyMessageListener extends ListenerAdapter {
     }
   }
 
-  protected void migrateRanking(MessageReceivedEvent event, Gson gson, JDA bot, String command) {
+  protected void migrateRanking(MessageReceivedEvent event, Gson gson, String command) {
+    log.info("ENTERED MIGRATE.");
     String rankingName = getRankingName(command);
-    TextChannel configChannel = getConfigChannel(bot);
+    TextChannel configChannel = getConfigChannel(event.getGuild());
     if (rankingExists(configChannel, rankingName)) {
+      log.info("ENTERED RANKING EXISTS.");
+
       RankingConfigurationWithMessageId ranking = getRankingWithMessageId(configChannel,
           rankingName);
       log.info("RETRIEVED CURRENT RANKING.");
@@ -179,9 +182,9 @@ public class RankyMessageListener extends ListenerAdapter {
     }
   }
 
-  protected void queryRanking(MessageReceivedEvent event, JDA bot, String command) {
+  protected void queryRanking(MessageReceivedEvent event, String command) {
     String rankingName = getRankingName(command);
-    TextChannel configChannel = getConfigChannel(bot);
+    TextChannel configChannel = getConfigChannel(event.getGuild());
     if (rankingExists(configChannel, rankingName)) {
       RankingConfiguration rankingConfiguration = getRanking(configChannel, rankingName);
       List<Optional<Account>> optionals = rankingConfiguration.getAccounts().stream()
@@ -202,10 +205,10 @@ public class RankyMessageListener extends ListenerAdapter {
     }
   }
 
-  protected void setDeadline(MessageReceivedEvent event, Gson gson, JDA bot, String command) {
+  protected void setDeadline(MessageReceivedEvent event, Gson gson, String command) {
     String rankingName = getRankingName(command);
     String deadlineString = getParameter(command, rankingName);
-    TextChannel configChannel = getConfigChannel(bot);
+    TextChannel configChannel = getConfigChannel(event.getGuild());
     if (rankingExists(configChannel, rankingName)) {
       RankingConfigurationWithMessageId ranking = getRankingWithMessageId(configChannel,
           rankingName);
@@ -225,10 +228,10 @@ public class RankyMessageListener extends ListenerAdapter {
     }
   }
 
-  protected void addAccount(MessageReceivedEvent event, Gson gson, JDA bot, String command) {
+  protected void addAccount(MessageReceivedEvent event, Gson gson, String command) {
     String rankingName = getRankingName(command);
     String accountToAdd = getParameter(command, rankingName);
-    TextChannel configChannel = getConfigChannel(bot);
+    TextChannel configChannel = getConfigChannel(event.getGuild());
     if (rankingExists(configChannel, rankingName)) {
       RankingConfigurationWithMessageId ranking = getRankingWithMessageId(configChannel,
           rankingName);
@@ -247,10 +250,10 @@ public class RankyMessageListener extends ListenerAdapter {
     }
   }
 
-  protected void addAccounts(MessageReceivedEvent event, Gson gson, JDA bot, String command) {
+  protected void addAccounts(MessageReceivedEvent event, Gson gson, String command) {
     String rankingName = getRankingName(command);
     List<String> accountsToAdd = getAccountsToAdd(command, rankingName);
-    TextChannel configChannel = getConfigChannel(bot);
+    TextChannel configChannel = getConfigChannel(event.getGuild());
     if (rankingExists(configChannel, rankingName)) {
       RankingConfigurationWithMessageId ranking = getRankingWithMessageId(configChannel,
           rankingName);
@@ -271,10 +274,10 @@ public class RankyMessageListener extends ListenerAdapter {
     }
   }
 
-  protected void removeAccount(MessageReceivedEvent event, Gson gson, JDA bot, String command) {
+  protected void removeAccount(MessageReceivedEvent event, Gson gson, String command) {
     String rankingName = getRankingName(command);
     String accountToRemove = getParameter(command, rankingName);
-    TextChannel configChannel = getConfigChannel(bot);
+    TextChannel configChannel = getConfigChannel(event.getGuild());
     if (rankingExists(configChannel, rankingName)) {
       RankingConfigurationWithMessageId ranking = getRankingWithMessageId(configChannel,
           rankingName);
@@ -362,8 +365,9 @@ public class RankyMessageListener extends ListenerAdapter {
     return Arrays.asList(accounts);
   }
 
-  protected TextChannel getConfigChannel(JDA bot) {
-    return bot.getTextChannelsByName(PRIVATE_CONFIG_CHANNEL, true).stream()
+  protected TextChannel getConfigChannel(Guild guild) {
+    return guild.getTextChannels().stream()
+        .filter(textChannel -> textChannel.getName().equalsIgnoreCase(PRIVATE_CONFIG_CHANNEL))
         .findFirst().orElseThrow(
             ConfigChannelNotFoundException::new);
   }
