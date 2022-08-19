@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Activity.ActivityType;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -32,7 +33,8 @@ public class Ranky extends SpringBootServletInitializer {
         .run(Ranky.class, args);
     try {
       bot = JDABuilder.createDefault(System.getenv("DISCORD_API_KEY"))
-          .setActivity(Activity.of(ActivityType.WATCHING, "YA FUNCIONO SOLO")).build();
+          .enableIntents(GatewayIntent.GUILD_MEMBERS)
+          .setActivity(Activity.of(ActivityType.CUSTOM_STATUS, "TESTING")).build();
       bot.addEventListener(new RankyGuildJoinListener());
       bot.addEventListener(new RankyMessageListener(context.getBean(RiotAccountRepository.class)));
 
