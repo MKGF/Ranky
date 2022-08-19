@@ -16,6 +16,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -33,6 +34,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @AllArgsConstructor
 public class RankyListener extends ListenerAdapter {
+
+  public static final Logger log = Logger.getLogger("RankyListener.class");
 
   public static final String CREATE_COMMAND = "/create";
   public static final String DEADLINE_COMMAND = "/setDeadline";
@@ -152,12 +155,14 @@ public class RankyListener extends ListenerAdapter {
           +
           "- /ranking \"RANKINGNAME\" gives the soloQ information of the accounts in the ranking ordered by rank.";
       sendMessage(event.getGuild().getOwner().getUser(), ownerMessage);
+
     }
   }
 
   static void sendMessage(User user, String content) {
     user.openPrivateChannel().queue(channel -> {
-      channel.sendMessage(content).queue();
+      channel.sendMessage(content).complete();
+      log.info("SENT MESSAGE: \n" + content);
     });
   }
 
