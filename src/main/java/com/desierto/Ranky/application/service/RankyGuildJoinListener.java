@@ -3,6 +3,7 @@ package com.desierto.Ranky.application.service;
 import java.util.logging.Logger;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.entities.BaseGuildMessageChannel;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -19,6 +20,17 @@ public class RankyGuildJoinListener extends ListenerAdapter {
 
   @Override
   public void onGuildJoin(GuildJoinEvent event) {
+
+    Member member = event.getGuild().getOwner();
+
+    log.info("JOINED GUILD: " + event.getGuild().getName());
+    if (member != null) {
+      log.info(
+          "OWNER OF THE GUILD: " + member.getUser().getName() + "/" + member.getUser().getId());
+    } else {
+      log.info("GUILD HAS NO OWNER.");
+    }
+
     event.getGuild().createTextChannel(PRIVATE_CONFIG_CHANNEL).clearPermissionOverrides().queue();
     event.getGuild().createRole().setName(RANKY_USER_ROLE).queue();
     String welcomeMessage =

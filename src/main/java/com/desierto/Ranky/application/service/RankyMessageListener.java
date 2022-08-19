@@ -59,6 +59,10 @@ public class RankyMessageListener extends ListenerAdapter {
     User user = event.getAuthor();
     Member member = guild.getMember(user);
 
+    log.info("ARRIVED MESSAGE: " + event.getMessage().getContentRaw());
+    log.info("FROM GUILD: " + guild.getName());
+    log.info("FROM USER: " + user.getName() + "/" + user.getId());
+
     if (event.getMessage().getContentRaw().startsWith(Ranky.prefix)) {
       String command = event.getMessage().getContentRaw();
       if (command.contains(HELP_COMMAND)) {
