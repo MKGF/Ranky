@@ -88,9 +88,9 @@ public class RankyListener extends ListenerAdapter {
     }
   }
 
-  //  @Override
-//  public void onGuildJoin(GuildJoinEvent event) {
-  public void test(GuildJoinEvent event) {
+  @Override
+  public void onGuildJoin(GuildJoinEvent event) {
+//  public void test(GuildJoinEvent event) {
     event.getGuild().createTextChannel(PRIVATE_CONFIG_CHANNEL).clearPermissionOverrides().queue();
     event.getGuild().createRole().setName(RANKY_USER_ROLE).queue();
     String welcomeMessage =
