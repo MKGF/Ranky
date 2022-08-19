@@ -66,6 +66,12 @@ public class RankyMessageListener extends ListenerAdapter {
       log.info("ARRIVED MESSAGE: " + event.getMessage().getContentRaw());
       log.info("FROM GUILD: " + guild.getName());
       log.info("FROM USER: " + user.getName() + "/" + user.getId());
+      log.info("IS MEMBER NULL: " + (member == null));
+      if (member != null) {
+        log.info("HAS " + RANKY_USER_ROLE + " ROLE: " + member
+            .getRoles().stream()
+            .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE)));
+      }
 
       String command = event.getMessage().getContentRaw();
       if (command.contains(HELP_COMMAND)) {
