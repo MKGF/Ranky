@@ -153,7 +153,7 @@ public class RankyListener extends ListenerAdapter {
           +
           "- /ranking \"RANKINGNAME\" gives the soloQ information of the accounts in the ranking ordered by rank.";
       event.getGuild().getOwner().getUser().openPrivateChannel().complete()
-          .sendMessage(ownerMessage).complete();
+          .sendMessage(ownerMessage).queue();
     }
   }
 
