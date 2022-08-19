@@ -18,13 +18,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TestConfig.class})
-public class RankyListenerTest extends BaseTest {
+public class RankyMessageListenerTest extends BaseTest {
 
-  private static RankyListener ranky;
+  private static RankyMessageListener ranky;
 
   @BeforeAll
   public static void setUp() {
-    ranky = new RankyListener(null);
+    ranky = new RankyMessageListener(null);
   }
 
   @Test

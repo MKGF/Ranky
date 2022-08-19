@@ -1,6 +1,7 @@
 package com.desierto.Ranky.infrastructure;
 
-import com.desierto.Ranky.application.service.RankyListener;
+import com.desierto.Ranky.application.service.RankyGuildJoinListener;
+import com.desierto.Ranky.application.service.RankyMessageListener;
 import com.desierto.Ranky.domain.exception.BotCredentialsMissingException;
 import com.desierto.Ranky.domain.repository.RiotAccountRepository;
 import java.util.logging.Logger;
@@ -32,8 +33,9 @@ public class Ranky extends SpringBootServletInitializer {
     try {
       bot = JDABuilder.createDefault(System.getenv("DISCORD_API_KEY"))
           .setActivity(Activity.of(ActivityType.WATCHING, "YA FUNCIONO SOLO")).build();
-      bot.addEventListener(new RankyListener(context.getBean(RiotAccountRepository.class)));
-      
+      bot.addEventListener(new RankyGuildJoinListener());
+      bot.addEventListener(new RankyMessageListener(context.getBean(RiotAccountRepository.class)));
+
     } catch (LoginException e) {
       throw new BotCredentialsMissingException(e.getMessage());
     } finally {
