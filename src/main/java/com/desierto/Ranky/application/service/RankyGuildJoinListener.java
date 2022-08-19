@@ -2,7 +2,6 @@ package com.desierto.Ranky.application.service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.entities.BaseGuildMessageChannel;
@@ -26,8 +25,8 @@ public class RankyGuildJoinListener extends ListenerAdapter {
   public void onGuildJoin(GuildJoinEvent event) {
 
     Guild guild = event.getGuild();
-    CompletableFuture<List<Member>> listCompletableFuture = loadMembersFull(guild);
-    Optional<Member> owner = listCompletableFuture.join().stream()
+    List<Member> loadedMembers = guild.getMembers();
+    Optional<Member> owner = loadedMembers.stream()
         .filter(Member::isOwner).findFirst();
 
     log.info("JOINED GUILD: " + event.getGuild().getName());
@@ -113,18 +112,6 @@ public class RankyGuildJoinListener extends ListenerAdapter {
       channel.sendMessage(content).complete();
       log.info("SENT MESSAGE: \n" + content);
     });
-  }
-
-  public CompletableFuture<List<Member>> loadMembersFull(Guild guild) {
-    CompletableFuture<List<Member>> future = new CompletableFuture<>();
-    if (guild.isLoaded()) {
-      future.complete(guild.getMembers());
-    } else {
-      guild.loadMembers()
-          .onError(future::completeExceptionally)
-          .onSuccess(future::complete);
-    }
-    return future;
   }
 
 }
