@@ -154,18 +154,22 @@ public class RankyMessageListener extends ListenerAdapter {
     if (rankingExists(configChannel, rankingName)) {
       RankingConfigurationWithMessageId ranking = getRankingWithMessageId(configChannel,
           rankingName);
+      log.info("RETRIEVED CURRENT RANKING.");
       List<Optional<Account>> optionals = ranking.getRankingConfiguration().getAccounts().stream()
           .map(s -> riotAccountRepository.getAccountByName(s)).collect(
               Collectors.toList());
       List<Account> accounts = optionals.stream().filter(Optional::isPresent).map(Optional::get)
           .sorted().collect(
               Collectors.toList());
+      log.info("RETRIEVED DATA FROM RIOT.");
       ranking.getRankingConfiguration()
           .setAccounts(accounts.stream().map(Account::getId).collect(Collectors.toList()));
+      log.info("UPDATING RANKING FROM ACCOUNT NAME TO SUMMONER IDS.");
       configChannel
           .editMessageById(ranking.getMessageId(),
               gson.toJson(ranking.getRankingConfiguration()))
           .queue();
+      log.info("UPDATE SUCCESSFUL.");
       event.getChannel().sendMessage("Accounts successfully migrated.").queue();
     }
   }
