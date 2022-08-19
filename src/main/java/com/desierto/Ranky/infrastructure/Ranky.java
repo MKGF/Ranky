@@ -1,16 +1,9 @@
 package com.desierto.Ranky.infrastructure;
 
-import static net.dv8tion.jda.api.requests.GatewayIntent.DIRECT_MESSAGE_TYPING;
-import static net.dv8tion.jda.api.requests.GatewayIntent.GUILD_MESSAGE_TYPING;
-import static net.dv8tion.jda.api.requests.GatewayIntent.GUILD_PRESENCES;
-import static net.dv8tion.jda.api.requests.GatewayIntent.GUILD_WEBHOOKS;
-
 import com.desierto.Ranky.application.service.RankyGuildJoinListener;
 import com.desierto.Ranky.application.service.RankyMessageListener;
 import com.desierto.Ranky.domain.exception.BotCredentialsMissingException;
 import com.desierto.Ranky.domain.repository.RiotAccountRepository;
-import java.util.Arrays;
-import java.util.List;
 import java.util.logging.Logger;
 import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.api.JDA;
@@ -39,10 +32,8 @@ public class Ranky extends SpringBootServletInitializer {
     ConfigurableApplicationContext context = SpringApplication
         .run(Ranky.class, args);
     try {
-      List<GatewayIntent> intents = Arrays.asList(GatewayIntent.values());
-      intents.removeAll(Arrays.asList(GUILD_PRESENCES, GUILD_WEBHOOKS, GUILD_MESSAGE_TYPING,
-          DIRECT_MESSAGE_TYPING));
-      bot = JDABuilder.create(System.getenv("DISCORD_API_KEY"), intents)
+      bot = JDABuilder.createDefault(System.getenv("DISCORD_API_KEY"))
+          .enableIntents(GatewayIntent.GUILD_MEMBERS)
           .setActivity(Activity.of(ActivityType.PLAYING, "AL TETO")).build();
       bot.addEventListener(new RankyGuildJoinListener());
       bot.addEventListener(new RankyMessageListener(context.getBean(RiotAccountRepository.class)));
