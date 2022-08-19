@@ -52,46 +52,46 @@ public class RankyListener extends ListenerAdapter {
   @Override
   @SneakyThrows
   public void onMessageReceived(MessageReceivedEvent event) {
-    if (event.getGuild() != null) {
-      Gson gson = new Gson();
-      JDA bot = event.getJDA();
-      Guild guild = event.getGuild();
-      User user = event.getAuthor();
-      Member member = guild.getMember(user);
 
-      if (event.getMessage().getContentRaw().startsWith(Ranky.prefix)) {
-        String command = event.getMessage().getContentRaw();
-        if (command.contains(HELP_COMMAND)) {
-          help(event);
-        } else if (command.contains(CREATE_COMMAND) && member != null && member
-            .getRoles().stream()
-            .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
-          createRanking(event, gson, bot, command);
-        } else
+    Gson gson = new Gson();
+    JDA bot = event.getJDA();
+    Guild guild = event.getGuild();
+    User user = event.getAuthor();
+    Member member = guild.getMember(user);
+
+    if (event.getMessage().getContentRaw().startsWith(Ranky.prefix)) {
+      String command = event.getMessage().getContentRaw();
+      if (command.contains(HELP_COMMAND)) {
+        help(event);
+      } else if (command.contains(CREATE_COMMAND) && member != null && member
+          .getRoles().stream()
+          .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
+        createRanking(event, gson, bot, command);
+      } else
 //      if (command.contains(DEADLINE_COMMAND)) {
 //        setDeadline(event, gson, bot, command);
 //      }
-          if (command.contains(ADD_ACCOUNT_COMMAND) && member != null && member
-              .getRoles().stream()
-              .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
-            addAccount(event, gson, bot, command);
-          } else if (command.contains(ADD_MULTIPLE_COMMAND) && member != null && member
-              .getRoles().stream()
-              .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
-            addAccounts(event, gson, bot, command);
-          } else if (command.contains(REMOVE_ACCOUNT_COMMAND) && member != null && member
-              .getRoles().stream()
-              .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
-            removeAccount(event, gson, bot, command);
-          } else if (command.contains(RANKING_COMMAND)) {
-            queryRanking(event, bot, command);
-          }
-      }
+        if (command.contains(ADD_ACCOUNT_COMMAND) && member != null && member
+            .getRoles().stream()
+            .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
+          addAccount(event, gson, bot, command);
+        } else if (command.contains(ADD_MULTIPLE_COMMAND) && member != null && member
+            .getRoles().stream()
+            .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
+          addAccounts(event, gson, bot, command);
+        } else if (command.contains(REMOVE_ACCOUNT_COMMAND) && member != null && member
+            .getRoles().stream()
+            .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
+          removeAccount(event, gson, bot, command);
+        } else if (command.contains(RANKING_COMMAND)) {
+          queryRanking(event, bot, command);
+        }
     }
   }
 
-  @Override
-  public void onGuildJoin(GuildJoinEvent event) {
+  //  @Override
+//  public void onGuildJoin(GuildJoinEvent event) {
+  public void test(GuildJoinEvent event) {
     event.getGuild().createTextChannel(PRIVATE_CONFIG_CHANNEL).clearPermissionOverrides().queue();
     event.getGuild().createRole().setName(RANKY_USER_ROLE).queue();
     String welcomeMessage =
