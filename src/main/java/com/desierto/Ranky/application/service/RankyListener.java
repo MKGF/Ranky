@@ -151,9 +151,14 @@ public class RankyListener extends ListenerAdapter {
           "- /removeAccount \"RANKINGNAME\" ACCOUNT removes the account from the ranking if it exists.\n"
           +
           "- /ranking \"RANKINGNAME\" gives the soloQ information of the accounts in the ranking ordered by rank.";
-      event.getGuild().getOwner().getUser().openPrivateChannel().complete()
-          .sendMessage(ownerMessage).queue();
+      sendMessage(event.getGuild().getOwner().getUser(), ownerMessage);
     }
+  }
+
+  static void sendMessage(User user, String content) {
+    user.openPrivateChannel().queue(channel -> {
+      channel.sendMessage(content).queue();
+    });
   }
 
   protected void help(MessageReceivedEvent event) {
