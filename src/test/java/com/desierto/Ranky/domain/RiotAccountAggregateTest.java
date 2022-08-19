@@ -31,6 +31,7 @@ public class RiotAccountAggregateTest extends BaseTest {
   @Mock
   private RiotAccountRepository riotAccountRepository;
 
+
   @Autowired
   private Validator validator;
 

@@ -2,10 +2,7 @@ package com.desierto.Ranky.domain.valueobject;
 
 import static com.desierto.Ranky.domain.valueobject.Rank.Tier.UNRANKED;
 
-import com.desierto.Ranky.domain.converter.ValueEnumConverter;
 import com.desierto.Ranky.domain.entity.ValueEnum;
-import javax.persistence.Convert;
-import javax.persistence.Embeddable;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import lombok.AllArgsConstructor;
@@ -19,10 +16,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @EqualsAndHashCode
-@Embeddable
 public class Rank implements Comparable<Rank> {
 
-  @Convert(converter = Tier.Converter.class)
   private Tier tier; //Tier
   @Min(0)
   @Max(4)
@@ -55,10 +50,10 @@ public class Rank implements Comparable<Rank> {
       return value;
     }
 
-    public static class Converter extends ValueEnumConverter<Tier, String> {
+    public static class Converter {
 
       public Converter() {
-        super(Tier.class);
+        
       }
     }
 

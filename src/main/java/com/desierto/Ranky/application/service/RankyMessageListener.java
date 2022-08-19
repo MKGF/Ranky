@@ -56,18 +56,17 @@ public class RankyMessageListener extends ListenerAdapter {
   @Override
   @SneakyThrows
   public void onMessageReceived(MessageReceivedEvent event) {
-
-    Gson gson = new Gson();
-    JDA bot = event.getJDA();
-    Guild guild = event.getGuild();
-    User user = event.getAuthor();
-    Member member = guild.getMember(user);
-
-    log.info("ARRIVED MESSAGE: " + event.getMessage().getContentRaw());
-    log.info("FROM GUILD: " + guild.getName());
-    log.info("FROM USER: " + user.getName() + "/" + user.getId());
-
     if (event.getMessage().getContentRaw().startsWith(Ranky.prefix)) {
+      Gson gson = new Gson();
+      JDA bot = event.getJDA();
+      Guild guild = event.getGuild();
+      User user = event.getAuthor();
+      Member member = guild.getMember(user);
+
+      log.info("ARRIVED MESSAGE: " + event.getMessage().getContentRaw());
+      log.info("FROM GUILD: " + guild.getName());
+      log.info("FROM USER: " + user.getName() + "/" + user.getId());
+
       String command = event.getMessage().getContentRaw();
       if (command.contains(HELP_COMMAND)) {
         help(event);

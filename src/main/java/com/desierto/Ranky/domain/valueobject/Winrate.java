@@ -5,7 +5,6 @@ import static java.math.BigDecimal.valueOf;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import javax.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -18,7 +17,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-@Embeddable
 @EqualsAndHashCode
 public class Winrate {
 
