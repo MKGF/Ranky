@@ -1,8 +1,12 @@
 package com.desierto.Ranky.application.service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.entities.BaseGuildMessageChannel;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
@@ -21,12 +25,16 @@ public class RankyGuildJoinListener extends ListenerAdapter {
   @Override
   public void onGuildJoin(GuildJoinEvent event) {
 
-    Member member = event.getGuild().getOwner();
+    Guild guild = event.getGuild();
+    CompletableFuture<List<Member>> listCompletableFuture = loadMembersFull(guild);
+    Optional<Member> owner = listCompletableFuture.join().stream()
+        .filter(Member::isOwner).findFirst();
 
     log.info("JOINED GUILD: " + event.getGuild().getName());
-    if (member != null) {
+    if (owner.isPresent()) {
       log.info(
-          "OWNER OF THE GUILD: " + member.getUser().getName() + "/" + member.getUser().getId());
+          "OWNER OF THE GUILD: " + owner.get().getUser().getName() + "/" + owner.get().getUser()
+              .getId());
     } else {
       log.info("GUILD HAS NO OWNER.");
     }
@@ -105,6 +113,18 @@ public class RankyGuildJoinListener extends ListenerAdapter {
       channel.sendMessage(content).complete();
       log.info("SENT MESSAGE: \n" + content);
     });
+  }
+
+  public CompletableFuture<List<Member>> loadMembersFull(Guild guild) {
+    CompletableFuture<List<Member>> future = new CompletableFuture<>();
+    if (guild.isLoaded()) {
+      future.complete(guild.getMembers());
+    } else {
+      guild.loadMembers()
+          .onError(future::completeExceptionally)
+          .onSuccess(future::complete);
+    }
+    return future;
   }
 
 }
