@@ -4,7 +4,6 @@ import com.desierto.Ranky.application.service.dto.RankingConfigurationWithMessag
 import com.desierto.Ranky.domain.entity.Account;
 import com.desierto.Ranky.domain.exception.ConfigChannelNotFoundException;
 import com.desierto.Ranky.domain.exception.RankingAlreadyExistsException;
-import com.desierto.Ranky.domain.exception.account.AccountNotFoundException;
 import com.desierto.Ranky.domain.exception.ranking.RankingNotFoundException;
 import com.desierto.Ranky.domain.repository.RiotAccountRepository;
 import com.desierto.Ranky.domain.valueobject.RankingConfiguration;
@@ -208,9 +207,11 @@ public class RankyListener extends ListenerAdapter {
     TextChannel configChannel = getConfigChannel(bot);
     if (rankingExists(configChannel, rankingName)) {
       RankingConfiguration rankingConfiguration = getRanking(configChannel, rankingName);
-      List<Account> accounts = rankingConfiguration.getAccounts().stream()
-          .map(s -> riotAccountRepository.getAccount(s)
-              .orElseThrow(() -> new AccountNotFoundException(s))).sorted().collect(
+      List<Optional<Account>> optionals = rankingConfiguration.getAccounts().stream()
+          .map(s -> riotAccountRepository.getAccount(s)).collect(
+              Collectors.toList());
+      List<Account> accounts = optionals.stream().filter(Optional::isPresent).map(Optional::get)
+          .sorted().collect(
               Collectors.toList());
       EmbedBuilder ranking = new EmbedBuilder();
       ranking.setTitle("\uD83D\uDC51 RANKING " + rankingName.toUpperCase() + " \uD83D\uDC51");
