@@ -25,6 +25,7 @@ public class RankyGuildJoinListener extends ListenerAdapter {
   public void onGuildJoin(GuildJoinEvent event) {
 
     Guild guild = event.getGuild();
+    
     List<Member> loadedMembers = guild.getMembers();
     Optional<Member> owner = loadedMembers.stream()
         .filter(Member::isOwner).findFirst();
