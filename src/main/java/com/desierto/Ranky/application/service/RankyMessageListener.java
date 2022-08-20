@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -58,10 +57,11 @@ public class RankyMessageListener extends ListenerAdapter {
   public void onMessageReceived(MessageReceivedEvent event) {
     if (event.getMessage().getContentRaw().startsWith(Ranky.prefix)) {
       Gson gson = new Gson();
-      JDA bot = event.getJDA();
       Guild guild = event.getGuild();
       User user = event.getAuthor();
-      Member member = guild.getMember(user);
+      Member member = guild
+          .findMembers(member1 -> member1.getUser().getId().equalsIgnoreCase(user.getId())).get()
+          .stream().findFirst().orElse(null);
 
       log.info("ARRIVED MESSAGE: " + event.getMessage().getContentRaw());
       log.info("FROM GUILD: " + guild.getName());
