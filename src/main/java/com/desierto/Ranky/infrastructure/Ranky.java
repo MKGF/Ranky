@@ -33,8 +33,6 @@ public class Ranky extends SpringBootServletInitializer {
     try {
       bot = JDABuilder.createDefault(System.getenv("DISCORD_API_KEY"))
           .enableIntents(GatewayIntent.GUILD_MEMBERS).build();
-      bot.getPresence().setActivity(
-          Activity.playing("currently at " + bot.getGuilds().size() + " different servers."));
       bot.addEventListener(new RankyGuildJoinListener());
       bot.addEventListener(new RankyMessageListener(context.getBean(RiotAccountRepository.class)));
 
@@ -44,6 +42,13 @@ public class Ranky extends SpringBootServletInitializer {
       if (bot == null) {
         SpringApplication.exit(context, () -> -1);
       }
+      try {
+        bot.awaitReady();
+      } catch (InterruptedException e) {
+        SpringApplication.exit(context, () -> -1);
+      }
+      bot.getPresence().setActivity(
+          Activity.playing("currently at " + bot.getGuilds().size() + " different servers."));
     }
   }
 

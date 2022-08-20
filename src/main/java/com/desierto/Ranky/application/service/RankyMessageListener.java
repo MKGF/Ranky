@@ -3,6 +3,8 @@ package com.desierto.Ranky.application.service;
 import com.desierto.Ranky.application.service.dto.RankingConfigurationWithMessageId;
 import com.desierto.Ranky.domain.entity.Account;
 import com.desierto.Ranky.domain.exception.ConfigChannelNotFoundException;
+import com.desierto.Ranky.domain.exception.ExcessiveAccountsException;
+import com.desierto.Ranky.domain.exception.ExcessiveParamsException;
 import com.desierto.Ranky.domain.exception.RankingAlreadyExistsException;
 import com.desierto.Ranky.domain.exception.account.AccountNotFoundException;
 import com.desierto.Ranky.domain.exception.ranking.RankingNotFoundException;
@@ -78,7 +80,7 @@ public class RankyMessageListener extends ListenerAdapter {
           .getRoles().stream()
           .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
         migrateRanking(event, gson, command);
-      } else if (command.contains(CREATE_COMMAND) && member != null && member
+      } else if (isCreateCommand(command) && member != null && member
           .getRoles().stream()
           .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
         createRanking(event, gson, command);
@@ -86,15 +88,15 @@ public class RankyMessageListener extends ListenerAdapter {
 //      if (command.contains(DEADLINE_COMMAND)) {
 //        setDeadline(event, gson, command);
 //      }
-        if (command.contains(ADD_ACCOUNT_COMMAND) && member != null && member
+        if (isAddAccountCommand(command) && member != null && member
             .getRoles().stream()
             .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
           addAccount(event, gson, command);
-        } else if (command.contains(ADD_MULTIPLE_COMMAND) && member != null && member
+        } else if (isAddMultipleCommand(command) && member != null && member
             .getRoles().stream()
             .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
           addAccounts(event, gson, command);
-        } else if (command.contains(REMOVE_ACCOUNT_COMMAND) && member != null && member
+        } else if (isRemoveAccountCommand(command) && member != null && member
             .getRoles().stream()
             .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
           removeAccount(event, gson, command);
@@ -368,6 +370,56 @@ public class RankyMessageListener extends ListenerAdapter {
         .filter(textChannel -> textChannel.getName().equalsIgnoreCase(PRIVATE_CONFIG_CHANNEL))
         .findFirst().orElseThrow(
             ConfigChannelNotFoundException::new);
+  }
+
+  protected boolean isCreateCommand(String command) {
+    String[] words = command.split("\"");
+    if (words.length > 2) {
+      throw new ExcessiveParamsException();
+    }
+    return command.startsWith(CREATE_COMMAND) && words.length == 2;
+  }
+
+  protected boolean isAddAccountCommand(String command) {
+    String[] words = command.split("\"");
+    if (words.length < 3) {
+      return false;
+    } else {
+      if (words[2].contains(",")) {
+        throw new ExcessiveAccountsException();
+      }
+      if (words.length > 3) {
+        throw new ExcessiveParamsException();
+      }
+      return command.startsWith(ADD_ACCOUNT_COMMAND);
+    }
+  }
+
+  protected boolean isAddMultipleCommand(String command) {
+    String[] words = command.split("\"");
+    if (words.length < 3) {
+      return false;
+    } else {
+      if (words.length > 3) {
+        throw new ExcessiveParamsException();
+      }
+      return command.startsWith(ADD_MULTIPLE_COMMAND);
+    }
+  }
+
+  protected boolean isRemoveAccountCommand(String command) {
+    String[] words = command.split("\"");
+    if (words.length < 3) {
+      return false;
+    } else {
+      if (words[2].contains(",")) {
+        throw new ExcessiveAccountsException();
+      }
+      if (words.length > 3) {
+        throw new ExcessiveParamsException();
+      }
+      return command.startsWith(REMOVE_ACCOUNT_COMMAND);
+    }
   }
 
 }
