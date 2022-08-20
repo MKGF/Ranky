@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 import lombok.AllArgsConstructor;
+import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.BaseGuildMessageChannel;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -25,7 +26,6 @@ public class RankyGuildJoinListener extends ListenerAdapter {
   public void onGuildJoin(GuildJoinEvent event) {
 
     Guild guild = event.getGuild();
-    
     List<Member> loadedMembers = guild.getMembers();
     Optional<Member> owner = loadedMembers.stream()
         .filter(Member::isOwner).findFirst();
@@ -39,6 +39,10 @@ public class RankyGuildJoinListener extends ListenerAdapter {
       log.info("GUILD HAS NO OWNER.");
     }
 
+    event.getJDA().getPresence().setActivity(
+        Activity
+            .playing("currently at " + event.getJDA().getGuilds().size() + " different servers."));
+    
     event.getGuild().createTextChannel(PRIVATE_CONFIG_CHANNEL).clearPermissionOverrides().queue();
     event.getGuild().createRole().setName(RANKY_USER_ROLE).queue();
     String welcomeMessage =
