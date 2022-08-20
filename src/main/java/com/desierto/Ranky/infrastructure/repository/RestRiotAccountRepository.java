@@ -100,7 +100,7 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
 
   @Override
   public Optional<Account> getAccountById(String id) {
-    Summoner summoner = Orianna.summonerWithId(id).get();
+    Summoner summoner = Orianna.summonerWithAccountId(id).get();
     if (summoner.exists()) {
       LeaguePositions leaguePositions = Orianna.leaguePositionsForSummoner(
           summoner
