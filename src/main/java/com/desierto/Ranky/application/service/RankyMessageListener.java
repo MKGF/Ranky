@@ -59,13 +59,7 @@ public class RankyMessageListener extends ListenerAdapter {
       Gson gson = new Gson();
       Guild guild = event.getGuild();
       User user = event.getAuthor();
-      final List<Member> membersFinal = new ArrayList<>();
-      guild
-          .loadMembers().onSuccess(membersFinal::addAll);
-      log.info("MEMBERS: " + membersFinal.stream().map(Member::getEffectiveName)
-          .collect(Collectors.joining(" | ")));
-      Member member = membersFinal.stream().filter(m -> m.getUser().equals(user)).findFirst()
-          .orElse(null);
+      Member member = event.getMember();
 
       log.info("ARRIVED MESSAGE: " + event.getMessage().getContentRaw());
       log.info("FROM GUILD: " + guild.getName());
