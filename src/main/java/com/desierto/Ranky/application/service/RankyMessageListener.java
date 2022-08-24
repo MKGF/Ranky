@@ -3,8 +3,6 @@ package com.desierto.Ranky.application.service;
 import com.desierto.Ranky.application.service.dto.RankingConfigurationWithMessageId;
 import com.desierto.Ranky.domain.entity.Account;
 import com.desierto.Ranky.domain.exception.ConfigChannelNotFoundException;
-import com.desierto.Ranky.domain.exception.ExcessiveAccountsException;
-import com.desierto.Ranky.domain.exception.ExcessiveParamsException;
 import com.desierto.Ranky.domain.exception.RankingAlreadyExistsException;
 import com.desierto.Ranky.domain.exception.account.AccountNotFoundException;
 import com.desierto.Ranky.domain.exception.ranking.RankingNotFoundException;
@@ -75,10 +73,7 @@ public class RankyMessageListener extends ListenerAdapter {
       }
 
       String command = event.getMessage().getContentRaw();
-      log.info("COMMAND: " + command);
-      String[] words = command.split("\"");
-      log.info("SIZE OF WORDS: " + words.length);
-      log.info("WORDS: " + String.join("|", words));
+
       if (command.contains(HELP_COMMAND)) {
         help(event);
       } else if (command.contains(MIGRATE_COMMAND) && member != null && member
@@ -89,6 +84,7 @@ public class RankyMessageListener extends ListenerAdapter {
           .getRoles().stream()
           .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
         createRanking(event, gson, command);
+
       } else
 //      if (command.contains(DEADLINE_COMMAND)) {
 //        setDeadline(event, gson, command);
@@ -380,7 +376,7 @@ public class RankyMessageListener extends ListenerAdapter {
   protected boolean isCreateCommand(String command) {
     String[] words = command.split("\"");
     if (words.length > 2) {
-      throw new ExcessiveParamsException();
+      return false;
     }
     return command.startsWith(CREATE_COMMAND) && words.length == 2;
   }
@@ -394,10 +390,10 @@ public class RankyMessageListener extends ListenerAdapter {
       return false;
     } else {
       if (words[2].contains(",")) {
-        throw new ExcessiveAccountsException();
+        return false;
       }
       if (words.length > 3) {
-        throw new ExcessiveParamsException();
+        return false;
       }
       return command.startsWith(ADD_ACCOUNT_COMMAND);
     }
@@ -409,7 +405,7 @@ public class RankyMessageListener extends ListenerAdapter {
       return false;
     } else {
       if (words.length > 3) {
-        throw new ExcessiveParamsException();
+        return false;
       }
       return command.startsWith(ADD_MULTIPLE_COMMAND);
     }
@@ -421,10 +417,10 @@ public class RankyMessageListener extends ListenerAdapter {
       return false;
     } else {
       if (words[2].contains(",")) {
-        throw new ExcessiveAccountsException();
+        return false;
       }
       if (words.length > 3) {
-        throw new ExcessiveParamsException();
+        return false;
       }
       return command.startsWith(REMOVE_ACCOUNT_COMMAND);
     }

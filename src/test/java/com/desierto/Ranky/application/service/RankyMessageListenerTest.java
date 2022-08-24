@@ -3,13 +3,10 @@ package com.desierto.Ranky.application.service;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.desierto.Ranky.TestConfig;
 import com.desierto.Ranky.domain.BaseTest;
-import com.desierto.Ranky.domain.exception.ExcessiveAccountsException;
-import com.desierto.Ranky.domain.exception.ExcessiveParamsException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -75,11 +72,9 @@ public class RankyMessageListenerTest extends BaseTest {
     String thirdCommand = "/create RANKING";
     String fourthCommand = "/create \"RANKING\" I DO NOT CARE ABOUT THE REST";
     assertTrue(ranky.isCreateCommand(firstCommand));
-    assertThrows(ExcessiveParamsException.class,
-        () -> ranky.isCreateCommand(secondCommand));
+    assertFalse(ranky.isCreateCommand(secondCommand));
     assertFalse(ranky.isCreateCommand(thirdCommand));
-    assertThrows(ExcessiveParamsException.class,
-        () -> ranky.isCreateCommand(fourthCommand));
+    assertFalse(ranky.isCreateCommand(fourthCommand));
   }
 
   @Test
@@ -89,11 +84,9 @@ public class RankyMessageListenerTest extends BaseTest {
     String thirdCommand = "/addAccount RANKING account";
     String fourthCommand = "/addAccount \"RANKING\" anAccount, anotherAccount";
     assertTrue(ranky.isAddAccountCommand(firstCommand));
-    assertThrows(ExcessiveParamsException.class,
-        () -> ranky.isAddAccountCommand(secondCommand));
+    assertFalse(ranky.isAddAccountCommand(secondCommand));
     assertFalse(ranky.isAddAccountCommand(thirdCommand));
-    assertThrows(ExcessiveAccountsException.class,
-        () -> ranky.isAddAccountCommand(fourthCommand));
+    assertFalse(ranky.isAddAccountCommand(fourthCommand));
   }
 
   @Test
@@ -104,8 +97,7 @@ public class RankyMessageListenerTest extends BaseTest {
     String fourthCommand = "/addMultiple \"RANKING\" anAccount, anotherAccount";
     String fifthCommand = "/addMultiple \"RANKING\" Test Account, Test Account 2";
     assertTrue(ranky.isAddMultipleCommand(firstCommand));
-    assertThrows(ExcessiveParamsException.class,
-        () -> ranky.isAddMultipleCommand(secondCommand));
+    assertFalse(ranky.isAddMultipleCommand(secondCommand));
     assertFalse(ranky.isAddMultipleCommand(thirdCommand));
     assertTrue(ranky.isAddMultipleCommand(fourthCommand));
     assertTrue(ranky.isAddMultipleCommand(fifthCommand));
@@ -118,10 +110,8 @@ public class RankyMessageListenerTest extends BaseTest {
     String thirdCommand = "/removeAccount RANKING account";
     String fourthCommand = "/removeAccount \"RANKING\" anAccount, anotherAccount";
     assertTrue(ranky.isRemoveAccountCommand(firstCommand));
-    assertThrows(ExcessiveParamsException.class,
-        () -> ranky.isRemoveAccountCommand(secondCommand));
+    assertFalse(ranky.isRemoveAccountCommand(secondCommand));
     assertFalse(ranky.isRemoveAccountCommand(thirdCommand));
-    assertThrows(ExcessiveAccountsException.class,
-        () -> ranky.isRemoveAccountCommand(fourthCommand));
+    assertFalse(ranky.isRemoveAccountCommand(fourthCommand));
   }
 }
