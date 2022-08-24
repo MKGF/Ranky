@@ -67,6 +67,7 @@ public class RankyMessageListener extends ListenerAdapter {
       log.info("FROM GUILD: " + guild.getName());
       log.info("FROM USER: " + user.getName() + "/" + user.getId());
       log.info("IS MEMBER NULL: " + (member == null));
+
       if (member != null) {
         log.info("HAS " + RANKY_USER_ROLE + " ROLE: " + member
             .getRoles().stream()
@@ -74,6 +75,10 @@ public class RankyMessageListener extends ListenerAdapter {
       }
 
       String command = event.getMessage().getContentRaw();
+      log.info("COMMAND: " + command);
+      String[] words = command.split("\"");
+      log.info("SIZE OF WORDS: " + words.length);
+      log.info("WORDS: " + String.join("|", words));
       if (command.contains(HELP_COMMAND)) {
         help(event);
       } else if (command.contains(MIGRATE_COMMAND) && member != null && member
