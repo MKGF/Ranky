@@ -381,7 +381,10 @@ public class RankyMessageListener extends ListenerAdapter {
   }
 
   protected boolean isAddAccountCommand(String command) {
+    log.info("COMMAND: " + command);
     String[] words = command.split("\"");
+    log.info("SIZE OF WORDS: " + words.length);
+    log.info("WORDS: " + String.join("|", words));
     if (words.length < 3) {
       return false;
     } else {
