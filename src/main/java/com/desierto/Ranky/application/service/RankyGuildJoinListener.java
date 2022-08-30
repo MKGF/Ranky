@@ -42,7 +42,7 @@ public class RankyGuildJoinListener extends ListenerAdapter {
     event.getJDA().getPresence().setActivity(
         Activity
             .playing("currently at " + event.getJDA().getGuilds().size() + " different servers."));
-    
+
     event.getGuild().createTextChannel(PRIVATE_CONFIG_CHANNEL).clearPermissionOverrides().queue();
     event.getGuild().createRole().setName(RANKY_USER_ROLE).queue();
     String welcomeMessage =
@@ -68,7 +68,11 @@ public class RankyGuildJoinListener extends ListenerAdapter {
             +
             "- /removeAccount \"RANKINGNAME\" ACCOUNT removes the account from the ranking if it exists.\n"
             +
-            "- /ranking \"RANKINGNAME\" gives the soloQ information of the accounts in the ranking ordered by rank.";
+            "- /ranking \"RANKINGNAME\" gives the soloQ information of the accounts in the ranking ordered by rank.\n\n"
+            +
+            "Ranky isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties."
+            +
+            "Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.";
 
     BaseGuildMessageChannel textChannel = event.getGuild().getDefaultChannel();
     if (textChannel == null) {
