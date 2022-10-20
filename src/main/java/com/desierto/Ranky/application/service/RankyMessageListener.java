@@ -130,7 +130,9 @@ public class RankyMessageListener extends ListenerAdapter {
             +
             "- /removeAccount \"RANKINGNAME\" ACCOUNT removes the account from the ranking if it exists.\n"
             +
-            "- /ranking \"RANKINGNAME\" gives the soloQ information of the accounts in the ranking ordered by rank.";
+            "- /ranking \"RANKINGNAME\" gives the soloQ information of the accounts in the ranking ordered by rank,\nalong with a bubble that displays whether the player is in game or not and the link to the user's stream in case there is any.\n"
+            +
+            "- /addStream \"RANKINGNAME\" \"ACCOUNT\" LINKTOSTREAM adds a link that refers to the player's stream.";
     EmbedBuilder embed = new EmbedBuilder();
     embed.setTitle("RANKY HELP");
     embed.setDescription(helpMessage);
