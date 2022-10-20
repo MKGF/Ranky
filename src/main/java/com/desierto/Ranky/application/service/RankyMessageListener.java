@@ -311,12 +311,12 @@ public class RankyMessageListener extends ListenerAdapter {
       throws AccountNotFoundException {
     String rankingName = getRankingName(command);
     String[] params = getWordsAfterRankingName(command, rankingName);
-    if (params.length != 2) {
+    if (params.length != 3) {
       rethrowExceptionAfterNoticingTheServer(event, new ExcessiveParamsException());
     }
 
-    String account = params[0];
-    String streamChannel = params[1];
+    String account = params[1];
+    String streamChannel = params[2].replace(" ", "");
     TextChannel configChannel = getConfigChannel(event.getGuild());
     if (rankingExists(configChannel, rankingName)) {
       RankingConfigurationWithMessageId ranking = getRankingWithMessageId(configChannel,
@@ -468,7 +468,7 @@ public class RankyMessageListener extends ListenerAdapter {
   protected boolean isAddStreamChannelCommand(String command) {
     log.info("Looking if it's addStream command or not.");
     String[] words = command.split("\"");
-    if (words.length != 4) {
+    if (words.length != 5) {
       log.info("IT IS NOT.");
       return false;
     }

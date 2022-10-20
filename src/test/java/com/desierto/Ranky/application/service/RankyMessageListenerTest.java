@@ -114,4 +114,23 @@ public class RankyMessageListenerTest extends BaseTest {
     assertFalse(ranky.isRemoveAccountCommand(thirdCommand));
     assertFalse(ranky.isRemoveAccountCommand(fourthCommand));
   }
+
+  @Test
+  public void isAddStreamCommandTest() {
+    String firstCommand = "/addStream \"RANKING\" \"Test Account\" https://www.twitch.tv/mk_gf";
+    String secondCommand = "/addStream \"RANKING\" \"Test Account\"";
+    assertTrue(ranky.isAddStreamChannelCommand(firstCommand));
+    assertFalse(ranky.isAddStreamChannelCommand(secondCommand));
+  }
+
+  @Test
+  public void getWordsAfterRankingNameTest() {
+    String firstCommand = "/addStream \"RANKING\" \"Test Account\" https://www.twitch.tv/mk_gf";
+    String secondCommand = "/addStream \"RANKING\" \"Test Account\"";
+    String[] firstParams = ranky.getWordsAfterRankingName(firstCommand, "RANKING");
+    String[] secondParams = ranky.getWordsAfterRankingName(secondCommand, "RANKING");
+    assertEquals(3, firstParams.length);
+    assertEquals(2, secondParams.length);
+    assertEquals(" https://www.twitch.tv/mk_gf", firstParams[2]);
+  }
 }
