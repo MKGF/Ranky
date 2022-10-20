@@ -316,7 +316,7 @@ public class RankyMessageListener extends ListenerAdapter {
     }
 
     String account = params[1];
-    String streamChannel = params[2].replace(" ", "");
+    String streamChannel = params[2].replace(" ", "") + " ";
     TextChannel configChannel = getConfigChannel(event.getGuild());
     if (rankingExists(configChannel, rankingName)) {
       RankingConfigurationWithMessageId ranking = getRankingWithMessageId(configChannel,
