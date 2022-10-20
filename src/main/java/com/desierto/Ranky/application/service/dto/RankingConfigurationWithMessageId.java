@@ -1,5 +1,6 @@
 package com.desierto.Ranky.application.service.dto;
 
+import com.desierto.Ranky.domain.exception.account.AccountNotFoundException;
 import com.desierto.Ranky.domain.valueobject.RankingConfiguration;
 import com.google.gson.Gson;
 import java.util.List;
@@ -33,7 +34,12 @@ public class RankingConfigurationWithMessageId {
   }
 
   public void removeAccount(String account) {
-    rankingConfiguration.removeAccount(account);
+    rankingConfiguration.removeAccountNamed(account);
+  }
+
+  public void addStreamChannelToAccount(String streamChannel, String account)
+      throws AccountNotFoundException {
+    rankingConfiguration.addStreamChannelToAccount(streamChannel, account);
   }
 
 //  public void setDeadline(LocalDateTime deadline) {

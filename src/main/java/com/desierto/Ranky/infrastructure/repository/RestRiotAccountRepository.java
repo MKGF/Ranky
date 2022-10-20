@@ -36,8 +36,8 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
   @Override
   public List<AccountInformation> getAccountInformation(Account account) {
     LeaguePositions leaguePositions = Orianna.leaguePositionsForSummoner(
-        Orianna.summonerNamed(account.getName()).get()
-    )
+            Orianna.summonerNamed(account.getName()).get()
+        )
         .get();
 
     return leaguePositions.stream().map(leagueEntry ->
@@ -63,8 +63,8 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
     Summoner summoner = Orianna.summonerNamed(name).get();
     if (summoner.exists()) {
       LeaguePositions leaguePositions = Orianna.leaguePositionsForSummoner(
-          summoner
-      )
+              summoner
+          )
           .get();
 
       AccountInformation soloQ = leaguePositions.stream()
@@ -99,14 +99,14 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
   }
 
   @Override
-  public Optional<Account> getAccountById(String id) {
+  public Optional<Account> getAccountById(String id, String streamChannel) {
     Summoner summoner = Orianna.summonerWithAccountId(id).get();
     if (summoner.exists()) {
       LeaguePositions leaguePositions = Orianna.leaguePositionsForSummoner(
-          summoner
-      )
+              summoner
+          )
           .get();
-
+      Boolean isInGame = summoner.isInGame();
       AccountInformation soloQ = leaguePositions.stream()
           .filter(leagueEntry -> leagueEntry.getQueue() != null && leagueEntry.getQueue().getTag()
               .equalsIgnoreCase(SOLOQ.getValue()))
@@ -130,8 +130,10 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
           );
       return Optional.of(Account.builder()
           .id(summoner.getAccountId())
+          .isInGame(isInGame)
           .name(leaguePositions.getSummoner().getName())
           .accountInformation(soloQ)
+          .streamChannel(streamChannel)
           .build());
     } else {
       return Optional.empty();

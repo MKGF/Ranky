@@ -11,6 +11,6 @@ public interface RiotAccountRepository {
 
   Optional<Account> getAccountByName(String name);
 
-  Optional<Account> getAccountById(String id);
+  Optional<Account> getAccountById(String id, String streamChannel);
 
 }

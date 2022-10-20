@@ -3,6 +3,7 @@ package com.desierto.Ranky.application.service;
 import com.desierto.Ranky.application.service.dto.RankingConfigurationWithMessageId;
 import com.desierto.Ranky.domain.entity.Account;
 import com.desierto.Ranky.domain.exception.ConfigChannelNotFoundException;
+import com.desierto.Ranky.domain.exception.ExcessiveParamsException;
 import com.desierto.Ranky.domain.exception.RankingAlreadyExistsException;
 import com.desierto.Ranky.domain.exception.account.AccountNotFoundException;
 import com.desierto.Ranky.domain.exception.ranking.RankingNotFoundException;
@@ -38,10 +39,13 @@ public class RankyMessageListener extends ListenerAdapter {
   public static final Logger log = Logger.getLogger("RankyMessageListener.class");
 
   public static final String CREATE_COMMAND = "/create";
+
   public static final String DEADLINE_COMMAND = "/setDeadline";
   public static final String ADD_ACCOUNT_COMMAND = "/addAccount";
   public static final String ADD_MULTIPLE_COMMAND = "/addMultiple";
   public static final String REMOVE_ACCOUNT_COMMAND = "/removeAccount";
+
+  public static final String ADD_STREAM_COMMAND = "/addStream";
   public static final String RANKING_COMMAND = "/ranking";
   public static final String MIGRATE_COMMAND = "/migrate";
   public static final String HELP_COMMAND = "/helpRanky";
@@ -101,6 +105,10 @@ public class RankyMessageListener extends ListenerAdapter {
             .getRoles().stream()
             .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
           removeAccount(event, gson, command);
+        } else if (isAddStreamChannelCommand(command) && member != null && member.getRoles()
+            .stream()
+            .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
+          addStreamChannel(event, gson, command);
         } else if (command.contains(RANKING_COMMAND)) {
           queryRanking(event, command);
         }
@@ -154,6 +162,7 @@ public class RankyMessageListener extends ListenerAdapter {
     }
   }
 
+  @Deprecated
   protected void migrateRanking(MessageReceivedEvent event, Gson gson, String command) {
     log.info("ENTERED MIGRATE.");
     String rankingName = getRankingName(command);
@@ -165,7 +174,7 @@ public class RankyMessageListener extends ListenerAdapter {
           rankingName);
       log.info("RETRIEVED CURRENT RANKING.");
       List<Optional<Account>> optionals = ranking.getRankingConfiguration().getAccounts().stream()
-          .map(s -> riotAccountRepository.getAccountByName(s)).collect(
+          .map(s -> riotAccountRepository.getAccountByName(s.getAccountId())).collect(
               Collectors.toList());
       List<Account> accounts = optionals.stream().filter(Optional::isPresent).map(Optional::get)
           .sorted().collect(
@@ -189,7 +198,8 @@ public class RankyMessageListener extends ListenerAdapter {
     if (rankingExists(configChannel, rankingName)) {
       RankingConfiguration rankingConfiguration = getRanking(configChannel, rankingName);
       List<Optional<Account>> optionals = rankingConfiguration.getAccounts().stream()
-          .map(s -> riotAccountRepository.getAccountById(s)).collect(
+          .map(s -> riotAccountRepository.getAccountById(s.getAccountId(), s.getStreamChannel()))
+          .collect(
               Collectors.toList());
       List<Account> accounts = optionals.stream().filter(Optional::isPresent).map(Optional::get)
           .sorted().collect(
@@ -199,7 +209,7 @@ public class RankyMessageListener extends ListenerAdapter {
       String accountsToText = accounts.stream().map(Account::getFormattedForRanking).collect(
           Collectors.joining("\n"));
       ranking.setDescription(accountsToText);
-      ranking.addField("Creator", "Maiky", false);
+      ranking.addField("Creator", "Maiky | Twitter: @maikyelrenacido", false);
       ranking.setColor(0x000000);
       event.getChannel().sendMessageEmbeds(ranking.build()).queue();
       ranking.clear();
@@ -297,6 +307,31 @@ public class RankyMessageListener extends ListenerAdapter {
     }
   }
 
+  private void addStreamChannel(MessageReceivedEvent event, Gson gson, String command)
+      throws AccountNotFoundException {
+    String rankingName = getRankingName(command);
+    String[] params = getWordsAfterRankingName(command, rankingName);
+    if (params.length != 2) {
+      rethrowExceptionAfterNoticingTheServer(event, new ExcessiveParamsException());
+    }
+
+    String account = params[0];
+    String streamChannel = params[1];
+    TextChannel configChannel = getConfigChannel(event.getGuild());
+    if (rankingExists(configChannel, rankingName)) {
+      RankingConfigurationWithMessageId ranking = getRankingWithMessageId(configChannel,
+          rankingName);
+      Account riotAccount = riotAccountRepository.getAccountByName(account)
+          .orElseThrow(() -> new AccountNotFoundException(account));
+      ranking.addStreamChannelToAccount(streamChannel, riotAccount.getId());
+      configChannel
+          .editMessageById(ranking.getMessageId(), gson.toJson(ranking.getRankingConfiguration()))
+          .queue();
+      event.getChannel().sendMessage("Stream successfully updated for account " + account + "!")
+          .queue();
+    }
+  }
+
   protected void rethrowExceptionAfterNoticingTheServer(MessageReceivedEvent event,
       RuntimeException e) throws ConfigChannelNotFoundException, RankingAlreadyExistsException {
     event.getChannel().sendMessage(e.getMessage()).queue();
@@ -357,6 +392,10 @@ public class RankyMessageListener extends ListenerAdapter {
   protected String getParameter(String command, String rankingName) {
     return command
         .substring(command.indexOf(rankingName) + rankingName.length() + 2);
+  }
+
+  protected String[] getWordsAfterRankingName(String command, String rankingName) {
+    return command.substring(command.indexOf(rankingName) + rankingName.length() + 2).split("\"");
   }
 
   protected List<String> getAccountsToAdd(String command, String rankingName) {
@@ -424,6 +463,15 @@ public class RankyMessageListener extends ListenerAdapter {
       }
       return command.startsWith(REMOVE_ACCOUNT_COMMAND);
     }
+  }
+
+  protected boolean isAddStreamChannelCommand(String command) {
+    String[] words = command.split("\"");
+    if (words.length != 4) {
+      return false;
+    }
+    return command.startsWith(ADD_STREAM_COMMAND);
+
   }
 
 }

@@ -36,14 +36,16 @@ public class RestRiotAccountRepositoryIT extends BaseIT {
     Summoner summoner = Orianna.summonerNamed(name).get();
     if (summoner.exists()) {
       LeaguePositions leaguePositions = Orianna.leaguePositionsForSummoner(
-          Orianna.summonerNamed(name).get()
-      )
+              Orianna.summonerNamed(name).get()
+          )
           .get();
       LeagueEntry soloQEntry = leaguePositions.stream()
           .filter(leagueEntry -> leagueEntry.getQueue().getTag().equalsIgnoreCase(SOLOQ.getValue()))
           .findAny().get();
+      Boolean isInGame = summoner.isInGame();
       Account expectedAccount = Account.builder()
           .name(soloQEntry.getSummoner().getName())
+          .isInGame(isInGame)
           .accountInformation(
               AccountInformation.builder()
                   .rank(

@@ -1,9 +1,11 @@
 package com.desierto.Ranky.domain.valueobject;
 
+import com.desierto.Ranky.domain.exception.account.AccountNotFoundException;
 import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,7 +18,7 @@ public class RankingConfiguration {
 
   String name;
 
-  List<String> accounts;
+  List<AccountWithStream> accounts;
 
 //  LocalDateTime deadline;
 
@@ -41,19 +43,30 @@ public class RankingConfiguration {
   }
 
   public void addAccount(String account) {
-    accounts.add(account);
+    accounts.add(new AccountWithStream(account, ""));
   }
 
   public void addAccounts(List<String> accounts) {
-    this.accounts.addAll(accounts);
+    this.accounts.addAll(
+        accounts.stream().map(a -> new AccountWithStream(a, "")).collect(Collectors.toList()));
   }
 
-  public void removeAccount(String account) {
-    accounts.remove(account);
+  public void removeAccountNamed(String account) {
+    accounts.removeIf(
+        accountWithStream -> accountWithStream.getAccountId().equalsIgnoreCase(account));
   }
 
+  @Deprecated
   public void setAccounts(List<String> accounts) {
-    this.accounts = accounts;
+//    this.accounts = accounts;
+  }
+
+  public void addStreamChannelToAccount(String streamChannel, String account)
+      throws AccountNotFoundException {
+    AccountWithStream accountWithStream = accounts.stream()
+        .filter(a -> a.getAccountId().equalsIgnoreCase(account)).findFirst().orElseThrow(() ->
+            new AccountNotFoundException(account));
+    accountWithStream.setStreamChannel(streamChannel);
   }
 
 //  public void setDeadline(LocalDateTime deadline) {

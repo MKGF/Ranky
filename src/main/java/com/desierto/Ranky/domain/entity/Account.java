@@ -19,6 +19,14 @@ public class Account implements Comparable<Account> {
   private String name;
   private AccountInformation accountInformation;
 
+  private Boolean isInGame;
+
+  private static final String isLive = "\uD83D\uDFE2";
+
+  private static final String isNotLive = "\uD83D\uDD34";
+
+  private String streamChannel;
+
   @Override
   public int compareTo(Account account) {
     if (this.accountInformation.getRank().compareTo(account.accountInformation.getRank()) != 0) {
@@ -30,10 +38,13 @@ public class Account implements Comparable<Account> {
   }
 
   public String getFormattedForRanking() {
-    return name + " | " + accountInformation.getRank().toString() + " | " + accountInformation
-        .getLeaguePoints()
-        + "LP | " + accountInformation.getWinrate().getWins() + "W/" + accountInformation
-        .getWinrate()
-        .getLosses() + "L | " + accountInformation.getWinrate().getPercentage().toString();
+    return isInGame ? isLive
+        : isNotLive + " | " + name + " | " + accountInformation.getRank().toString() + " | "
+            + accountInformation
+            .getLeaguePoints()
+            + "LP | " + accountInformation.getWinrate().getWins() + "W/" + accountInformation
+            .getWinrate()
+            .getLosses() + "L | " + accountInformation.getWinrate().getPercentage().toString()
+            + " | " + streamChannel;
   }
 }
