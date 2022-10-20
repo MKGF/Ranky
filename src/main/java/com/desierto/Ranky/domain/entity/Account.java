@@ -43,14 +43,14 @@ public class Account implements Comparable<Account> {
     String stream =
         (!streamChannel.isEmpty() && !streamChannel.isBlank()) ? " | [Stream]("
             + streamChannel.replace(" ", "")
-            : ") ";
-    return isPlaying + " | " + name + " | " + accountInformation.getRank().toString() + " | "
+            : ")";
+    return isPlaying + " | " + stream + " | " + name + " | " + accountInformation.getRank()
+        .toString() + " | "
         + accountInformation
         .getLeaguePoints()
         + "LP | " + accountInformation.getWinrate().getWins() + "W/" + accountInformation
         .getWinrate()
         .getLosses() + "L | " + accountInformation.getWinrate().getPercentage().toString()
-        + stream
         ;
   }
 }
