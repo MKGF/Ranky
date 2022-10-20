@@ -466,12 +466,14 @@ public class RankyMessageListener extends ListenerAdapter {
   }
 
   protected boolean isAddStreamChannelCommand(String command) {
+    log.info("Looking if it's addStream command or not.");
     String[] words = command.split("\"");
     if (words.length != 4) {
+      log.info("IT IS NOT.");
       return false;
     }
+    log.info("IT IS.");
     return command.startsWith(ADD_STREAM_COMMAND);
-
   }
 
 }
