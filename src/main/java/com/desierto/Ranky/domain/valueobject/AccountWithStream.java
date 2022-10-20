@@ -14,7 +14,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class AccountWithStream {
-
+  
   String accountId;
 
   String streamChannel;
