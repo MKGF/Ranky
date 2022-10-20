@@ -41,7 +41,8 @@ public class Account implements Comparable<Account> {
     String isPlaying = (isInGame ? isLive
         : isNotLive);
     String stream =
-        (!streamChannel.isEmpty() && !streamChannel.isBlank()) ? " | " + streamChannel : "";
+        (!streamChannel.isEmpty() && !streamChannel.isBlank()) ? " | (Stream)[" + streamChannel
+            : "]";
     return isPlaying + " | " + name + " | " + accountInformation.getRank().toString() + " | "
         + accountInformation
         .getLeaguePoints()
