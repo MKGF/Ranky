@@ -1,5 +1,6 @@
 package com.desierto.Ranky.domain.valueobject;
 
+import com.desierto.Ranky.domain.entity.Account;
 import com.desierto.Ranky.domain.exception.account.AccountNotFoundException;
 import com.google.gson.Gson;
 import java.util.ArrayList;
@@ -28,9 +29,14 @@ public class RankingConfiguration {
 //    this.deadline = null;
   }
 
-  public static RankingConfiguration fromMessage(Message message) {
+  private static RankingConfiguration fromMessage(Message message) {
     Gson gson = new Gson();
     return gson.fromJson(message.getContentRaw(), RankingConfiguration.class);
+  }
+
+  public static List<RankingConfiguration> fromMessages(List<Message> messages) {
+    Gson gson = new Gson();
+    return messages.stream().map(RankingConfiguration::fromMessage).collect(Collectors.toList());
   }
 
   public static Optional<RankingConfiguration> fromMessageIfPossible(Message message) {
@@ -67,6 +73,12 @@ public class RankingConfiguration {
         .filter(a -> a.getAccountId().equalsIgnoreCase(account)).findFirst().orElseThrow(() ->
             new AccountNotFoundException(account));
     accountWithStream.setStreamChannel(streamChannel);
+  }
+
+  public boolean hasAccountNamed(Account account) {
+    return this.getAccounts().stream()
+        .anyMatch(accountWithStream -> accountWithStream.getAccountId()
+            .equalsIgnoreCase(account.getId()));
   }
 
 //  public void setDeadline(LocalDateTime deadline) {

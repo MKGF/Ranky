@@ -8,13 +8,10 @@ import com.desierto.Ranky.domain.exception.RankingAlreadyExistsException;
 import com.desierto.Ranky.domain.exception.account.AccountNotFoundException;
 import com.desierto.Ranky.domain.exception.ranking.RankingNotFoundException;
 import com.desierto.Ranky.domain.repository.RiotAccountRepository;
+import com.desierto.Ranky.domain.valueobject.AccountWithStream;
 import com.desierto.Ranky.domain.valueobject.RankingConfiguration;
 import com.desierto.Ranky.infrastructure.Ranky;
 import com.google.gson.Gson;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -52,6 +49,8 @@ public class RankyMessageListener extends ListenerAdapter {
   public static final String PRIVATE_CONFIG_CHANNEL = "config-channel";
   public static final String RANKY_USER_ROLE = "Ranky user";
   public static final int RANKING_LIMIT = 100;
+
+  public static final int ACCOUNT_LIMIT = 10;
 
   @Autowired
   private RiotAccountRepository riotAccountRepository;
@@ -166,40 +165,22 @@ public class RankyMessageListener extends ListenerAdapter {
 
   @Deprecated
   protected void migrateRanking(MessageReceivedEvent event, Gson gson, String command) {
-    log.info("ENTERED MIGRATE.");
-    String rankingName = getRankingName(command);
-    TextChannel configChannel = getConfigChannel(event.getGuild());
-    if (rankingExists(configChannel, rankingName)) {
-      log.info("ENTERED RANKING EXISTS.");
-
-      RankingConfigurationWithMessageId ranking = getRankingWithMessageId(configChannel,
-          rankingName);
-      log.info("RETRIEVED CURRENT RANKING.");
-      List<Optional<Account>> optionals = ranking.getRankingConfiguration().getAccounts().stream()
-          .map(s -> riotAccountRepository.getAccountByName(s.getAccountId())).collect(
-              Collectors.toList());
-      List<Account> accounts = optionals.stream().filter(Optional::isPresent).map(Optional::get)
-          .sorted().collect(
-              Collectors.toList());
-      log.info("RETRIEVED DATA FROM RIOT.");
-      ranking.getRankingConfiguration()
-          .setAccounts(accounts.stream().map(Account::getId).collect(Collectors.toList()));
-      log.info("UPDATING RANKING FROM ACCOUNT NAME TO SUMMONER IDS.");
-      configChannel
-          .editMessageById(ranking.getMessageId(),
-              gson.toJson(ranking.getRankingConfiguration()))
-          .queue();
-      log.info("UPDATE SUCCESSFUL.");
-      event.getChannel().sendMessage("Accounts successfully migrated.").queue();
-    }
+    //Does nothing
   }
 
   protected void queryRanking(MessageReceivedEvent event, String command) {
     String rankingName = getRankingName(command);
+
     TextChannel configChannel = getConfigChannel(event.getGuild());
     if (rankingExists(configChannel, rankingName)) {
-      RankingConfiguration rankingConfiguration = getRanking(configChannel, rankingName);
-      List<Optional<Account>> optionals = rankingConfiguration.getAccounts().stream()
+      List<RankingConfiguration> rankingConfiguration = getRanking(configChannel, rankingName);
+      if (rankingConfiguration.isEmpty()) {
+        throw new RankingNotFoundException();
+      }
+      List<AccountWithStream> accountsWithStream = new ArrayList<>();
+      rankingConfiguration.forEach(
+          rankingConfiguration1 -> accountsWithStream.addAll(rankingConfiguration1.getAccounts()));
+      List<Optional<Account>> optionals = accountsWithStream.stream()
           .map(s -> riotAccountRepository.getAccountById(s.getAccountId(), s.getStreamChannel()))
           .collect(
               Collectors.toList());
@@ -218,35 +199,12 @@ public class RankyMessageListener extends ListenerAdapter {
     }
   }
 
-  protected void setDeadline(MessageReceivedEvent event, Gson gson, String command) {
-    String rankingName = getRankingName(command);
-    String deadlineString = getParameter(command, rankingName);
-    TextChannel configChannel = getConfigChannel(event.getGuild());
-    if (rankingExists(configChannel, rankingName)) {
-      RankingConfigurationWithMessageId ranking = getRankingWithMessageId(configChannel,
-          rankingName);
-      try {
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        LocalDate deadlineLocalDate = LocalDate.parse(deadlineString, df);
-        LocalDateTime deadline = deadlineLocalDate.atTime(23, 59, 59);
-//        ranking.setDeadline(deadline);
-        configChannel
-            .editMessageById(ranking.getMessageId(),
-                gson.toJson(ranking.getRankingConfiguration()))
-            .queue();
-        event.getChannel().sendMessage("Account successfully added to the ranking.").queue();
-      } catch (DateTimeParseException e) {
-        rethrowExceptionAfterNoticingTheServer(event, e);
-      }
-    }
-  }
-
   protected void addAccount(MessageReceivedEvent event, Gson gson, String command) {
     String rankingName = getRankingName(command);
     String accountToAdd = getParameter(command, rankingName);
     TextChannel configChannel = getConfigChannel(event.getGuild());
     if (rankingExists(configChannel, rankingName)) {
-      RankingConfigurationWithMessageId ranking = getRankingWithMessageId(configChannel,
+      List<RankingConfigurationWithMessageId> ranking = getRankingWithMessageId(configChannel,
           rankingName);
       Account account = null;
       try {
@@ -255,11 +213,25 @@ public class RankyMessageListener extends ListenerAdapter {
       } catch (AccountNotFoundException e) {
         rethrowExceptionAfterNoticingTheServer(event, e);
       }
-      ranking.addAccount(Objects.requireNonNull(account).getId());
-      configChannel
-          .editMessageById(ranking.getMessageId(), gson.toJson(ranking.getRankingConfiguration()))
-          .queue();
-      event.getChannel().sendMessage("Account successfully added to the ranking.").queue();
+      Optional<RankingConfigurationWithMessageId> messageWithRoom = ranking.stream().filter(
+          rankingConfigurationWithMessageId ->
+              rankingConfigurationWithMessageId.getRankingConfiguration().getAccounts().size()
+                  < ACCOUNT_LIMIT).findFirst();
+      if (messageWithRoom.isPresent()) {
+        RankingConfigurationWithMessageId rankingMessageWithRoom = messageWithRoom.get();
+        rankingMessageWithRoom.addAccount(Objects.requireNonNull(account).getId());
+        configChannel
+            .editMessageById(rankingMessageWithRoom.getMessageId(),
+                gson.toJson(rankingMessageWithRoom.getRankingConfiguration()))
+            .queue();
+        event.getChannel().sendMessage("Account successfully added to the ranking.").queue();
+      } else {
+        RankingConfiguration newMessageForRanking = new RankingConfiguration(rankingName);
+        newMessageForRanking.addAccount(Objects.requireNonNull(account).getId());
+        String json = gson
+            .toJson(newMessageForRanking);
+        configChannel.sendMessage(json).queue();
+      }
     }
   }
 
@@ -268,8 +240,7 @@ public class RankyMessageListener extends ListenerAdapter {
     List<String> accountsToAdd = getAccountsToAdd(command, rankingName);
     TextChannel configChannel = getConfigChannel(event.getGuild());
     if (rankingExists(configChannel, rankingName)) {
-      RankingConfigurationWithMessageId ranking = getRankingWithMessageId(configChannel,
-          rankingName);
+
       List<Account> accounts = new ArrayList<>();
       accountsToAdd.forEach(s -> {
         try {
@@ -279,11 +250,31 @@ public class RankyMessageListener extends ListenerAdapter {
           rethrowExceptionAfterNoticingTheServer(event, e);
         }
       });
-      ranking.addAccounts(accounts.stream().map(Account::getId).collect(Collectors.toList()));
-      configChannel
-          .editMessageById(ranking.getMessageId(), gson.toJson(ranking.getRankingConfiguration()))
-          .queue();
-      event.getChannel().sendMessage("Accounts successfully added to the ranking.").queue();
+      accounts.forEach(account -> {
+            List<RankingConfigurationWithMessageId> ranking = getRankingWithMessageId(configChannel,
+                rankingName);
+            Optional<RankingConfigurationWithMessageId> messageWithRoom = ranking.stream().filter(
+                rankingConfigurationWithMessageId ->
+                    rankingConfigurationWithMessageId.getRankingConfiguration().getAccounts().size()
+                        < ACCOUNT_LIMIT).findFirst();
+            if (messageWithRoom.isPresent()) {
+              RankingConfigurationWithMessageId rankingMessageWithRoom = messageWithRoom.get();
+              rankingMessageWithRoom.addAccount(Objects.requireNonNull(account).getId());
+              configChannel
+                  .editMessageById(rankingMessageWithRoom.getMessageId(),
+                      gson.toJson(rankingMessageWithRoom.getRankingConfiguration()))
+                  .queue();
+              event.getChannel().sendMessage("Account successfully added to the ranking.").queue();
+            } else {
+              RankingConfiguration newMessageForRanking = new RankingConfiguration(rankingName);
+              newMessageForRanking.addAccount(Objects.requireNonNull(account).getId());
+              String json = gson
+                  .toJson(newMessageForRanking);
+              configChannel.sendMessage(json).queue();
+            }
+          }
+      );
+
     }
   }
 
@@ -292,7 +283,8 @@ public class RankyMessageListener extends ListenerAdapter {
     String accountToRemove = getParameter(command, rankingName);
     TextChannel configChannel = getConfigChannel(event.getGuild());
     if (rankingExists(configChannel, rankingName)) {
-      RankingConfigurationWithMessageId ranking = getRankingWithMessageId(configChannel,
+      List<RankingConfigurationWithMessageId> rankingInMessages = getRankingWithMessageId(
+          configChannel,
           rankingName);
       Account account = null;
       try {
@@ -301,11 +293,21 @@ public class RankyMessageListener extends ListenerAdapter {
       } catch (AccountNotFoundException e) {
         rethrowExceptionAfterNoticingTheServer(event, e);
       }
-      ranking.removeAccount(Objects.requireNonNull(account).getId());
-      configChannel
-          .editMessageById(ranking.getMessageId(), gson.toJson(ranking.getRankingConfiguration()))
-          .queue();
-      event.getChannel().sendMessage("Account successfully removed from the ranking.").queue();
+      try {
+        Account finalAccount = account;
+        RankingConfigurationWithMessageId ranking = rankingInMessages.stream().filter(
+                rankingConfigurationWithMessageId -> rankingConfigurationWithMessageId.getRankingConfiguration()
+                    .hasAccountNamed(finalAccount)).findFirst()
+            .orElseThrow(() -> new AccountNotFoundException(accountToRemove));
+
+        ranking.removeAccount(Objects.requireNonNull(account).getId());
+        configChannel
+            .editMessageById(ranking.getMessageId(), gson.toJson(ranking.getRankingConfiguration()))
+            .queue();
+        event.getChannel().sendMessage("Account successfully removed from the ranking.").queue();
+      } catch (AccountNotFoundException e) {
+        rethrowExceptionAfterNoticingTheServer(event, e);
+      }
     }
   }
 
@@ -321,9 +323,15 @@ public class RankyMessageListener extends ListenerAdapter {
     String streamChannel = params[2].replace(" ", "") + " ";
     TextChannel configChannel = getConfigChannel(event.getGuild());
     if (rankingExists(configChannel, rankingName)) {
-      RankingConfigurationWithMessageId ranking = getRankingWithMessageId(configChannel,
+      List<RankingConfigurationWithMessageId> rankingInMessages = getRankingWithMessageId(
+          configChannel,
           rankingName);
+
       Account riotAccount = riotAccountRepository.getAccountByName(account)
+          .orElseThrow(() -> new AccountNotFoundException(account));
+      RankingConfigurationWithMessageId ranking = rankingInMessages.stream().filter(
+              rankingConfigurationWithMessageId -> rankingConfigurationWithMessageId.getRankingConfiguration()
+                  .hasAccountNamed(riotAccount)).findFirst()
           .orElseThrow(() -> new AccountNotFoundException(account));
       ranking.addStreamChannelToAccount(streamChannel, riotAccount.getId());
       configChannel
@@ -353,9 +361,9 @@ public class RankyMessageListener extends ListenerAdapter {
         });
   }
 
-  protected RankingConfiguration getRanking(TextChannel channel, String rankingName) {
+  protected List<RankingConfiguration> getRanking(TextChannel channel, String rankingName) {
     return RankingConfiguration
-        .fromMessage(channel.getHistory().retrievePast(RANKING_LIMIT).complete().stream()
+        .fromMessages(channel.getHistory().retrievePast(RANKING_LIMIT).complete().stream()
             .filter(message -> {
               Optional<RankingConfiguration> optionalRanking = RankingConfiguration
                   .fromMessageIfPossible(message);
@@ -364,15 +372,14 @@ public class RankyMessageListener extends ListenerAdapter {
                     .equalsIgnoreCase(rankingName);
               }
               return false;
-            }).findFirst()
-            .orElseThrow(
-                RankingNotFoundException::new));
+            }).collect(Collectors.toList()));
+
   }
 
-  protected RankingConfigurationWithMessageId getRankingWithMessageId(TextChannel channel,
+  protected List<RankingConfigurationWithMessageId> getRankingWithMessageId(TextChannel channel,
       String rankingName) {
     return RankingConfigurationWithMessageId
-        .fromMessage(channel.getHistory().retrievePast(RANKING_LIMIT).complete().stream()
+        .fromMessages(channel.getHistory().retrievePast(RANKING_LIMIT).complete().stream()
             .filter(message -> {
               Optional<RankingConfiguration> optionalRanking = RankingConfiguration
                   .fromMessageIfPossible(message);
@@ -381,9 +388,8 @@ public class RankyMessageListener extends ListenerAdapter {
                     .equalsIgnoreCase(rankingName);
               }
               return false;
-            }).findFirst()
-            .orElseThrow(
-                RankingNotFoundException::new));
+            }).collect(Collectors.toList()));
+
   }
 
   protected String getRankingName(String command) {

@@ -4,6 +4,7 @@ import com.desierto.Ranky.domain.exception.account.AccountNotFoundException;
 import com.desierto.Ranky.domain.valueobject.RankingConfiguration;
 import com.google.gson.Gson;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,11 +19,16 @@ public class RankingConfigurationWithMessageId {
 
   String messageId;
 
-  public static RankingConfigurationWithMessageId fromMessage(Message message) {
+  private static RankingConfigurationWithMessageId fromMessage(Message message) {
     Gson gson = new Gson();
     RankingConfiguration ranking = gson
         .fromJson(message.getContentRaw(), RankingConfiguration.class);
     return new RankingConfigurationWithMessageId(ranking, message.getId());
+  }
+
+  public static List<RankingConfigurationWithMessageId> fromMessages(List<Message> messages) {
+    return messages.stream().map(RankingConfigurationWithMessageId::fromMessage)
+        .collect(Collectors.toList());
   }
 
   public void addAccount(String account) {
