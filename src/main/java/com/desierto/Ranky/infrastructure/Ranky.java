@@ -65,18 +65,7 @@ public class Ranky extends SpringBootServletInitializer {
 
   private static List<CommandData> getCommands() {
     List<CommandData> commands = new ArrayList<>();
-    commands.add(Commands.slash("helpRanky", "Gives an explanation on how to use the bot."));
-    commands.add(Commands.slash("create", "Creates a ranking. Usage: /create \"Test ranking\""));
-    commands.add(Commands.slash("addAccount",
-        "Adds an account to a ranking. Usage: /addAccount \"Test ranking\" account"));
-    commands.add(Commands.slash("addMultiple",
-        "Adds several accounts to a ranking. Usage: /addMultiple \"Test ranking\" account1, account2"));
-    commands.add(Commands.slash("removeAccount",
-        "Removes an account from the ranking. Usage: /removeAccount \"Test ranking\" account"));
-    commands.add(Commands.slash("addStream",
-        "Adds a stream to an account from the ranking. Usage: /addStream \"Test ranking\" \"account\" link-to-stream"));
-    commands.add(Commands.slash("ranking",
-        "Gets the information of the ranking. Usage: /ranking \"Test ranking\""));
+    commands.add(Commands.slash("test", "Testing slash commands. Does nothing."));
 
     return commands;
   }
