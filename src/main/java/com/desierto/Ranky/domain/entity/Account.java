@@ -37,14 +37,15 @@ public class Account implements Comparable<Account> {
         account.accountInformation.getLeaguePoints()) * -1;
   }
 
-  public String getFormattedForRanking() {
+  public String getFormattedForRanking(int index) {
     String isPlaying = (isInGame ? isLive
         : isNotLive);
     String stream =
         (!streamChannel.isEmpty() && !streamChannel.isBlank()) ? "[Stream]("
             + streamChannel.replace(" ", "") + ")"
             : "";
-    return isPlaying + " | " + stream + " | " + name + " | " + accountInformation.getRank()
+    return index + " | " + isPlaying + " | " + stream + " | " + name + " | "
+        + accountInformation.getRank()
         .toString() + " | "
         + accountInformation
         .getLeaguePoints()

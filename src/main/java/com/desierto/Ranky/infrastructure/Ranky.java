@@ -39,7 +39,6 @@ public class Ranky extends SpringBootServletInitializer {
           .enableIntents(GatewayIntent.GUILD_MEMBERS).build();
       bot.addEventListener(new RankyGuildJoinListener());
       bot.addEventListener(new RankyMessageListener(context.getBean(RiotAccountRepository.class)));
-
     } catch (LoginException e) {
       throw new BotCredentialsMissingException(e.getMessage());
     } finally {

@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -189,8 +190,11 @@ public class RankyMessageListener extends ListenerAdapter {
               Collectors.toList());
       EmbedBuilder ranking = new EmbedBuilder();
       ranking.setTitle("\uD83D\uDC51 RANKING " + rankingName.toUpperCase() + " \uD83D\uDC51");
-      String accountsToText = accounts.stream().map(Account::getFormattedForRanking).collect(
-          Collectors.joining("\n"));
+      AtomicInteger index = new AtomicInteger(1);
+      String accountsToText = accounts.stream()
+          .map((account) -> account.getFormattedForRanking(index.getAndIncrement()))
+          .collect(
+              Collectors.joining("\n"));
       ranking.setDescription(accountsToText);
       ranking.addField("Creator", "Maiky | Twitter: @maikyelrenacido", false);
       ranking.setColor(0x000000);
