@@ -5,10 +5,10 @@ import java.util.Optional;
 import java.util.logging.Logger;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.BaseGuildMessageChannel;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -74,7 +74,7 @@ public class RankyGuildJoinListener extends ListenerAdapter {
             +
             "Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.";
 
-    BaseGuildMessageChannel textChannel = event.getGuild().getDefaultChannel();
+    DefaultGuildChannelUnion textChannel = event.getGuild().getDefaultChannel();
     if (textChannel == null) {
       if (event.getGuild().getSystemChannel() != null) {
         event.getGuild().getSystemChannel().sendMessage(welcomeMessage).complete();
@@ -82,7 +82,7 @@ public class RankyGuildJoinListener extends ListenerAdapter {
         event.getGuild().getTextChannels().get(0).sendMessage(welcomeMessage).complete();
       }
     } else {
-      textChannel.sendMessage(welcomeMessage).complete();
+      textChannel.asTextChannel().sendMessage(welcomeMessage).complete();
     }
     if (event.getGuild().getOwner() != null) {
       String ownerMessage = "Hello " + event.getGuild().getOwner().getUser().getName() + "!. \n"

@@ -1,14 +1,14 @@
 package com.desierto.Ranky.infrastructure;
 
+import com.desierto.Ranky.application.service.RankyButtonClickListener;
 import com.desierto.Ranky.application.service.RankyGuildJoinListener;
 import com.desierto.Ranky.application.service.RankyMessageListener;
-import com.desierto.Ranky.domain.exception.BotCredentialsMissingException;
+import com.desierto.Ranky.application.service.RankySlashCommandListener;
 import com.desierto.Ranky.domain.repository.RiotAccountRepository;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-import javax.security.auth.login.LoginException;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -33,27 +33,24 @@ public class Ranky extends SpringBootServletInitializer {
         .run(Ranky.class, args);
 
     ConfigLoader config = context.getBean(ConfigLoader.class);
-    try {
-      bot = JDABuilder.createDefault(config.getDiscordApiKey())
-          .enableIntents(GatewayIntent.GUILD_MEMBERS).build();
-      bot.addEventListener(new RankyGuildJoinListener());
-      bot.addEventListener(new RankyMessageListener(context.getBean(RiotAccountRepository.class)));
-    } catch (LoginException e) {
-      throw new BotCredentialsMissingException(e.getMessage());
-    } finally {
-      if (bot == null) {
-        SpringApplication.exit(context, () -> -1);
-      }
-      try {
-        bot.awaitReady();
-      } catch (InterruptedException e) {
-        SpringApplication.exit(context, () -> -1);
-      }
-      bot.updateCommands().addCommands(getCommands()).queue();
-
-      bot.getPresence().setActivity(
-          Activity.playing("currently at " + bot.getGuilds().size() + " different servers."));
+    bot = JDABuilder.createDefault(config.getDiscApiKey())
+        .enableIntents(GatewayIntent.GUILD_MEMBERS).build();
+    bot.addEventListener(new RankyGuildJoinListener());
+    bot.addEventListener(new RankyMessageListener(context.getBean(RiotAccountRepository.class)));
+    bot.addEventListener(new RankySlashCommandListener());
+    bot.addEventListener(new RankyButtonClickListener());
+    if (bot == null) {
+      SpringApplication.exit(context, () -> -1);
     }
+    try {
+      bot.awaitReady();
+    } catch (InterruptedException e) {
+      SpringApplication.exit(context, () -> -1);
+    }
+    bot.updateCommands().addCommands(getCommands()).queue();
+
+    bot.getPresence().setActivity(
+        Activity.playing("currently at " + bot.getGuilds().size() + " different servers."));
   }
 
   @Override

@@ -14,6 +14,6 @@ public class ConfigLoader {
   @Value("${riot.base.url}")
   private String riotBaseUrl;
 
-  @Value("${discord.api.key}")
-  private String discordApiKey;
+  @Value("${disc.api.key}")
+  private String discApiKey;
 }
