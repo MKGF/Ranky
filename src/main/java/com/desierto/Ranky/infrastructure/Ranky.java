@@ -4,6 +4,7 @@ import com.desierto.Ranky.application.service.RankyGuildJoinListener;
 import com.desierto.Ranky.application.service.RankyMessageListener;
 import com.desierto.Ranky.domain.exception.BotCredentialsMissingException;
 import com.desierto.Ranky.domain.repository.RiotAccountRepository;
+import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -25,17 +26,15 @@ public class Ranky extends SpringBootServletInitializer {
 
   public static JDA bot = null;
   public static String prefix = "/";
-  public static final String RIOT_API_KEY = "api.key";
-  public static final String RIOT_BASE_URL = "riot.base.url";
   public static final Logger log = Logger.getLogger("Ranky.class");
 
   public static void main(String[] args) {
-    System.setProperty(RIOT_API_KEY, System.getenv("RIOT_API_KEY"));
-    System.setProperty(RIOT_BASE_URL, "https://euw1.api.riotgames.com");
     ConfigurableApplicationContext context = SpringApplication
         .run(Ranky.class, args);
+
+    ConfigLoader config = context.getBean(ConfigLoader.class);
     try {
-      bot = JDABuilder.createDefault(System.getenv("DISCORD_API_KEY"))
+      bot = JDABuilder.createDefault(config.getDiscordApiKey())
           .enableIntents(GatewayIntent.GUILD_MEMBERS).build();
       bot.addEventListener(new RankyGuildJoinListener());
       bot.addEventListener(new RankyMessageListener(context.getBean(RiotAccountRepository.class)));

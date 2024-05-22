@@ -8,9 +8,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ConfigLoader {
 
-  @Value("${api.key}")
-  private String apiKey;
+  @Value("${riot.api.key}")
+  private String riotApiKey;
 
   @Value("${riot.base.url}")
   private String riotBaseUrl;
+
+  @Value("${discord.api.key}")
+  private String discordApiKey;
 }

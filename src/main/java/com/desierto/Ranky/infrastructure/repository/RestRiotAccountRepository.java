@@ -29,7 +29,7 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
 
   @PostConstruct
   public void setUp() {
-    Orianna.setRiotAPIKey(configLoader.getApiKey());
+    Orianna.setRiotAPIKey(configLoader.getRiotApiKey());
     Orianna.setDefaultRegion(Region.EUROPE_WEST);
   }
 
