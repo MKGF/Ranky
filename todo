@@ -3,3 +3,7 @@
 -Que discord sugiera los comandos de Ranky como lo hacen otros bots
   +Interactions API https://github.com/discord-jda/JDA/wiki/Interactions
 -Crear una homepage desde donde poder incluir el bot en tu servidor y dar una pequeña explicacion sobre el bot y su contexto
+-Todos los valores de configuracion deben venir de un fichero en particular, no de parametros ni de secrets (ya que ya no estamos en AWS)
+  +Mas adelante evaluaremos si merece la pena establecer una encriptacion entre el fichero de config y nuestra aplicacion como meter la config en una keystore
+-CICD independiente del entorno. Esta aplicacion debe de ser facil de ejecutar en cualquier lugar y para ello la complejidad del compilado con su config
+es algo que debemos abordar nosotros para que lo unico que tengamos que hacer sea subir el jar y ejecutar "java -jar"
