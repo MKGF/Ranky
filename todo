@@ -1,5 +1,5 @@
--Que en la lista aparezca un indicador de si esta en partida o no cada jugador
--Que aparezca un link directo al canal de twitch de cada jugador (en caso de añadirlo)
+-Cambiar dv8 API por discord-jda
+-Revisar los cambios de Riot a las cuentas y arreglar lo que no funcione sobre extraccion de cuentas de Riot (empezar a soportar el #)
 -Que discord sugiera los comandos de Ranky como lo hacen otros bots
--Darle un logo al bot  
--Crear una homepage desde donde poder descargar el bot
+  +Interactions API https://github.com/discord-jda/JDA/wiki/Interactions
+-Crear una homepage desde donde poder incluir el bot en tu servidor y dar una pequeña explicacion sobre el bot y su contexto
