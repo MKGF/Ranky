@@ -7,3 +7,16 @@
   +Mas adelante evaluaremos si merece la pena establecer una encriptacion entre el fichero de config y nuestra aplicacion como meter la config en una keystore
 -CICD independiente del entorno. Esta aplicacion debe de ser facil de ejecutar en cualquier lugar y para ello la complejidad del compilado con su config
 es algo que debemos abordar nosotros para que lo unico que tengamos que hacer sea subir el jar y ejecutar "java -jar"
+
+Hasta ahora el bot se comunicaba con todo el servidor a la vez, interpretando cada mensaje que era capaz de leer y si era un comando que el entendia,
+respondia. Esta solucion es caotica, ya que no todo el mundo puede estar familiarizado con el funcionamiento de un comando.
+Por otro lado, incorpora mucho ruido al servidor, ya sea por los comandos que al fin y al cabo, son mensajes que la gente manda a un canal,
+como las respuestas del bot, que tambien son visibles para todo el mundo.
+Ademas surgieron los "slash commands" que complican el uso de Ranky ya que usa el mismo token que un slash command para dar comienzo al comando (/).
+
+Por esta razon conviene cambiar y usar los slash commands. Arreglan el problema del ruido, arreglan en parte el problema con los comandos,
+ya que la interfaz de Discord ayuda con guias visuales sobre como escribir cada comando.
+
+Esto no significa que Ranky no deba mandar mensajes. El mensaje introductorio siempre debe estar para dar una breve explicacion sobre lo que es
+capaz de hacer. Ademas, puede tener sentido que en cierto momento alguien quiera compartir el ranking con todo el mundo y lo podemos solventar
+incorporando un boton al slash command para que Ranky reenvie el mensaje del hook del comando a todo el servidor.
