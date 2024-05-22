@@ -36,7 +36,7 @@ public class Rank implements Comparable<Rank> {
 
   public enum Tier implements ValueEnum<String> {
     UNRANKED("UNRANKED"), IRON("IRON"), BRONZE("BRONZE"), SILVER("SILVER"), GOLD("GOLD"), PLATINUM(
-        "PLATINUM"), DIAMOND(
+        "PLATINUM"), EMERALD("EMERALD"), DIAMOND(
         "DIAMOND"), MASTER("MASTER"), GRANDMASTER("GRANDMASTER"), CHALLENGER(
         "CHALLENGER");
 
