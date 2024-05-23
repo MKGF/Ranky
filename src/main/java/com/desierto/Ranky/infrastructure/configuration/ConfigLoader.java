@@ -16,4 +16,7 @@ public class ConfigLoader {
 
   @Value("${disc.api.key}")
   private String discApiKey;
+
+  @Value("${ranking.limit}")
+  private int rankingLimit;
 }

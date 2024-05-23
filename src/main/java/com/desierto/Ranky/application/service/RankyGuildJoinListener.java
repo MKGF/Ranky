@@ -11,8 +11,10 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
+@Service
 public class RankyGuildJoinListener extends ListenerAdapter {
 
   public static final Logger log = Logger.getLogger("RankyGuildJoinListener.class");

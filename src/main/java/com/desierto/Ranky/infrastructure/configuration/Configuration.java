@@ -10,5 +10,5 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @ComponentScan(basePackages = "com.desierto.Ranky.application")
 @EntityScan(basePackages = "com.desierto.Ranky.domain.entity")
 public class Configuration implements WebMvcConfigurer {
-  
+
 }

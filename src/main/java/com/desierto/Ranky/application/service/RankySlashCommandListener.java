@@ -1,13 +1,35 @@
 package com.desierto.Ranky.application.service;
 
+import static com.desierto.Ranky.infrastructure.commands.Command.ADD_ACCOUNTS;
+import static com.desierto.Ranky.infrastructure.commands.Command.CREATE;
+import static com.desierto.Ranky.infrastructure.commands.Command.DELETE;
+import static com.desierto.Ranky.infrastructure.commands.Command.HELP_RANKY;
+import static com.desierto.Ranky.infrastructure.commands.Command.RANKING;
+import static com.desierto.Ranky.infrastructure.commands.Command.REMOVE_ACCOUNTS;
+
 import java.util.logging.Logger;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
+import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.InteractionHook;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
+@AllArgsConstructor
 public class RankySlashCommandListener extends ListenerAdapter {
+
+  @Autowired
+  private HelpRankyService helpRankyService;
+  @Autowired
+  private GetRankingService getRankingService;
+  @Autowired
+  private CreateRankingService createRankingService;
+  @Autowired
+  private DeleteRankingService deleteRankingService;
+  @Autowired
+  private AddAccountsService addAccountsService;
+  @Autowired
+  private RemoveAccountsService removeAccountsService;
 
   public static final Logger log = Logger.getLogger("RankySlashCommandListener.class");
 
@@ -15,12 +37,23 @@ public class RankySlashCommandListener extends ListenerAdapter {
   public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
     log.info("ENTERED SLASH COMMAND LISTENER");
     event.deferReply(true).queue();
-    InteractionHook hook = event.getHook();
-    hook.setEphemeral(true);
-    hook.sendMessage("Hello! If you want to say hi to the whole guild, click the button.")
-        .addActionRow(
-            Button.primary("Make public", Emoji.fromFormatted("<:github:849286315580719104>"))
-                .asEnabled().withLabel("Make public")
-        ).queue();
+    if (event.getCommandString().equals("/" + HELP_RANKY.getCommandId())) {
+      helpRankyService.execute(event);
+    }
+    if (event.getCommandString().equals("/" + RANKING.getCommandId())) {
+      getRankingService.execute(event);
+    }
+    if (event.getCommandString().equals("/" + CREATE.getCommandId())) {
+      createRankingService.execute(event);
+    }
+    if (event.getCommandString().equals("/" + DELETE.getCommandId())) {
+      deleteRankingService.execute(event);
+    }
+    if (event.getCommandString().equals("/" + ADD_ACCOUNTS.getCommandId())) {
+      addAccountsService.execute(event);
+    }
+    if (event.getCommandString().equals("/" + REMOVE_ACCOUNTS.getCommandId())) {
+      removeAccountsService.execute(event);
+    }
   }
 }
