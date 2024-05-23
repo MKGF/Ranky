@@ -14,10 +14,10 @@ import com.merakianalytics.orianna.Orianna;
 import com.merakianalytics.orianna.types.common.Region;
 import com.merakianalytics.orianna.types.core.league.LeaguePositions;
 import com.merakianalytics.orianna.types.core.summoner.Summoner;
+import jakarta.annotation.PostConstruct;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 

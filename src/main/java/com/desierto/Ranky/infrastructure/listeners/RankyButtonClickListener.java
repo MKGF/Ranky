@@ -1,7 +1,7 @@
 package com.desierto.Ranky.infrastructure.listeners;
 
+import jakarta.annotation.PostConstruct;
 import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
