@@ -51,7 +51,7 @@ public class RankyGuildJoinListener extends ListenerAdapter {
       log.info("GUILD HAS NO OWNER.");
     }
 
-    botStatusUpdaterService.execute(event.getJDA());
+    botStatusUpdaterService.execute();
 
     createConfigChannel(event);
     createRankyRole(event);
