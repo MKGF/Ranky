@@ -1,0 +1,3 @@
+Hello to you that invited me, people of %s!
+I'm Ranky and I'm here to help you creating your own customized SoloQ rankings.
+I will explain my functioning right now, but you can get this information anytime again as long as you type in the /helpRanky command.

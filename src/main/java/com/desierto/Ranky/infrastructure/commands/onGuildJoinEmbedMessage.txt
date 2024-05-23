@@ -1,0 +1,9 @@
+This Discord bot will use one of your channels as storage for different SoloQ rankings made in the server.
+The complete use of my commands is only given to the users with a role named "%s" (which I already created myself). Otherwise, just '/helpRanky' and '/ranking' are open to the users.
+This channel is referred to as "%s" (I already created it as well) and only uses the last %d messages as storage. So please do not spam in it. If something escapes the threshold I won't be able to retrieve it anymore.
+
+-/create "RANKINGNAME" creates a ranking with that name.
+-/addAccount "RANKINGNAME" ACCOUNT adds the account to the ranking if it exists. Supports spaces in the name.
+-/addMultiple "RANKINGNAME" ACCOUNT1,ACCOUNT2... adds all the accounts to the ranking if they exist.
+-/removeAccount "RANKINGNAME" ACCOUNT removes the account from the ranking if it exists.
+-/ranking "RANKINGNAME" gives the soloQ information of the accounts in the ranking ordered by rank.

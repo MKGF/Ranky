@@ -19,4 +19,10 @@ public class ConfigLoader {
 
   @Value("${ranking.limit}")
   private int rankingLimit;
+
+  @Value("${ranky.user.role}")
+  private String rankyUserRole;
+
+  @Value("${config.channel}")
+  private String configChannel;
 }
