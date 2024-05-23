@@ -6,26 +6,40 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <configuration>
           <mainClass>com.desierto.Ranky.infrastructure.Ranky</mainClass>
         </configuration>
+        <groupId>org.springframework.boot</groupId>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
           <source>${java.version}</source>
           <target>${java.version}</target>
         </configuration>
+        <groupId>org.apache.maven.plugins</groupId>
         <version>3.8.1</version>
       </plugin>
     </plugins>
   </build>
   <groupId>com.desierto</groupId>
   <artifactId>Ranky</artifactId>
+  <description>Ranky is a bot to create custom League of Legend SoloQ rankings.
+  </description>
   <name>Ranky</name>
+  <parent>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <groupId>org.springframework.boot</groupId>
+    <relativePath/>
+    <version>3.2.5</version> <!-- lookup parent from repository -->
+  </parent>
+
+  <properties>
+    <java.version>17</java.version>
+    <spring.version>3.2.5</spring.version>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -119,16 +133,6 @@
     </dependency>
   </dependencies>
 
-  <description>Ranky is a bot to create custom League of Legend SoloQ rankings.
-  </description>
-
-  <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.2.5</version>
-    <relativePath/> <!-- lookup parent from repository -->
-  </parent>
-
   <repositories>
     <repository>
       <id>snapshots-repo</id>
@@ -142,8 +146,5 @@
     </repository>
   </repositories>
 
-  <properties>
-    <java.version>17</java.version>
-    <spring.version>3.2.5</spring.version>
-  </properties>
+  <version>0.0.1-SNAPSHOT</version>
 </project>
