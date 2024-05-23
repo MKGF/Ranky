@@ -1,10 +1,10 @@
 package com.desierto.Ranky.infrastructure.configuration;
 
-import com.desierto.Ranky.application.service.RankyButtonClickListener;
-import com.desierto.Ranky.application.service.RankyGuildJoinListener;
-import com.desierto.Ranky.application.service.RankyMessageListener;
-import com.desierto.Ranky.application.service.RankySlashCommandListener;
 import com.desierto.Ranky.infrastructure.commands.Command;
+import com.desierto.Ranky.infrastructure.service.RankyButtonClickListener;
+import com.desierto.Ranky.infrastructure.service.RankyGuildJoinListener;
+import com.desierto.Ranky.infrastructure.service.RankyMessageListener;
+import com.desierto.Ranky.infrastructure.service.RankySlashCommandListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;

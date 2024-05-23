@@ -1,4 +1,4 @@
-package com.desierto.Ranky.application.service;
+package com.desierto.Ranky.infrastructure.service;
 
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;

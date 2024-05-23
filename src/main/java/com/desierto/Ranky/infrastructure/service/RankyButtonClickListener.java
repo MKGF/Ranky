@@ -1,4 +1,4 @@
-package com.desierto.Ranky.application.service;
+package com.desierto.Ranky.infrastructure.service;
 
 import java.util.logging.Logger;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package com.desierto.Ranky.application.service;
+package com.desierto.Ranky.infrastructure.service;
 
 import static com.desierto.Ranky.infrastructure.commands.Command.ADD_ACCOUNTS;
 import static com.desierto.Ranky.infrastructure.commands.Command.CREATE;

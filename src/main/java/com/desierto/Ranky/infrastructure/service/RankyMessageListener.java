@@ -1,6 +1,5 @@
-package com.desierto.Ranky.application.service;
+package com.desierto.Ranky.infrastructure.service;
 
-import com.desierto.Ranky.application.service.dto.RankingConfigurationWithMessageId;
 import com.desierto.Ranky.domain.entity.Account;
 import com.desierto.Ranky.domain.exception.ConfigChannelNotFoundException;
 import com.desierto.Ranky.domain.exception.ExcessiveParamsException;
@@ -11,6 +10,7 @@ import com.desierto.Ranky.domain.repository.RiotAccountRepository;
 import com.desierto.Ranky.domain.valueobject.AccountWithStream;
 import com.desierto.Ranky.domain.valueobject.RankingConfiguration;
 import com.desierto.Ranky.infrastructure.Ranky;
+import com.desierto.Ranky.infrastructure.service.dto.RankingConfigurationWithMessageId;
 import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.Arrays;

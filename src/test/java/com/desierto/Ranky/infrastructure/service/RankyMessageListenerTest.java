@@ -1,4 +1,4 @@
-package com.desierto.Ranky.application.service;
+package com.desierto.Ranky.infrastructure.service;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;

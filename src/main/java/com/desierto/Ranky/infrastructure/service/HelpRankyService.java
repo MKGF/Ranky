@@ -1,4 +1,4 @@
-package com.desierto.Ranky.application.service;
+package com.desierto.Ranky.infrastructure.service;
 
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
 import java.io.IOException;

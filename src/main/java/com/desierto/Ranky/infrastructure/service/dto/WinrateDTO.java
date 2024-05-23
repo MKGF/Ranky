@@ -1,4 +1,4 @@
-package com.desierto.Ranky.application.service.dto;
+package com.desierto.Ranky.infrastructure.service.dto;
 
 import com.desierto.Ranky.domain.valueobject.Winrate;
 import java.math.BigDecimal;
