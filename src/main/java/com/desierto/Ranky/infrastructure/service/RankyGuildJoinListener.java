@@ -4,7 +4,9 @@ import static com.desierto.Ranky.domain.utils.FileReader.read;
 
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
@@ -19,17 +21,25 @@ public class RankyGuildJoinListener extends ListenerAdapter {
   public static final Logger log = Logger.getLogger("RankyGuildJoinListener.class");
 
   @Autowired
-  public ConfigLoader config;
+  private ConfigLoader config;
 
   @Autowired
-  public WelcomeGuildService welcomeGuildService;
+  private JDA bot;
 
   @Autowired
-  public WelcomeOwnerService welcomeOwnerService;
+  private WelcomeGuildService welcomeGuildService;
 
   @Autowired
-  public BotStatusUpdaterService botStatusUpdaterService;
+  private WelcomeOwnerService welcomeOwnerService;
 
+  @Autowired
+  private BotStatusUpdaterService botStatusUpdaterService;
+
+  @PostConstruct
+  private void postConstruct() {
+    bot.addEventListener(this);
+    log.info(String.format("Added %s to the bot!", this.getClass().getName()));
+  }
 
   @Override
   public void onGuildJoin(GuildJoinEvent event) {

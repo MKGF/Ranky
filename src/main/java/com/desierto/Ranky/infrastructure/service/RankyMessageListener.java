@@ -10,6 +10,7 @@ import com.desierto.Ranky.domain.repository.RiotAccountRepository;
 import com.desierto.Ranky.domain.valueobject.AccountWithStream;
 import com.desierto.Ranky.domain.valueobject.RankingConfiguration;
 import com.desierto.Ranky.infrastructure.Ranky;
+import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
 import com.desierto.Ranky.infrastructure.service.dto.RankingConfigurationWithMessageId;
 import com.google.gson.Gson;
 import java.util.ArrayList;
@@ -20,9 +21,11 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -58,44 +61,52 @@ public class RankyMessageListener extends ListenerAdapter {
   @Autowired
   private RiotAccountRepository riotAccountRepository;
 
+  @Autowired
+  private JDA bot;
+  @Autowired
+  private ConfigLoader config;
+
+  @PostConstruct
+  private void postConstruct() {
+    bot.addEventListener(this);
+    log.info(String.format("Added %s to the bot!", this.getClass().getName()));
+  }
+
   @Override
   @SneakyThrows
   public void onMessageReceived(MessageReceivedEvent event) {
-    if (event.getMessage().getContentRaw().startsWith(Ranky.prefix)) {
-      Gson gson = new Gson();
-      Guild guild = event.getGuild();
-      User user = event.getAuthor();
-      Member member = event.getMember();
+    if (config.getIsMessageListenerEnabled()) {
+      if (event.getMessage().getContentRaw().startsWith(Ranky.prefix)) {
+        Gson gson = new Gson();
+        Guild guild = event.getGuild();
+        User user = event.getAuthor();
+        Member member = event.getMember();
 
-      log.info("ARRIVED MESSAGE: " + event.getMessage().getContentRaw());
-      log.info("FROM GUILD: " + guild.getName());
-      log.info("FROM USER: " + user.getName() + "/" + user.getId());
-      log.info("IS MEMBER NULL: " + (member == null));
+        log.info("ARRIVED MESSAGE: " + event.getMessage().getContentRaw());
+        log.info("FROM GUILD: " + guild.getName());
+        log.info("FROM USER: " + user.getName() + "/" + user.getId());
+        log.info("IS MEMBER NULL: " + (member == null));
 
-      if (member != null) {
-        log.info("HAS " + RANKY_USER_ROLE + " ROLE: " + member
+        if (member != null) {
+          log.info("HAS " + RANKY_USER_ROLE + " ROLE: " + member
+              .getRoles().stream()
+              .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE)));
+        }
+
+        String command = event.getMessage().getContentRaw();
+
+        if (command.contains(HELP_COMMAND)) {
+          help(event);
+        } else if (command.contains(MIGRATE_COMMAND) && member != null && member
             .getRoles().stream()
-            .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE)));
-      }
+            .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
+          migrateRanking(event, gson, command);
+        } else if (isCreateCommand(command) && member != null && member
+            .getRoles().stream()
+            .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
+          createRanking(event, gson, command);
 
-      String command = event.getMessage().getContentRaw();
-
-      if (command.contains(HELP_COMMAND)) {
-        help(event);
-      } else if (command.contains(MIGRATE_COMMAND) && member != null && member
-          .getRoles().stream()
-          .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
-        migrateRanking(event, gson, command);
-      } else if (isCreateCommand(command) && member != null && member
-          .getRoles().stream()
-          .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
-        createRanking(event, gson, command);
-
-      } else
-//      if (command.contains(DEADLINE_COMMAND)) {
-//        setDeadline(event, gson, command);
-//      }
-        if (isAddAccountCommand(command) && member != null && member
+        } else if (isAddAccountCommand(command) && member != null && member
             .getRoles().stream()
             .anyMatch(role -> role.getName().equalsIgnoreCase(RANKY_USER_ROLE))) {
           addAccount(event, gson, command);
@@ -114,6 +125,7 @@ public class RankyMessageListener extends ListenerAdapter {
         } else if (command.contains(RANKING_COMMAND)) {
           queryRanking(event, command);
         }
+      }
     }
   }
 

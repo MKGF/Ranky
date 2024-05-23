@@ -8,7 +8,9 @@ import static com.desierto.Ranky.infrastructure.commands.Command.RANKING;
 import static com.desierto.Ranky.infrastructure.commands.Command.REMOVE_ACCOUNTS;
 
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +33,17 @@ public class RankySlashCommandListener extends ListenerAdapter {
   @Autowired
   private RemoveAccountsService removeAccountsService;
 
+  @Autowired
+  private JDA bot;
+
   public static final Logger log = Logger.getLogger("RankySlashCommandListener.class");
+
+
+  @PostConstruct
+  private void postConstruct() {
+    bot.addEventListener(this);
+    log.info(String.format("Added %s to the bot!", this.getClass().getName()));
+  }
 
   @Override
   public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {

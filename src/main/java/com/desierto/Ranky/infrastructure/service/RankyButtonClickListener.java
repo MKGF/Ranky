@@ -1,9 +1,12 @@
 package com.desierto.Ranky.infrastructure.service;
 
 import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -11,6 +14,15 @@ import org.springframework.stereotype.Service;
 public class RankyButtonClickListener extends ListenerAdapter {
 
   public static final Logger log = Logger.getLogger("RankyButtonClickListener.class");
+
+  @Autowired
+  private JDA bot;
+
+  @PostConstruct
+  private void postConstruct() {
+    bot.addEventListener(this);
+    log.info(String.format("Added %s to the bot!", this.getClass().getName()));
+  }
 
   @Override
   public void onButtonInteraction(ButtonInteractionEvent event) {
