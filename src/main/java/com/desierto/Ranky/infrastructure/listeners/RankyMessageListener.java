@@ -1,4 +1,4 @@
-package com.desierto.Ranky.infrastructure.service;
+package com.desierto.Ranky.infrastructure.listeners;
 
 import com.desierto.Ranky.domain.entity.Account;
 import com.desierto.Ranky.domain.exception.ConfigChannelNotFoundException;

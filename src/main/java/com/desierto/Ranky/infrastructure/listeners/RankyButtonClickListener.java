@@ -1,4 +1,4 @@
-package com.desierto.Ranky.infrastructure.service;
+package com.desierto.Ranky.infrastructure.listeners;
 
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
