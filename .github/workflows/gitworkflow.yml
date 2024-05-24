@@ -21,12 +21,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@master
 
-      - name: Merge Current -> master
-        uses: devmasx/merge-branch@master
-        with:
-          type: now
-          target_branch: master
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Merge Current -> master
+      #   uses: devmasx/merge-branch@master
+      #   with:
+      #     type: now
+      #     target_branch: master
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Merge Current -> AWS202405
         uses: devmasx/merge-branch@master
