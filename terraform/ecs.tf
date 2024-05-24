@@ -82,7 +82,7 @@ resource "aws_autoscaling_group" "ranky-ecs-autoscaling-group" {
   vpc_zone_identifier  = [aws_subnet.ranky-subnet.id]  # Subred donde se lanzarán las instancias
 
   depends_on = [ 
-    aws_launch_configuration.ecs_launch_configuration ,
+    aws_launch_configuration.ranky-ecs-launch-configuration ,
     aws_subnet.ranky-subnet
   ]
 }
