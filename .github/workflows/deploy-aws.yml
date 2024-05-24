@@ -1,9 +1,7 @@
 name: Release AWS Infrastructure Pipeline
 
 on:
-  push:
-    branches: 
-      - AWS202405
+  workflow_dispatch:
 
 jobs:
   build:
