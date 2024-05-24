@@ -1,18 +1,22 @@
 resource "aws_vpc" "ranky-vpc" {
   cidr_block = "10.0.0.0/16" 
+  tags = {
+    Name = "ranky-vpc"
+  }
 }
 
 resource "aws_subnet" "ranky-subnet" {
   vpc_id                  = aws_vpc.ranky-vpc.id 
   cidr_block              = "10.0.1.0/24" 
   availability_zone       = "eu-west-3a" 
+  map_public_ip_on_launch = true
 
   depends_on = [ 
     aws_vpc.ranky-vpc 
   ]
 
   tags = {
-    Name = "ranky-vpc"
+    Name = "ranky-subnet"
   }
 }
 
@@ -55,13 +59,18 @@ resource "aws_route_table_association" "ranky-public-ta" {
   ]
 }
 
-resource "aws_security_group" "ranky-sg" {
+resource "aws_security_group" "ranky-sg-ec2" {
   name        = "ranky-sg"
-  description = "Security group for container traffic"
+  description = "Security group for ranky ec2"
 
-  vpc_id = aws_vpc.ranky-vpc.id  # ID de tu VPC
+  vpc_id = aws_vpc.ranky-vpc.id 
 
-  
+  ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
   ingress {
     from_port   = 80
     to_port     = 80

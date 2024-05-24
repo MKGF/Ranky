@@ -8,24 +8,27 @@ resource "aws_key_pair" "ranky-ec2-keypair" {
   public_key = tls_private_key.ranky-ec2-keypair.public_key_openssh
 }
 
-resource "aws_iam_role_policy_attachment" "ecsTaskExecutionRole_policy" {
-  role       = aws_iam_role.ecsTaskExecutionRole.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+resource "local_file" "private_key_file" {
+  filename = "hola.pem"
+  content = tls_private_key.ranky-ec2-keypair.private_key_pem
 }
 
-resource "aws_iam_role" "ecsTaskExecutionRole" {
-  name = "ecsTaskExecutionRole"
-
+resource "aws_iam_role" "ranky-ec2-role" {
+  name               = "ranky-ec2-ecr-role"
   assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          Service = "ecs-tasks.amazonaws.com"
-        }
-        Action = "sts:AssumeRole"
-      }
-    ]
+    Version = "2012-10-17",
+    Statement = [{
+      Effect    = "Allow",
+      Principal = {
+        Service = "ec2.amazonaws.com"
+      },
+      Action    = "sts:AssumeRole"
+    }]
   })
+}
+
+resource "aws_iam_policy_attachment" "ranky-ec2-ecr-policy-attachment" {
+  name       = "ec2-ecr-policy-attachment"
+  roles      = [aws_iam_role.ranky-ec2-role.name]
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }

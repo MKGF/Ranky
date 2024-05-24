@@ -1,8 +1,8 @@
-name: Git Workflow Pipeline
+name: tfstate-push-to-branches
 
 on:
   repository_dispatch:
-    types: {"event_type":"trigger_gitworkflow"}
+    types: {"event_type":"trigger_tfstate-push-to-branches"}
 
 
 jobs:

@@ -57,6 +57,7 @@ jobs:
     - name: Login to Amazon ECR
       run: |
         aws ecr get-login-password --region eu-west-3 | docker login --username AWS --password-stdin 637423483220.dkr.ecr.eu-west-3.amazonaws.com
+#         aws ecr get-login-password --region eu-west-3 | docker login --username AWS --password-stdin ${{ secrets.AWS_ID }}.dkr.ecr.eu-west-3.amazonaws.com
 
     - name: Terraform Init
       run: terraform init
@@ -79,9 +80,9 @@ jobs:
         git commit -m "Added .tfstate with date ${DATE}"
         git push origin HEAD:develop
     
-    - name: Trigger gitworkflow
+    - name: Trigger tfstate-push-to-branches
       run: |
         curl -X POST -H "Accept: application/vnd.github.v3+json" \
           -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
           https://api.github.com/repos/${{ github.repository }}/dispatches \
-          -d '{"event_type":"trigger_gitworkflow"}'
+          -d '{"event_type":"trigger_tfstate-push-to-branches"}'
