@@ -25,7 +25,7 @@ jobs:
       - name: Set Tag Output
         if: env.TAG_EXISTS == 'true'
         run: echo "Tag exists"
-          
+
       - name: Push version to master
         if: env.TAG_EXISTS == 'true'
         run: |
