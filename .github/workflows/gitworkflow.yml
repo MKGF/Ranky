@@ -6,13 +6,25 @@ on:
       - develop
 
 jobs:
-  build:
+  push-to-master:
     runs-on: ubuntu-latest
-
+    
     steps:
-
-    - name: Checkout
-      uses: actions/checkout@v3
+      - name: Check if tag exists
+        id: check_tag
+        run: |
+          if [[ $(git tag --points-at ${{ github.sha }}) ]]; then
+            echo "::set-output name=tag::$(git tag --points-at ${{ github.sha }})"
+          else
+            echo "::set-output name=tag::"
+          fi
+          
+      - name: Push version to master
+        if: steps.check_tag.outputs.tag != ''
+        run: |
+          git checkout master
+          git merge ${{ steps.check_tag.outputs.tag }}
+          git push origin master
 
 #     - name: Configure AWS credentials
 #       uses: aws-actions/configure-aws-credentials@v1
