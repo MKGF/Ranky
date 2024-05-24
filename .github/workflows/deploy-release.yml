@@ -3,7 +3,7 @@ name: Release Pipeline
 on:
   push:
     branches: 
-      - AWS2024
+      - AWS202405
 
 jobs:
   build:
