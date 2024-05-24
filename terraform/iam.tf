@@ -33,16 +33,3 @@ resource "aws_iam_role" "ecsTaskExecutionRole" {
 resource "aws_iam_service_linked_role" "ecs" {
   aws_service_name = "ecs.amazonaws.com"
 }
-
-data "aws_iam_policy_document" "cloudwatch_logs_policy" {
-  statement {
-    effect    = "Allow"
-    actions   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
-    resources = ["arn:aws:logs:*:*:*"]
-  }
-}
-
-resource "aws_iam_role_policy_attachment" "cloudwatch_logs_attachment" {
-  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"  # O usa data.aws_iam_policy_document.cloudwatch_logs_policy.arn
-  role       = aws_iam_role.ecsTaskExecutionRole.name # Reemplaza con el nombre de tu rol de tarea de ECS
-}
