@@ -6,7 +6,6 @@ on:
       - develop
       # - master
       - AWS202405
-
   repository_dispatch:
     types: {"event_type":"trigger_gitworkflow"}
 
