@@ -4,34 +4,29 @@ on:
   push:
     branches:
       - develop
+      - master
+      - AWS202405
 
 jobs:
-  push-to-master:
+  push-to-branches:
     runs-on: ubuntu-latest
     
     steps:
+      
+      - name: Configure git_config
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+      
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@master
 
-      - name: Check if tag exists
-        id: check_tag
-        run: |
-          if [[ $(git tag --points-at ea465bdb047159429605433d4249200eab505b9d) ]]; then
-            echo "TAG_EXISTS=true" >> $GITHUB_ENV
-          else
-            echo "TAG_EXISTS=false" >> $GITHUB_ENV
-          fi
-
-      - name: Set Tag Output
-        if: env.TAG_EXISTS == 'true'
-        run: echo "Tag exists"
-
-      - name: Push version to master
-        if: env.TAG_EXISTS == 'true'
-        run: |
-          git checkout master
-          git merge ${{ steps.check_tag.outputs.TAG_EXISTS }}
-          git push origin master
+      - name: Merge Current -> master
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          target_branch: master
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
 #     - name: Configure AWS credentials
 #       uses: aws-actions/configure-aws-credentials@v1
