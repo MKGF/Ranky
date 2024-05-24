@@ -19,19 +19,14 @@ jobs:
           git config --global user.name "GitHub Actions"
       
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@master
 
-      - name: Merge develop to master
-        run: |
-          git checkout master
-          git merge develop
-          git push origin master
-
-      - name: Merge branch to AWS202405
-        run: |
-          git checkout AWS202405
-          git merge develop
-          git push origin AWS202405
+      - name: Merge Current -> master
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          target_branch: master
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
 
       # - name: Check if tag exists
