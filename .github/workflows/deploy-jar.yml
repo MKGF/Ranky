@@ -1,4 +1,4 @@
-name: Deploy JAR
+name: Deploy JAR Pipeline
 
 on:
   push:
