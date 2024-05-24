@@ -1,6 +1,11 @@
 package com.desierto.Ranky.infrastructure.listeners;
 
+import static com.desierto.Ranky.infrastructure.commands.Command.ADD_ACCOUNTS;
+import static com.desierto.Ranky.infrastructure.commands.Command.CREATE;
+import static com.desierto.Ranky.infrastructure.commands.Command.DELETE;
 import static com.desierto.Ranky.infrastructure.commands.Command.HELP_RANKY;
+import static com.desierto.Ranky.infrastructure.commands.Command.RANKING;
+import static com.desierto.Ranky.infrastructure.commands.Command.REMOVE_ACCOUNTS;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
@@ -83,5 +88,55 @@ public class RankySlashCommandListenerTest {
     cut.onSlashCommandInteraction(event);
 
     verify(helpRankyService, times(1)).execute(event);
+  }
+
+  @Test
+  public void onRankingCommand_callsGetRankingService() {
+    SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
+    when(event.getCommandString()).thenReturn("/" + RANKING.getCommandId());
+
+    cut.onSlashCommandInteraction(event);
+
+    verify(getRankingService, times(1)).execute(event);
+  }
+
+  @Test
+  public void onCreateCommand_callsCreateRankingService() {
+    SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
+    when(event.getCommandString()).thenReturn("/" + CREATE.getCommandId());
+
+    cut.onSlashCommandInteraction(event);
+
+    verify(createRankingService, times(1)).execute(event);
+  }
+
+  @Test
+  public void onDeleteCommand_callsDeleteRankingService() {
+    SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
+    when(event.getCommandString()).thenReturn("/" + DELETE.getCommandId());
+
+    cut.onSlashCommandInteraction(event);
+
+    verify(deleteRankingService, times(1)).execute(event);
+  }
+
+  @Test
+  public void onAddAccountsCommand_callsAddAccountsService() {
+    SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
+    when(event.getCommandString()).thenReturn("/" + ADD_ACCOUNTS.getCommandId());
+
+    cut.onSlashCommandInteraction(event);
+
+    verify(addAccountsService, times(1)).execute(event);
+  }
+
+  @Test
+  public void onRemoveAccountsCommand_callsRemoveAccountsService() {
+    SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
+    when(event.getCommandString()).thenReturn("/" + REMOVE_ACCOUNTS.getCommandId());
+
+    cut.onSlashCommandInteraction(event);
+
+    verify(removeAccountsService, times(1)).execute(event);
   }
 }
