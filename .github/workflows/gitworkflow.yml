@@ -21,7 +21,7 @@ jobs:
           else
             echo "TAG_EXISTS=false" >> $GITHUB_ENV
           fi
-      
+
       - name: Set Tag Output
         if: env.TAG_EXISTS == 'true'
         run: echo "Tag exists"
