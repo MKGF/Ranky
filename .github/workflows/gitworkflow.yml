@@ -28,6 +28,26 @@ jobs:
           target_branch: master
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
+      # - name: Check if tag exists
+      #   id: check_tag
+      #   run: |
+      #     if [[ $(git tag --points-at ea465bdb047159429605433d4249200eab505b9d) ]]; then
+      #       echo "TAG_EXISTS=true" >> $GITHUB_ENV
+      #     else
+      #       echo "TAG_EXISTS=false" >> $GITHUB_ENV
+      #     fi
+
+      # - name: Set Tag Output
+      #   if: env.TAG_EXISTS == 'true'
+      #   run: echo "Tag exists"
+
+      # - name: Push version to master
+      #   if: env.TAG_EXISTS == 'true'
+      #   run: |
+      #     git checkout master
+      #     git merge ${{ steps.check_tag.outputs.TAG_EXISTS }}
+      #     git push origin master
+
 #     - name: Configure AWS credentials
 #       uses: aws-actions/configure-aws-credentials@v1
 #       with:
