@@ -12,15 +12,19 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
-        
+
       - name: Check if tag exists
         id: check_tag
         run: |
-          if [[ $(git tag --points-at ${{ github.sha }}) ]]; then
-            echo "::set-output name=tag::$(git tag --points-at ${{ github.sha }})"
+          if [[ $(git tag --points-at ea465bdb047159429605433d4249200eab505b9d) ]]; then
+            echo "::set-env name=TAG_EXISTS::true"
           else
-            echo "::set-output name=tag::"
+            echo "::set-env name=TAG_EXISTS::false"
           fi
+
+      - name: Set Tag Output
+        if: steps.check_tag.outputs.TAG_EXISTS == 'true'
+        run: echo "Tag exists"
           
       - name: Push version to master
         if: steps.check_tag.outputs.tag != ''
