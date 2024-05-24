@@ -44,18 +44,15 @@ jobs:
     - name: Create file to be pushed
       run: touch ./terraform/terraform.tfstate
     
-    - name: Changing .tfstate name to date
-      run: |
-        DATE=$(date +%Y%m%d)
-        mv ./terraform/terraform.tfstate ./terraform/${DATE}.tfstate
-    
     - name: Configure git_config
       run: |
         git config --global user.email "actions@github.com"
         git config --global user.name "GitHub Actions"
 
-    - name: Add/Commit/Push changes
+    - name: Changing .tfstate name to date/Add/Commit/Push changes
       run: |
+        DATE=$(date +%Y%m%d)
+        mv ./terraform/terraform.tfstate ./terraform/${DATE}.tfstate
         git add ./terraform/${DATE}.tfstate
         git commit -m "Added .tfstate with date ${DATE}"
         git push origin HEAD:develop
