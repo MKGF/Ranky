@@ -50,7 +50,7 @@ resource "aws_route_table_association" "ranky-public-ta" {
   route_table_id = aws_route_table.ranky-public-rt.id
 
   depends_on =  [
-    aws_vpc.ranky-subnet,
+    aws_subnet.ranky-subnet,
     aws_route_table.ranky-public-rt
   ]
 }
