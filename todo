@@ -21,6 +21,4 @@ incorporando un boton al slash command para que Ranky reenvie el mensaje del hoo
 
 PARA MAÑANA
 
-Testar los servicios/listeners que he creado estos dias
-Añadir comprobacion al arrancar de que los canales de configuracion y los roles estan creados en cada guild
-Añadir la comprobacion de la existencia de los canales de configuracion y roles al entrar en una nueva guild
+Testar los servicios que he creado estos dias
