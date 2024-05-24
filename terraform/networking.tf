@@ -8,7 +8,7 @@ resource "aws_subnet" "ranky-subnet" {
   availability_zone       = "eu-west-3a" 
 
   depends_on = [ 
-    aws_subnet.ranky-vpc 
+    aws_vpc.ranky-vpc 
   ]
 
   tags = {
