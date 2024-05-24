@@ -35,6 +35,13 @@ jobs:
           target_branch: AWS202405
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Merge Current -> develop
+        uses: devmasx/merge-branch@master
+        with:
+          type: now
+          target_branch: develop
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
       # - name: Check if tag exists
       #   id: check_tag
       #   run: |
