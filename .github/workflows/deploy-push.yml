@@ -42,7 +42,7 @@ jobs:
       run: mvn clean package -DskipTests
 
     - name: Create file to be pushed
-      run: touch ./terraform/date.tfstate
+      run: touch ./terraform/terraform.tfstate
     
     - name: Changing .tfstate name to date
       run: |
