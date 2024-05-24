@@ -14,59 +14,63 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-#     - name: Install Terraform
-#       uses: hashicorp/setup-terraform@v3
-#       with:
-#         aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#         aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    - name: Install Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-#     - name: Configure AWS credentials
-#       uses: aws-actions/configure-aws-credentials@v1
-#       with:
-#         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#         aws-region: eu-west-3
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-west-3
 
-#     - name: Create Secrets
-#       uses: 1arp/create-a-file-action@0.4.5
-#       with:
-#         path: 'src/main/resources/config'
-#         is AbsolutePath: false
-#         file: 'application-secret.properties'
-#         content: |
-#           riot.api.key=${{ secrets.RIOT_API_KEY }}
-#           disc.api.key=${{ secrets.DISCORD_API_KEY }}
+    - name: Create Secrets
+      uses: 1arp/create-a-file-action@0.4.5
+      with:
+        path: 'src/main/resources/config'
+        is AbsolutePath: false
+        file: 'application-secret.properties'
+        content: |
+          riot.api.key=${{ secrets.RIOT_API_KEY }}
+          disc.api.key=${{ secrets.DISCORD_API_KEY }}
 
-#     - name: Set up JDK 17
-#       uses: actions/setup-java@v3
-#       with:
-#         java-version: '17'
-#         distribution: 'adopt'
-#         cache: maven
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'adopt'
+        cache: maven
 
-# #    - name: Test with Maven
-# #      run: mvn clean test
+#    - name: Test with Maven
+#      run: mvn clean test
     
-#     - name: Build with Maven
-#       run: mvn clean package -DskipTests
+    - name: Build with Maven
+      run: mvn clean package -DskipTests
 
-#     - name: Terraform Init
-#       run: terraform init
-#       working-directory: ./terraform
+    - name: Login to Amazon ECR
+      run: |
+        aws ecr get-login-password --region eu-west-3 | docker login --username AWS --password-stdin 637423483220.dkr.ecr.eu-west-3.amazonaws.com
 
-#     - name: Terraform Apply
-#       run: terraform apply -auto-approve
-#       working-directory: ./terraform
+    - name: Terraform Init
+      run: terraform init
+      working-directory: ./terraform
 
-#     - name: Configure git_config
-#       run: |
-#         git config --global user.email "actions@github.com"
-#         git config --global user.name "GitHub Actions"
+    - name: Terraform Apply
+      run: terraform apply -auto-approve
+      working-directory: ./terraform
 
-#     - name: Changing .tfstate name to date/Add/Commit/Push changes
-#       run: |
-#         DATE=$(date +%Y%m%d)
-#         mv ./terraform/terraform.tfstate ./terraform/${DATE}.tfstate
-#         git add ./terraform/${DATE}.tfstate
-#         git commit -m "Added .tfstate with date ${DATE}"
-#         git push origin HEAD:AWS202405
+    - name: Configure git_config
+      run: |
+        git config --global user.email "actions@github.com"
+        git config --global user.name "GitHub Actions"
+
+    - name: Changing .tfstate name to date/Add/Commit/Push changes
+      run: |
+        DATE=$(date +%Y%m%d)
+        mv ./terraform/terraform.tfstate ./terraform/${DATE}.tfstate
+        git add ./terraform/${DATE}.tfstate
+        git commit -m "Added .tfstate with date ${DATE}"
+        git push origin HEAD:develop
