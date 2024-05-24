@@ -73,12 +73,26 @@ public class RankyGuildJoinListener extends ListenerAdapter {
 
   }
 
+  private static boolean guildHasConfigChannel(ConfigLoader config, Guild guild) {
+    return guild.getTextChannels().stream()
+        .anyMatch(textChannel -> textChannel.getName().equals(config.getConfigChannel()));
+  }
+
+  private static boolean guildHasRankyUserRole(ConfigLoader config, Guild guild) {
+    return guild.getRoles().stream()
+        .anyMatch(role -> role.getName().equals(config.getRankyUserRole()));
+  }
+
   private void createRankyRole(GuildJoinEvent event) {
-    event.getGuild().createRole().setName(config.getRankyUserRole()).queue();
+    if (!guildHasRankyUserRole(config, event.getGuild())) {
+      event.getGuild().createRole().setName(config.getRankyUserRole()).queue();
+    }
   }
 
   private void createConfigChannel(GuildJoinEvent event) {
-    event.getGuild().createTextChannel(config.getConfigChannel()).clearPermissionOverrides()
-        .queue();
+    if (!guildHasConfigChannel(config, event.getGuild())) {
+      event.getGuild().createTextChannel(config.getConfigChannel()).clearPermissionOverrides()
+          .queue();
+    }
   }
 }
