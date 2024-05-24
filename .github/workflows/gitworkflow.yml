@@ -28,7 +28,6 @@ jobs:
           target_branch: master
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
-
       # - name: Check if tag exists
       #   id: check_tag
       #   run: |
