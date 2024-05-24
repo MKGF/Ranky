@@ -1,4 +1,4 @@
-name: Release Pipeline
+name: Release AWS Infrastructure Pipeline
 
 on:
   push:
@@ -71,4 +71,4 @@ jobs:
         mv ./terraform/terraform.tfstate ./terraform/${DATE}.tfstate
         git add ./terraform/${DATE}.tfstate
         git commit -m "Added .tfstate with date ${DATE}"
-        git push origin HEAD:master
+        git push origin HEAD:AWS202405

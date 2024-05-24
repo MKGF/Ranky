@@ -1,0 +1,54 @@
+name: Git Workflow Pipeline
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  push-to-master:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check if tag exists
+        id: check_tag
+        run: |
+          if [[ $(git tag --points-at ${{ github.sha }}) ]]; then
+            echo "::set-output name=tag::$(git tag --points-at ${{ github.sha }})"
+          else
+            echo "::set-output name=tag::"
+          fi
+          
+      - name: Push version to master
+        if: steps.check_tag.outputs.tag != ''
+        run: |
+          git checkout master
+          git merge ${{ steps.check_tag.outputs.tag }}
+          git push origin master
+
+#     - name: Configure AWS credentials
+#       uses: aws-actions/configure-aws-credentials@v1
+#       with:
+#         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#         aws-region: eu-west-3
+
+#     - name: Create Secrets
+#       uses: 1arp/create-a-file-action@0.4.5
+#       with:
+#         path: 'src/main/resources'
+#         is AbsolutePath: false
+#         file: 'application-secret.properties'
+#         content: |
+#           riot.api.key=${{ secrets.RIOT_API_KEY }}
+#           disc.api.key=${{ secrets.DISCORD_API_KEY }}
+
+#     - name: Set up JDK 17
+#       uses: actions/setup-java@v3
+#       with:
+#         java-version: '17'
+#         distribution: 'adopt'
+#         cache: maven
+
+#     - name: Build with Maven
+#       run: mvn clean package -DskipTests
