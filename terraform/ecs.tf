@@ -53,8 +53,8 @@ resource "aws_ecs_service" "ranky_service" {
   ]
 }
 
-resource "aws_launch_configuration" "ranky-ecs-launch-config1" {
-  name                 = "ranky-ecs-launch-config"
+resource "aws_launch_configuration" "ranky-ecs-launch-config" {
+  name                 = "ranky-ecs-launch-config1"
   image_id             = "ami-0288d9523e7053c23"  # AMI de Amazon Linux 2 u otra AMI que desees
   instance_type        = "t2.micro"  # Tipo de instancia
   security_groups      = [aws_security_group.ranky-sg.id] # Grupo de seguridad que permite tráfico de contenedores
@@ -75,14 +75,14 @@ resource "aws_launch_configuration" "ranky-ecs-launch-config1" {
 
 resource "aws_autoscaling_group" "ranky-ecs-autoscaling-group" {
   name                 = "ranky-ecs-autoscaling-group"
-  launch_configuration = aws_launch_configuration.ranky-ecs-launch-config1.id
+  launch_configuration = aws_launch_configuration.ranky-ecs-launch-config.id
   min_size             = 1  # Número mínimo de instancias EC2
   max_size             = 1  # Número máximo de instancias EC2
   desired_capacity     = 1  # Capacidad deseada de instancias EC2
   vpc_zone_identifier  = [aws_subnet.ranky-subnet.id]  # Subred donde se lanzarán las instancias
 
   depends_on = [ 
-    aws_launch_configuration.ranky-ecs-launch-config1 ,
+    aws_launch_configuration.ranky-ecs-launch-config ,
     aws_subnet.ranky-subnet
   ]
 }
