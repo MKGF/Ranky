@@ -1,11 +1,9 @@
 name: Git Workflow Pipeline
 
 on:
-  push:
-    branches:
-      - develop
-      # - master
-      - AWS202405
+  repository_dispatch:
+    types: {"event_type":"trigger_gitworkflow"}
+
 
 jobs:
   push-to-branches:
