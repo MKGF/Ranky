@@ -5,6 +5,7 @@ on:
     branches:
       - master
 
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -40,19 +41,3 @@ jobs:
 
     - name: Build with Maven
       run: mvn clean package -DskipTests
-
-    - name: Create file to be pushed
-      run: touch ./terraform/terraform.tfstate
-    
-    - name: Configure git_config
-      run: |
-        git config --global user.email "actions@github.com"
-        git config --global user.name "GitHub Actions"
-
-    - name: Changing .tfstate name to date/Add/Commit/Push changes
-      run: |
-        DATE=$(date +%Y%m%d)
-        mv ./terraform/terraform.tfstate ./terraform/${DATE}.tfstate
-        git add ./terraform/${DATE}.tfstate
-        git commit -m "Added .tfstate with date ${DATE}"
-        git push origin HEAD:master
