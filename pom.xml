@@ -134,7 +134,7 @@
         <artifactId>spring-boot-maven-plugin</artifactId>
         <configuration>
           <mainClass>com.desierto.Ranky.infrastructure.Ranky</mainClass>
-          <finalName>Ranky.jar</finalName>
+          <finalName>Ranky</finalName>
         </configuration>
       </plugin>
       <plugin>
