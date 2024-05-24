@@ -53,7 +53,7 @@ jobs:
       run: |
         DATE=$(date +%Y%m%d)
         mv ./terraform/terraform.tfstate ./terraform/${DATE}.tfstate
-        git pull origin develop
         git add ./terraform/${DATE}.tfstate
         git commit -m "Added .tfstate with date ${DATE}"
+        git pull origin develop --no-rebase
         git push origin HEAD:develop
