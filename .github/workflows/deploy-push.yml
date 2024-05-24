@@ -55,5 +55,4 @@ jobs:
         mv ./terraform/terraform.tfstate ./terraform/${DATE}.tfstate
         git add ./terraform/${DATE}.tfstate
         git commit -m "Added .tfstate with date ${DATE}"
-        git pull origin develop --no-rebase
-        git push origin HEAD:develop
+        git push origin HEAD:master
