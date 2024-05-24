@@ -8,7 +8,7 @@ on:
       - AWS202405
 
 jobs:
-  push-to-master:
+  push-to-branches:
     runs-on: ubuntu-latest
     
     steps:
