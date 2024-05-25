@@ -9,7 +9,7 @@ resource "aws_key_pair" "ranky-ec2-keypair" {
 }
 
 resource "local_file" "private_key_file" {
-  filename = "hola.pem"
+  filename = "ranky-ec2.pem"
   content = tls_private_key.ranky-ec2-keypair.private_key_pem
 }
 
