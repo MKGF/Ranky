@@ -5,6 +5,10 @@
 -Revisar si merece la pena establecer una encriptacion entre el fichero de config y nuestra aplicacion como por ejemplo, meter la config en una keystore
 -CICD independiente del entorno. Esta aplicacion debe de ser facil de ejecutar en cualquier lugar y para ello la complejidad del compilado con su config
 es algo que debemos abordar nosotros para que lo unico que tengamos que hacer sea subir el jar y ejecutar "java -jar"
+-Revisar permisos ranky-sg y ajustarlos al mínimo
+-Crear JSON de permisos para la group policy de ranky-terraform en AWS
+-Investigar cómo dejar el fichero en app/data o suplir el contenedor de docker o dockerfile en ECR
+-¿Realmente hace falta tener el puerto SSH abierto? Cerrar todos los puertos e ingress que no hagan falta. Mirar cómo subrilos a AWS secret y rescatarlos por pipeline
 
 Hasta ahora el bot se comunicaba con todo el servidor a la vez, interpretando cada mensaje que era capaz de leer y si era un comando que el entendia,
 respondia. Esta solucion es caotica, ya que no todo el mundo puede estar familiarizado con el funcionamiento de un comando.
