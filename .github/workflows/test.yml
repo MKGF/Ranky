@@ -1,9 +1,9 @@
-name: triggered test
+name: triggered tests
 
 on:
   repository_dispatch:
     types: 
-      - manual-trigger-test"
+      - trigger-test"
 jobs:
         push-to-branches:
           runs-on: ubuntu-latest
