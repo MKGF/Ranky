@@ -1,7 +1,7 @@
 name: test taht triggers
 
 on:
-  repository_dispatch:
+  workflow_dispatch:
 
 jobs:
         push-to-branches:
