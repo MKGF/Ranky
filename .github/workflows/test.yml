@@ -7,3 +7,7 @@ on:
 jobs:
         push-to-branches:
           runs-on: ubuntu-latest
+          steps:
+
+            - name: Print Hola
+              run: echo "hola"
