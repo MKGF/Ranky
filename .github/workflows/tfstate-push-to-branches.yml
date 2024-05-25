@@ -2,7 +2,8 @@ name: tfstate-push-to-branches
 
 on:
   repository_dispatch:
-    types: {"event_type":"trigger_tfstate-push-to-branches"}
+    types: 
+      - manual-trigger-tfstate-push-to-branches"
 
 
 jobs:
