@@ -11,17 +11,19 @@ on:
       #   options:
       #     - 'Yes'
       #     - 'No'
-      Commit:
+      commit:
         description: 'Commit ID to deploy'
         required: false
-      Version:
+      version:
         description: 'Version to deploy'
         required: false
       
 jobs:
-  deploy-jar-to-ec2:
-    uses: ./.github/workflows/deploy-jar.yml
-
+  define-outputs:
+    runs-on: ubuntu-latest
+    outputs:
+      commit: ${{ inputs.commit }}
+      version: ${{ inputs.version }}
   
   push-to-branches:
           runs-on: ubuntu-latest
