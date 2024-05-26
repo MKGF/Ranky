@@ -6,4 +6,4 @@ on:
 jobs:
         push-to-branches:
           runs-on: ubuntu-latest
-          uses: my-org/my-repo/.github/workflows/test.yml@develop
+          uses: my-repo/.github/workflows/test.yml@develop
