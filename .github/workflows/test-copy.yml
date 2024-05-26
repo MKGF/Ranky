@@ -15,5 +15,6 @@ jobs:
               run: |
                 echo "Version: ${{ github.event.inputs.version }}"
             
-            - name: Run test workflow
-              uses: ./.github/workflows/test.yml
+            
+        hola:
+          uses: ./.github/workflows/test.yml
