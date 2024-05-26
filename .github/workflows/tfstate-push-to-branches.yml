@@ -18,7 +18,7 @@ jobs:
           git config --global user.name "GitHub Actions"
       
       - name: Checkout Repository
-        uses: actions/checkout@master
+        uses: actions/checkout@develop
 
       # - name: Merge Current -> master
       #   uses: devmasx/merge-branch@master

@@ -1,9 +1,8 @@
 name: triggered tests
 
 on:
-  repository_dispatch:
-    types: 
-      - trigger-test"
+  workflow_call:
+    
 jobs:
         push-to-branches:
           runs-on: ubuntu-latest
