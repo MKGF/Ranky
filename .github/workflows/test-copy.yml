@@ -11,10 +11,9 @@ on:
         options:
           - info
           - warning
-          - debug
       version:
         description: 'Version to deploy'
-        required: true
+        required: false
         default: '1.0.0'
       
 jobs:
