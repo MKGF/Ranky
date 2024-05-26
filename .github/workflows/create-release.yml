@@ -24,9 +24,7 @@ jobs:
     outputs:
       commit: ${{ inputs.commit }}
       version: ${{ inputs.version }}
-    steps:
-      - name: a
-        run: echo a
+    use: ./.github/deploy-jar.yml
   
   push-to-branches:
           runs-on: ubuntu-latest
