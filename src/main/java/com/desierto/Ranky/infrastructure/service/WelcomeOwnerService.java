@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class WelcomeOwnerService {
 
+  public static final String PATH_TO_MESSAGE_TO_OWNER_TXT = "src/main/resources/config/onGuildJoinMessageToOwner.txt";
   @Autowired
   public ConfigLoader config;
 
@@ -23,7 +24,7 @@ public class WelcomeOwnerService {
       String nonRiotEndorsementMessage) {
     if (owner != null) {
       String ownerMessage = String.format(read(
-              "src/main/java/com/desierto/Ranky/infrastructure/commands/onGuildJoinMessageToOwner.txt"),
+              PATH_TO_MESSAGE_TO_OWNER_TXT),
           owner.getUser().getName(),
           guild.getName()
       );

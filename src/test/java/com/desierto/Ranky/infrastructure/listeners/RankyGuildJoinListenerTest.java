@@ -38,8 +38,8 @@ public class RankyGuildJoinListenerTest {
 
   public static final String RANKY_USER_ROLE = "rankyUserRole";
   public static final String CONFIG_CHANNEL = "configChannel";
-  public static final String PATH_TO_EMBED_MESSAGE_TXT = "src/main/java/com/desierto/Ranky/infrastructure/commands/onGuildJoinEmbedMessage.txt";
-  public static final String PATH_TO_NON_RIOT_ENDORSEMENT_MESSAGE_TXT = "src/main/java/com/desierto/Ranky/infrastructure/commands/nonRiotEndorsementMessage.txt";
+  public static final String PATH_TO_EMBED_MESSAGE_TXT = "src/main/resources/config/onGuildJoinEmbedMessage.txt";
+  public static final String PATH_TO_NON_RIOT_ENDORSEMENT_MESSAGE_TXT = "src/main/resources/config/nonRiotEndorsementMessage.txt";
   RankyGuildJoinListener cut;
 
   @Mock
