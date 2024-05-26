@@ -13,14 +13,14 @@ resource "aws_instance" "ranky-ec2" {
               sudo systemctl enable docker
 
               # Autenticarse con ECR
-              aws ecr get-login-password --region eu-west-3 | sudo docker login --username AWS --password-stdin ${local.AWS_ACCOUNT_ID}.dkr.ecr.eu-west-3.amazonaws.com/ranky-repo
+              aws ecr get-login-password --region eu-west-3 | sudo docker login --username AWS --password-stdin ${var.AWS_ACCOUNT_ID}.dkr.ecr.eu-west-3.amazonaws.com/ranky-repo
 
 
               # Tirar la imagen desde ECR
-              sudo docker pull ${local.AWS_ACCOUNT_ID}.dkr.ecr.eu-west-3.amazonaws.com/ranky-repo:latest
+              sudo docker pull ${var.AWS_ACCOUNT_ID}.dkr.ecr.eu-west-3.amazonaws.com/ranky-repo:latest
 
               # Ejecutar la imagen
-              sudo docker run -d ${local.AWS_ACCOUNT_ID}.dkr.ecr.eu-west-3.amazonaws.com/ranky-repo:latest
+              sudo docker run -d ${var.AWS_ACCOUNT_ID}.dkr.ecr.eu-west-3.amazonaws.com/ranky-repo:latest
               EOF
 
   iam_instance_profile = aws_iam_instance_profile.ranky-ec2-profile.name
