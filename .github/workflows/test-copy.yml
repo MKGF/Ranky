@@ -5,7 +5,7 @@ on:
     inputs:
       Is Release:
         required: true
-        default: 'no'
+        default: 'No'
         type: choice
         options:
           - Yes
@@ -19,9 +19,10 @@ jobs:
         push-to-branches:
           runs-on: ubuntu-latest
           steps:
-            - name: Print version
+            - name: Imprimir los valores de los inputs
               run: |
-                echo "Version: ${{ github.event.inputs.version }}"
+                echo "¿Es un release? ${{ inputs.is_release }}"
+                echo "Versión a desplegar: ${{ inputs.version }}"
             
             
         hola:
