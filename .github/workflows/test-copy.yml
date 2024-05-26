@@ -1,17 +1,17 @@
-name: test taht triggers
+name: Test that triggers
 
 on:
   workflow_dispatch:
     inputs: 
       Release:
-        description: 'Would you like to create a release for this commit?'
+        description: 'Would you like to create a '
         required: true
         default: 'No'
         type: choice
         options:
           - 'Yes'
           - 'No'
-      version:
+      Version:
         description: 'Version to deploy'
         required: false
       
