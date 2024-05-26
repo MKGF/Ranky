@@ -2,14 +2,16 @@ name: test taht triggers
 
 on:
   workflow_dispatch:
-    inputs:
-      Is Release:
+    inputs: 
+      logLevel:
+        description: 'Log level'
         required: true
-        default: 'No'
+        default: 'warning'
         type: choice
         options:
-          - Yes
-          - No
+          - info
+          - warning
+          - debug
       version:
         description: 'Version to deploy'
         required: true
