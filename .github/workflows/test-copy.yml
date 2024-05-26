@@ -8,8 +8,8 @@ jobs:
           runs-on: ubuntu-latest
           steps:
 
-          - name: Checkout Repository
-            uses: actions/checkout@develop
-            
+          - name: Checkout
+            uses: actions/checkout@v3
+
           - name: hola
             uses: ./.github/workflows/test.yml@develop
