@@ -22,17 +22,11 @@ jobs:
 
     - name: hola
       if: ${{ github.event.workflow == 'Create Release' }}
-      with:
-        commit: ${{ inputs.commit }}
-        version: ${{ inputs.version }}
       run: |
         echo ${{ inputs.commit }}
         echo ${{ inputs.version }}
 
     - name: hola
-      with:
-        commit: ${{ inputs.commit }}
-        version: ${{ inputs.version }}
       run: |
         echo ${{ inputs.commit }}
         echo ${{ inputs.version }}
