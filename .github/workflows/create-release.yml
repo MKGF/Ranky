@@ -13,21 +13,9 @@ on:
         type: string
       
 jobs:
-  define-outputs:
-    runs-on: ubuntu-latest
-    outputs:
-      commit: ${{ steps.set_env.outputs.commit }}
-      version: ${{ steps.set_env.outputs.version }}
-    steps:
-      - name: Set Outputs
-        id: set_env
-        run: |
-          echo "commit=${{ github.event.inputs.commit }}"
-          echo "version=${{ github.event.inputs.version }}"
   
   call-deploy-jar:
-    needs: define-outputs
     uses: ./.github/workflows/deploy-jar.yml
     with:
-      commit: ${{ needs.define-outputs.outputs.commit }}
-      version: ${{ needs.define-outputs.outputs.version }}
+      commit: ${{ inputs.commit }}
+      version: ${{ inputs.version }}
