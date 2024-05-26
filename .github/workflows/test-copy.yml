@@ -9,6 +9,7 @@ on:
         default: '1.0.0'
 jobs:
         push-to-branches:
+          runs-on: ubuntu-latest
           steps:
             - name: Print version
               run: |
