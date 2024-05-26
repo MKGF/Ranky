@@ -6,4 +6,8 @@ on:
 jobs:
         push-to-branches:
           runs-on: ubuntu-latest
-          uses: my-repo/.github/workflows/test.yml@develop
+          
+        - name: Checkout Repository
+          uses: actions/checkout@develop
+
+          uses: ./.github/workflows/test.yml@develop
