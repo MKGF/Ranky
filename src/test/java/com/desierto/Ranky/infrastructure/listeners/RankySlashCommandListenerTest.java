@@ -20,6 +20,7 @@ import com.desierto.Ranky.infrastructure.service.HelpRankyService;
 import com.desierto.Ranky.infrastructure.service.RemoveAccountsService;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeAll;
@@ -75,8 +76,10 @@ public class RankySlashCommandListenerTest {
   private SlashCommandInteractionEvent getSlashCommandInteractionEvent() {
     SlashCommandInteractionEvent event = Mockito.mock(SlashCommandInteractionEvent.class);
     ReplyCallbackAction replyCallbackAction = Mockito.mock(ReplyCallbackAction.class);
+    InteractionHook hook = Mockito.mock(InteractionHook.class);
     when(event.deferReply(anyBoolean())).thenReturn(replyCallbackAction);
     doNothing().when(replyCallbackAction).queue();
+    when(event.getHook()).thenReturn(hook);
     return event;
   }
 
@@ -87,7 +90,7 @@ public class RankySlashCommandListenerTest {
 
     cut.onSlashCommandInteraction(event);
 
-    verify(helpRankyService, times(1)).execute(event);
+    verify(helpRankyService, times(1)).execute(event.getHook());
   }
 
   @Test
@@ -97,7 +100,7 @@ public class RankySlashCommandListenerTest {
 
     cut.onSlashCommandInteraction(event);
 
-    verify(getRankingService, times(1)).execute(event);
+    verify(getRankingService, times(1)).execute(event.getHook());
   }
 
   @Test
@@ -107,7 +110,7 @@ public class RankySlashCommandListenerTest {
 
     cut.onSlashCommandInteraction(event);
 
-    verify(createRankingService, times(1)).execute(event);
+    verify(createRankingService, times(1)).execute(event.getHook());
   }
 
   @Test
@@ -117,7 +120,7 @@ public class RankySlashCommandListenerTest {
 
     cut.onSlashCommandInteraction(event);
 
-    verify(deleteRankingService, times(1)).execute(event);
+    verify(deleteRankingService, times(1)).execute(event.getHook());
   }
 
   @Test
@@ -127,7 +130,7 @@ public class RankySlashCommandListenerTest {
 
     cut.onSlashCommandInteraction(event);
 
-    verify(addAccountsService, times(1)).execute(event);
+    verify(addAccountsService, times(1)).execute(event.getHook());
   }
 
   @Test
@@ -137,6 +140,6 @@ public class RankySlashCommandListenerTest {
 
     cut.onSlashCommandInteraction(event);
 
-    verify(removeAccountsService, times(1)).execute(event);
+    verify(removeAccountsService, times(1)).execute(event.getHook());
   }
 }

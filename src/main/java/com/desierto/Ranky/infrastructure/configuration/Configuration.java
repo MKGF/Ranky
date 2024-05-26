@@ -23,7 +23,7 @@ public class Configuration implements WebMvcConfigurer {
         .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.DIRECT_MESSAGES,
             GatewayIntent.GUILD_MODERATION, GatewayIntent.MESSAGE_CONTENT).build();
     bot.getPresence().setActivity(
-        Activity.playing("currently at " + bot.getGuilds().size() + " different servers.")
+        Activity.playing("Currently at " + bot.getGuilds().size() + " different servers.")
             .withState("Vibing"));
     bot.updateCommands().addCommands(Command.getDiscordCommands()).queue();
     return bot;
