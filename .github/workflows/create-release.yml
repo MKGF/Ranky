@@ -1,16 +1,16 @@
-name: Test that triggers
+name: Create Release
 
 on:
   workflow_dispatch:
     inputs: 
-      Release:
-        description: 'Would you like to create a release?'
-        required: true
-        default: 'No'
-        type: choice
-        options:
-          - 'Yes'
-          - 'No'
+      # Release:
+      #   description: 'Would you like to create a release?'
+      #   required: true
+      #   default: 'No'
+      #   type: choice
+      #   options:
+      #     - 'Yes'
+      #     - 'No'
       Commit:
         description: 'Commit ID to deploy'
         required: false
@@ -19,7 +19,11 @@ on:
         required: false
       
 jobs:
-        push-to-branches:
+  Deploy JAR to EC2:
+    uses: ./.github/workflows/deploy-jar.yml
+
+  
+  push-to-branches:
           runs-on: ubuntu-latest
           steps:
             - name: Imprimir los valores de los inputs
@@ -28,5 +32,4 @@ jobs:
                 echo "Versión a desplegar: ${{ inputs.version }}"
             
             
-        hola:
-          uses: ./.github/workflows/test.yml
+        
