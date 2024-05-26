@@ -22,14 +22,21 @@ jobs:
   define-outputs:
     runs-on: ubuntu-latest
     outputs:
-      commit: ${{ inputs.commit }}
-      version: ${{ inputs.version }}
-    uses: ./.github/workflows/deploy-jar.yml
+      # is_release: ${{ steps.set_outputs.outputs.is_release }}
+      commit: ${{ steps.set_outputs.outputs.commit }}
+      version: ${{ steps.set_outputs.outputs.version }}
+    steps:
+      - name: Set Outputs
+        id: set_outputs
+        run: |
+#          echo "::set-output name=is_release::${{ github.event.inputs.is_release }}"
+          echo "::set-output name=commit::${{ github.event.inputs.commit }}"
+          echo "::set-output name=version::${{ github.event.inputs.version }}"
   
-  push-to-branches:
-          runs-on: ubuntu-latest
-          steps:
-            - name: Imprimir los valores de los inputs
-              run: |
-                echo "¿Es un release? ${{ inputs.is_release }}"
-                echo "Versión a desplegar: ${{ inputs.version }}"
+  call-deploy-jar:
+    needs: define-outputs
+    uses: ./.github/workflows/deploy-jar.yml
+    with:
+#      is_release: ${{ needs.define-outputs.outputs.is_release }}
+      commit: ${{ needs.define-outputs.outputs.commit }}
+      version: ${{ needs.define-outputs.outputs.version }}

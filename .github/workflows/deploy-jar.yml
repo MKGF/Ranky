@@ -2,6 +2,13 @@ name: Deploy JAR Pipeline
 
 on:
   workflow_call:
+    inputs:
+      commit:
+        description: 'Commit ID to deploy'
+        required: false
+      version:
+        description: 'Version to deploy'
+        required: false
 
 jobs:
   build:
