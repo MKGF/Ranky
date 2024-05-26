@@ -4,6 +4,7 @@ package com.desierto.Ranky.infrastructure.service;
 import static com.desierto.Ranky.domain.utils.FileReader.read;
 
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -16,29 +17,31 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class WelcomeGuildService {
 
+  public static final String PATH_TO_MESSAGE_TO_GUILD_TXT = "src/main/resources/config/onGuildJoinMessageToGuild.txt";
   @Autowired
   public ConfigLoader config;
 
   public void execute(Guild guild, String welcomeEmbedMessage,
       String nonRiotEndorsementMessage) {
     String welcomeMessage = String.format(read(
-            "src/main/java/com/desierto/Ranky/infrastructure/commands/onGuildJoinMessageToGuild.txt"),
+            PATH_TO_MESSAGE_TO_GUILD_TXT),
         guild.getName());
 
-    DefaultGuildChannelUnion textChannel = guild.getDefaultChannel();
-    if (textChannel == null) {
-      if (guild.getSystemChannel() != null) {
-        sendWelcomeMessageToGuild(guild.getSystemChannel(), welcomeMessage,
-            welcomeEmbedMessage, nonRiotEndorsementMessage);
-      } else {
-        sendWelcomeMessageToGuild(guild.getDefaultChannel().asTextChannel(),
-            welcomeMessage, welcomeEmbedMessage, nonRiotEndorsementMessage);
-      }
-    } else {
-      sendWelcomeMessageToGuild(guild.getTextChannels().get(0),
+    TextChannel systemChannel;
+    DefaultGuildChannelUnion defaultChannel;
+    Optional<TextChannel> firstTextChannel = guild.getTextChannels().stream().findFirst();
+    if ((systemChannel = guild.getSystemChannel()) != null) {
+      sendWelcomeMessageToGuild(systemChannel, welcomeMessage,
+          welcomeEmbedMessage, nonRiotEndorsementMessage);
+    } else if ((defaultChannel = guild.getDefaultChannel()) != null) {
+      sendWelcomeMessageToGuild(defaultChannel.asTextChannel(),
           welcomeMessage, welcomeEmbedMessage, nonRiotEndorsementMessage);
+    } else {
+      firstTextChannel.ifPresent(textChannel -> sendWelcomeMessageToGuild(textChannel,
+          welcomeMessage, welcomeEmbedMessage, nonRiotEndorsementMessage));
     }
   }
+
 
   private void sendWelcomeMessageToGuild(TextChannel channel, String welcomeMessage,
       String welcomeEmbedMessage, String nonRiotEndorsementMessage) {

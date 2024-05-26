@@ -27,7 +27,7 @@ public class Ranky extends SpringBootServletInitializer {
     ConfigLoader config = context.getBean(ConfigLoader.class);
     try {
       bot.awaitReady();
-      checkPressenceInNewServers(bot, config);
+      checkPressenceInNewGuilds(bot, config);
     } catch (InterruptedException e) {
       SpringApplication.exit(context, () -> -1);
     }
@@ -38,7 +38,7 @@ public class Ranky extends SpringBootServletInitializer {
     return applicationBuilder.sources(Ranky.class);
   }
 
-  private static void checkPressenceInNewServers(JDA bot, ConfigLoader config) {
+  private static void checkPressenceInNewGuilds(JDA bot, ConfigLoader config) {
     log.info(
         "JUST WOKEN UP. CHECKING MY SERVERS IN CASE OF MISSING CONFIG CHANNELS AND RANKY USER ROLES...");
     bot.getGuilds().forEach(guild -> {
