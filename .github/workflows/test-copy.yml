@@ -4,13 +4,16 @@ on:
   workflow_dispatch:
     inputs: 
       Release:
-        description: 'Would you like to create a '
+        description: 'Would you like to create a release?'
         required: true
         default: 'No'
         type: choice
         options:
           - 'Yes'
           - 'No'
+      Commit:
+        description: 'Commit ID to deploy'
+        required: false
       Version:
         description: 'Version to deploy'
         required: false
