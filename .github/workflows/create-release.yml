@@ -24,6 +24,9 @@ jobs:
     outputs:
       commit: ${{ inputs.commit }}
       version: ${{ inputs.version }}
+    steps:
+      - name: a
+        run: echo a
   
   push-to-branches:
           runs-on: ubuntu-latest
@@ -32,6 +35,3 @@ jobs:
               run: |
                 echo "¿Es un release? ${{ inputs.is_release }}"
                 echo "Versión a desplegar: ${{ inputs.version }}"
-            
-            
-        
