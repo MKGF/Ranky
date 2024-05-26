@@ -11,12 +11,13 @@ import org.springframework.stereotype.Service;
 public class BotStatusUpdaterService {
 
   @Autowired
-  public JDA jda;
+  public JDA bot;
 
   public void execute() {
-    jda.getPresence().setActivity(
+    bot.getPresence().setActivity(
         Activity
             .customStatus(
-                "Currently at " + jda.getGuilds().size() + " different servers."));
+                "Currently at " + bot.getGuilds().size() + " different servers.")
+            .withState("Vibing"));
   }
 }

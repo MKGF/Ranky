@@ -19,6 +19,7 @@ import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -55,23 +56,25 @@ public class RankySlashCommandListener extends ListenerAdapter {
   public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
     log.info("ENTERED SLASH COMMAND LISTENER");
     event.deferReply(true).queue();
+    InteractionHook hook = event.getHook();
+    hook.setEphemeral(true);
     if (event.getCommandString().equals("/" + HELP_RANKY.getCommandId())) {
-      helpRankyService.execute(event);
+      helpRankyService.execute(hook);
     }
     if (event.getCommandString().equals("/" + RANKING.getCommandId())) {
-      getRankingService.execute(event);
+      getRankingService.execute(hook);
     }
     if (event.getCommandString().equals("/" + CREATE.getCommandId())) {
-      createRankingService.execute(event);
+      createRankingService.execute(hook);
     }
     if (event.getCommandString().equals("/" + DELETE.getCommandId())) {
-      deleteRankingService.execute(event);
+      deleteRankingService.execute(hook);
     }
     if (event.getCommandString().equals("/" + ADD_ACCOUNTS.getCommandId())) {
-      addAccountsService.execute(event);
+      addAccountsService.execute(hook);
     }
     if (event.getCommandString().equals("/" + REMOVE_ACCOUNTS.getCommandId())) {
-      removeAccountsService.execute(event);
+      removeAccountsService.execute(hook);
     }
   }
 }
