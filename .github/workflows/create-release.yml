@@ -6,16 +6,18 @@ on:
       commit:
         description: 'Commit ID to deploy'
         required: false
+        type: string
       version:
         description: 'Version to deploy'
         required: false
+        type: string
       
 jobs:
   define-outputs:
     runs-on: ubuntu-latest
     outputs:
-      commit: ${{ steps.set_outputs.outputs.commit }}
-      version: ${{ steps.set_outputs.outputs.version }}
+      commit: ${{ steps.set_env.outputs.commit }}
+      version: ${{ steps.set_env.outputs.version }}
     steps:
       - name: Set Outputs
         id: set_outputs
