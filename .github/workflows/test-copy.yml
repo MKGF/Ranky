@@ -2,7 +2,18 @@ name: test taht triggers
 
 on:
   workflow_dispatch:
-
+    inputs:
+      version:
+        description: 'Version to deploy'
+        required: true
+        default: '1.0.0'
 jobs:
         push-to-branches:
           uses: ./.github/workflows/test.yml
+
+        
+        print:
+          steps: 
+            - name: Print version
+            run: |
+              echo "Version: ${{ github.event.inputs.version }}"
