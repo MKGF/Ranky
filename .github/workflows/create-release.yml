@@ -19,7 +19,7 @@ on:
         required: false
       
 jobs:
-  Deploy JAR to EC2:
+  deploy-jar-to-ec2:
     uses: ./.github/workflows/deploy-jar.yml
 
   
