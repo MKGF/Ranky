@@ -4,6 +4,8 @@ on:
   workflow_dispatch:
     inputs:
       Is Release:
+        required: true
+        default: 'no'
         type: choice
         options:
           - Yes
