@@ -22,16 +22,16 @@ jobs:
   define-outputs:
     runs-on: ubuntu-latest
     outputs:
-      # is_release: ${{ steps.set_outputs.outputs.is_release }}
+#      is_release: ${{ steps.set_outputs.outputs.is_release }}
       commit: ${{ steps.set_outputs.outputs.commit }}
       version: ${{ steps.set_outputs.outputs.version }}
-      steps:
-        - name: Set Outputs
-          id: set_outputs
-          run: |
-  #          echo "::set-output name=is_release::${{ github.event.inputs.is_release }}"
-            echo "::set-output name=commit::${{ github.event.inputs.commit }}"
-            echo "::set-output name=version::${{ github.event.inputs.version }}"
+    steps:
+      - name: Set Outputs
+        id: set_outputs
+        run: |
+#         echo "::set-output name=is_release::${{ github.event.inputs.is_release }}"
+          echo "::set-output name=commit::${{ github.event.inputs.commit }}"
+          echo "::set-output name=version::${{ github.event.inputs.version }}"
   
   call-deploy-jar:
     needs: define-outputs
