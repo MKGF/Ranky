@@ -56,15 +56,14 @@ jobs:
 
     - name: Login to Amazon ECR
       run: |
-        aws ecr get-login-password --region eu-west-3 | docker login --username AWS --password-stdin 637423483220.dkr.ecr.eu-west-3.amazonaws.com
-#         aws ecr get-login-password --region eu-west-3 | docker login --username AWS --password-stdin ${{ secrets.AWS_ID }}.dkr.ecr.eu-west-3.amazonaws.com
+        aws ecr get-login-password --region eu-west-3 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-west-3.amazonaws.com
 
     - name: Terraform Init
       run: terraform init
       working-directory: ./terraform
 
     - name: Terraform Apply
-      run: terraform apply -auto-approve
+      run: terraform apply -auto-approve -var="AWS_ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID }}"
       working-directory: ./terraform
 
     - name: Configure git_config
