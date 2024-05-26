@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs: 
       Release:
-        description: 'Would you like to create a release for this version?'
+        description: 'Would you like to create a release for this commit?'
         required: true
-        default: 'Yes'
+        default: 'No'
         type: choice
         options:
           - 'Yes'
@@ -14,7 +14,6 @@ on:
       version:
         description: 'Version to deploy'
         required: false
-        default: '1.0.0'
       
 jobs:
         push-to-branches:
