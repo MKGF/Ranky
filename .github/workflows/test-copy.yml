@@ -5,13 +5,4 @@ on:
 
 jobs:
         push-to-branches:
-          runs-on: ubuntu-latest
-          steps:
-
-          - name: Checkout
-            uses: actions/checkout@v3
-
-          - name: hola
-            uses: ./.github/workflows/test.yml
-            with:
-              ref: develop
+          uses: ./.github/workflows/test.yml
