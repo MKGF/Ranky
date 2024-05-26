@@ -21,7 +21,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: hola
-      if: ${{ github.event.sender.login == 'Create Release' }}
+      if: ${{ github.event.workflow == 'Create Release' }}
       run: |
         echo ${{ inputs.commit }}
         echo ${{ inputs.version }}
