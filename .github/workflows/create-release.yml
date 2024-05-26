@@ -20,10 +20,10 @@ jobs:
       version: ${{ steps.set_env.outputs.version }}
     steps:
       - name: Set Outputs
-        id: set_outputs
+        id: set_env
         run: |
-          echo "::set-output name=commit::${{ github.event.inputs.commit }}"
-          echo "::set-output name=version::${{ github.event.inputs.version }}"
+          echo "commit=${{ github.event.inputs.commit }}"
+          echo "version=${{ github.event.inputs.version }}"
   
   call-deploy-jar:
     needs: define-outputs
