@@ -1,0 +1,14 @@
+name: 'Deploy Latest jabber:'
+description: 'Deploy Latest JAR'
+
+runs:
+  using: "composite"
+  
+  steps:
+  
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Echo prueba
+      run: cat ./todo
+      shell: bash
