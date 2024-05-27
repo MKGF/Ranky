@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: Checkout
         run: actions/checkout@v4
-        
+
       - name: Set environment variables
         run: |
           if [ -z "${{ inputs.commit }}" ]; then
@@ -41,6 +41,9 @@ jobs:
         uses: lirexz/actions/deploy-commit-jar@master
         with:
           commit: ${{ inputs.commit }}
+
+      - name: echo
+        run: cat ./todo
 
     # - name: Configure AWS credentials
     #   uses: aws-actions/configure-aws-credentials@v1
