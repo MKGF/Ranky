@@ -8,7 +8,7 @@ on:
         required: false
         type: string
       version:
-        description: 'Version to create(none by default)'
+        description: 'Tag this deploy as release(none by default)'
         required: false
         type: string
       

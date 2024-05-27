@@ -17,8 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     
-    - name: Checkout
-      uses: actions/checkout@v4
+
 
     - name: Set environment variables
       run: |
@@ -35,15 +34,22 @@ jobs:
 
     - name: Deploy latest JAR
       if: ${{ env.IS_COMMIT_EMPTY == 'true' }}
-      run: |
-        echo ${{ inputs.commit }}
-        echo ${{ inputs.version }}
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
 
     - name: Deploy commit JAR
       if: ${{ env.IS_COMMIT_EMPTY == 'false' }}
-      run: |
-        echo ${{ inputs.commit }}
-        echo ${{ inputs.version }}
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+          with:
+            ref: ${{ inputs.commit }}
+
+        - name: Echo prueba
+          run: cat ./todo
+    
+    - name: Tag deployed version
 
     # - name: Configure AWS credentials
     #   uses: aws-actions/configure-aws-credentials@v1
