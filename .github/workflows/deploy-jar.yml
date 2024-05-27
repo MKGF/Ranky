@@ -33,13 +33,13 @@ jobs:
         steps:
           - name: Checkout
             uses: actions/checkout@v4
+          - name: echo
+            run: echo hola
       - name: Deploy commit JAR
         if: ${{ env.IS_COMMIT_EMPTY == 'false' }}
         steps:
           - name: Checkout
             uses: actions/checkout@v4
-          - name: echo
-            run: echo hola
             with:
               ref: ${{ inputs.commit }}
           - name: Echo prueba
