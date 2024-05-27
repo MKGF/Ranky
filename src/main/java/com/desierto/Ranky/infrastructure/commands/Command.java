@@ -73,10 +73,10 @@ public class Command {
 
   private SlashCommandData toDiscordCommand() {
     SlashCommandData command = Commands.slash(this.commandId, this.description);
-    parameters.forEach(parameter -> {
-      command.addOption(parameter.getOptionType(), parameter.getName(), parameter.getDescription(),
-          parameter.getRequired());
-    });
+    parameters.forEach(
+        parameter -> command.addOption(parameter.getOptionType(), parameter.getName(),
+            parameter.getDescription(),
+            parameter.getRequired()));
     log.info("INTRODUCED COMMAND: " + this);
     return command;
   }
