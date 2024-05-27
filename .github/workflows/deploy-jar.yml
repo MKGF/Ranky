@@ -38,6 +38,9 @@ jobs:
         - name: Checkout
           uses: actions/checkout@v4
 
+        - name: Echo prueba
+          run: echo "Despliegue de la última versión JAR"
+
     - name: Deploy commit JAR
       if: ${{ env.IS_COMMIT_EMPTY == 'false' }}
       steps:
