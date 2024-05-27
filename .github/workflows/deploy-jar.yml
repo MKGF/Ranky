@@ -17,9 +17,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Checkout
-        uses: actions/checkout@v4
-
       - name: Set environment variables
         run: |
           if [ -z "${{ inputs.commit }}" ]; then
@@ -40,6 +37,8 @@ jobs:
       - name: Deploy commit JAR
         if: ${{ env.IS_COMMIT_EMPTY == 'false' }}
         uses: lirexz/actions/deploy-commit-jar@master
+        with:
+          commit: ${{ inputs.commit }}
 
     # - name: Configure AWS credentials
     #   uses: aws-actions/configure-aws-credentials@v1
