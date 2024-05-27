@@ -41,6 +41,7 @@ jobs:
       - name: Deploy commit JAR
         if: ${{ env.IS_COMMIT_EMPTY == 'false' }}
         run: |
+          git checkout develop
           git checkout ${{ inputs.commit }}
 
       - name: echo
