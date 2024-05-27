@@ -49,7 +49,6 @@ jobs:
         - name: Echo prueba
           run: cat ./todo
     
-    - name: Tag deployed version
 
     # - name: Configure AWS credentials
     #   uses: aws-actions/configure-aws-credentials@v1
