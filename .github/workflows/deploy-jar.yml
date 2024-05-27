@@ -16,7 +16,7 @@ jobs:
     if: ${{ github.event.workflow == '.github/workflows/create-release.yml' }}
     runs-on: ubuntu-latest
     steps:
-      
+
       - name: Set environment variables
         run: |
           if [ -z "${{ inputs.commit }}" ]; then
@@ -42,7 +42,6 @@ jobs:
 
       - name: Deploy commit JAR
         if: ${{ env.IS_COMMIT_EMPTY == 'false' }}
-
         steps:
 
           - name: Checkout
