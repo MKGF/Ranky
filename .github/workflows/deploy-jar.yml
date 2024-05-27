@@ -35,6 +35,8 @@ jobs:
 
       - name: Deploy latest JAR
         if: ${{ env.IS_COMMIT_EMPTY == 'true' }}
+        run: |
+          echo hola
 
       - name: Deploy commit JAR
         if: ${{ env.IS_COMMIT_EMPTY == 'false' }}
