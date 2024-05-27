@@ -17,9 +17,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     
-      - name: Checkout Actions
-        uses: actions/checkout@v4
-
       - name: Set environment variables
         run: |
           if [ -z "${{ inputs.commit }}" ]; then
@@ -35,14 +32,13 @@ jobs:
 
       - name: Deploy latest JAR
         if: ${{ env.IS_COMMIT_EMPTY == 'true' }}
-        run: |
-          echo hola
+        uses: actions/checkout@v4
 
       - name: Deploy commit JAR
         if: ${{ env.IS_COMMIT_EMPTY == 'false' }}
-        run: |
-          git checkout develop
-          git checkout ${{ inputs.commit }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.commit }}
 
       - name: echo
         run: cat ./todo
