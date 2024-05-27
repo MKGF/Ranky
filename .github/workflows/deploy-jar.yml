@@ -28,6 +28,7 @@ jobs:
 
     - name: hola
       run: |
+        echo "Caller workflow name: ${{ github.event.workflow }}"
         echo ${{ inputs.commit }}
         echo ${{ inputs.version }}
     # - name: Configure AWS credentials

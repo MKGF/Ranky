@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
     inputs: 
       commit:
-        description: 'Commit ID to deploy'
+        description: 'Commit ID to deploy(latest by default)'
         required: false
         type: string
       version:
-        description: 'Version to deploy'
+        description: 'Version to create(none by default)'
         required: false
         type: string
       
