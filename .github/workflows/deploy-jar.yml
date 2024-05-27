@@ -17,6 +17,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     
+      - name: Checkout Actions
+        uses: actions/checkout@v4
+
       - name: Set environment variables
         run: |
           if [ -z "${{ inputs.commit }}" ]; then
