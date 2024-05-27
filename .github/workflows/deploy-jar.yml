@@ -16,6 +16,9 @@ jobs:
     if: ${{ github.event.workflow == '.github/workflows/create-release.yml' }}
     runs-on: ubuntu-latest
     steps:
+    
+      - name: Checkout Actions
+        uses: actions/checkout@v4
 
       - name: Set environment variables
         run: |
@@ -32,13 +35,11 @@ jobs:
 
       - name: Deploy latest JAR
         if: ${{ env.IS_COMMIT_EMPTY == 'true' }}
-        uses: actions/checkout@v4
 
       - name: Deploy commit JAR
         if: ${{ env.IS_COMMIT_EMPTY == 'false' }}
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.commit }}
+        run: |
+          git checkout ${{ inputs.commit }}
 
       - name: echo
         run: cat ./todo
