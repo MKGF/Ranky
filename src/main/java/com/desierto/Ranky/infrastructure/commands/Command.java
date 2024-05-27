@@ -77,7 +77,7 @@ public class Command {
       command.addOption(parameter.getOptionType(), parameter.getName(), parameter.getDescription(),
           parameter.getRequired());
     });
-    log.info("INTRODUCED COMMAND: " + this.toString());
+    log.info("INTRODUCED COMMAND: " + this);
     return command;
   }
 }
