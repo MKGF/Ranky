@@ -9,12 +9,10 @@ runs:
   using: "composite"
   steps:
 
-    - name: Checkout Actions
-      uses: actions/checkout@v4
-      
     - name: Checkout Commit
-      run: git checkout ${{ inputs.commit }}
-      shell: bash
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.commit }}
 
     - name: Echo prueba
       run: cat ./todo
