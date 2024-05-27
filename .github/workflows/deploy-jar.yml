@@ -12,25 +12,26 @@ on:
         required: false
         type: string
 jobs:
-  build:
+  deploy-jar:
+    if: ${{ github.event.workflow == '.github/workflows/create-release.yml' }}
     runs-on: ubuntu-latest
-
     steps:
     
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: hola
-      if: ${{ github.event.workflow == 'Create Release' }}
+    - name: Deploy latest JAR
+      if: ${{ inputs.commit }} == ''
       run: |
         echo ${{ inputs.commit }}
         echo ${{ inputs.version }}
 
-    - name: hola
+    - name: Deploy commit JAR
+      if: ${{ inputs.commit }} != ''
       run: |
-        echo "Caller workflow name: ${{ github.event.workflow }}"
         echo ${{ inputs.commit }}
         echo ${{ inputs.version }}
+
     # - name: Configure AWS credentials
     #   uses: aws-actions/configure-aws-credentials@v1
     #   with:
