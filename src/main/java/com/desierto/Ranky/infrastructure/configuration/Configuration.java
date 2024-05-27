@@ -3,7 +3,6 @@ package com.desierto.Ranky.infrastructure.configuration;
 import com.desierto.Ranky.infrastructure.commands.Command;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -22,9 +21,7 @@ public class Configuration implements WebMvcConfigurer {
     JDA bot = JDABuilder.createDefault(config.getDiscApiKey())
         .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.DIRECT_MESSAGES,
             GatewayIntent.GUILD_MODERATION, GatewayIntent.MESSAGE_CONTENT).build();
-    bot.getPresence().setActivity(
-        Activity.playing("Currently at " + bot.getGuilds().size() + " different servers.")
-            .withState("Vibing"));
+    
     bot.updateCommands().addCommands(Command.getDiscordCommands()).queue();
     return bot;
   }
