@@ -16,8 +16,6 @@ jobs:
     if: ${{ github.event.workflow == '.github/workflows/create-release.yml' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
 
       - name: Set environment variables
         run: |
@@ -34,13 +32,15 @@ jobs:
 
       - name: Deploy latest JAR
         if: ${{ env.IS_COMMIT_EMPTY == 'true' }}
-        uses: lirexz/actions/deploy-latest-jar@master
+        uses: ./.github/actions/deploy-latest-jar
 
       - name: Deploy commit JAR
         if: ${{ env.IS_COMMIT_EMPTY == 'false' }}
-        uses: lirexz/actions/deploy-commit-jar@master
+        uses: ./.github/actions/deploy-commit-jar
         with:
           commit: ${{ inputs.commit }}
+          github-repository: ${{ secrets.GITHUB_REPOSITORY }}
+          access-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: echo
         run: cat ./todo
