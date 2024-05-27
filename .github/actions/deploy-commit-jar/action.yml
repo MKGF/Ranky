@@ -10,9 +10,8 @@ runs:
   steps:
 
     - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        ref: ${{ inputs.commit }}
+      run: git checkout ${{ inputs.commit }}
+      shell: bash
 
     - name: Echo prueba
       run: cat ./todo
