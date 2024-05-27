@@ -28,13 +28,13 @@ jobs:
           else
             echo "IS_COMMIT_EMPTY=false" >> $GITHUB_ENV
           fi
+
       - name: Deploy latest JAR
         if: ${{ env.IS_COMMIT_EMPTY == 'true' }}
         steps:
           - name: Checkout
             uses: actions/checkout@v4
-          - name: echo
-            run: echo hola
+
       - name: Deploy commit JAR
         if: ${{ env.IS_COMMIT_EMPTY == 'false' }}
         steps:
@@ -42,9 +42,7 @@ jobs:
             uses: actions/checkout@v4
             with:
               ref: ${{ inputs.commit }}
-          - name: Echo prueba
-            run: cat ./todo
-    
+
     # - name: Configure AWS credentials
     #   uses: aws-actions/configure-aws-credentials@v1
     #   with:
