@@ -35,11 +35,11 @@ jobs:
 
       - name: Deploy latest JAR
         if: ${{ env.IS_COMMIT_EMPTY == 'true' }}
-        uses: LiReXz/actions/deploy-latest-jar@v1
+        uses: lirexz/actions/deploy-latest-jar
 
       - name: Deploy commit JAR
         if: ${{ env.IS_COMMIT_EMPTY == 'false' }}
-        uses: LiReXz/actions/deploy-commit-jar@v1
+        uses: lirexz/actions/deploy-commit-jar
 
     # - name: Configure AWS credentials
     #   uses: aws-actions/configure-aws-credentials@v1
