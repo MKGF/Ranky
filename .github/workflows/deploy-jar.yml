@@ -20,14 +20,27 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
+    - name: Set environment variables
+      run: |
+        if [ -z "${{ inputs.commit }}" ]; then
+          echo "IS_COMMIT_EMPTY=true" >> $GITHUB_ENV
+        else
+          echo "IS_COMMIT_EMPTY=false" >> $GITHUB_ENV
+        fi
+        if [ -z "${{ inputs.version }}" ]; then
+          echo "IS_COMMIT_EMPTY=true" >> $GITHUB_ENV
+        else
+          echo "IS_COMMIT_EMPTY=false" >> $GITHUB_ENV
+        fi
+
     - name: Deploy latest JAR
-      if: ${{ inputs.commit }} == ''
+      if: ${{ env.IS_COMMIT_EMPTY == 'true' }}
       run: |
         echo ${{ inputs.commit }}
         echo ${{ inputs.version }}
 
     - name: Deploy commit JAR
-      if: ${{ inputs.commit }} != ''
+      if: ${{ env.IS_COMMIT_EMPTY == 'false' }}
       run: |
         echo ${{ inputs.commit }}
         echo ${{ inputs.version }}
