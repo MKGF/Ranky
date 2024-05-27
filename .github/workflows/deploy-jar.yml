@@ -16,7 +16,9 @@ jobs:
     if: ${{ github.event.workflow == '.github/workflows/create-release.yml' }}
     runs-on: ubuntu-latest
     steps:
-
+      - name: Checkout
+        run: actions/checkout@v4
+        
       - name: Set environment variables
         run: |
           if [ -z "${{ inputs.commit }}" ]; then
