@@ -58,22 +58,22 @@ public class RankySlashCommandListener extends ListenerAdapter {
     event.deferReply(true).queue();
     InteractionHook hook = event.getHook();
     hook.setEphemeral(true);
-    if (event.getCommandString().equals("/" + HELP_RANKY.getCommandId())) {
+    if (event.getCommandString().contains("/" + HELP_RANKY.getCommandId())) {
       helpRankyService.execute(hook);
     }
-    if (event.getCommandString().equals("/" + RANKING.getCommandId())) {
+    if (event.getCommandString().contains("/" + RANKING.getCommandId())) {
       getRankingService.execute(hook);
     }
-    if (event.getCommandString().equals("/" + CREATE.getCommandId())) {
-      createRankingService.execute(hook);
+    if (event.getCommandString().contains("/" + CREATE.getCommandId())) {
+      createRankingService.execute(event);
     }
-    if (event.getCommandString().equals("/" + DELETE.getCommandId())) {
+    if (event.getCommandString().contains("/" + DELETE.getCommandId())) {
       deleteRankingService.execute(hook);
     }
-    if (event.getCommandString().equals("/" + ADD_ACCOUNTS.getCommandId())) {
+    if (event.getCommandString().contains("/" + ADD_ACCOUNTS.getCommandId())) {
       addAccountsService.execute(hook);
     }
-    if (event.getCommandString().equals("/" + REMOVE_ACCOUNTS.getCommandId())) {
+    if (event.getCommandString().contains("/" + REMOVE_ACCOUNTS.getCommandId())) {
       removeAccountsService.execute(hook);
     }
   }
