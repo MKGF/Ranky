@@ -1,6 +1,7 @@
 package com.desierto.Ranky.infrastructure.configuration;
 
 import com.desierto.Ranky.infrastructure.commands.Command;
+import com.google.gson.Gson;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -21,8 +22,13 @@ public class Configuration implements WebMvcConfigurer {
     JDA bot = JDABuilder.createDefault(config.getDiscApiKey())
         .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.DIRECT_MESSAGES,
             GatewayIntent.GUILD_MODERATION, GatewayIntent.MESSAGE_CONTENT).build();
-    
+
     bot.updateCommands().addCommands(Command.getDiscordCommands()).queue();
     return bot;
+  }
+
+  @Bean
+  public Gson gson() {
+    return new Gson();
   }
 }

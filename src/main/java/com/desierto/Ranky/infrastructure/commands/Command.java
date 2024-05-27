@@ -1,13 +1,20 @@
 package com.desierto.Ranky.infrastructure.commands;
 
+import static java.util.Collections.emptyList;
+
 import java.util.List;
+import java.util.logging.Logger;
 import lombok.Getter;
+import lombok.ToString;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
 @Getter
+@ToString
 public class Command {
 
+  public static final Logger log = Logger.getLogger("Command.class");
   public static final Command HELP_RANKY;
   public static final Command RANKING;
   public static final Command CREATE;
@@ -17,26 +24,41 @@ public class Command {
 
   static {
     HELP_RANKY = Command.of("help_ranky",
-        "Shows a detailed explanation of the possibilites of Ranky");
-    RANKING = Command.of("ranking", "Shows information of the specified ranking");
-    CREATE = Command.of("create", "Creates a new ranking with the given name");
-    DELETE = Command.of("delete", "Deletes the specified ranking");
-    ADD_ACCOUNTS = Command.of("add_accounts",
-        "Adds the given accounts (format: summonerName#tagLine)");
-    REMOVE_ACCOUNTS = Command.of("remove_accounts",
-        "Removes the given accounts (format: summonerName#tagLine)");
+        "Shows a detailed explanation of the possibilites of Ranky", emptyList());
+    RANKING = Command.of("ranking", "Shows information of the specified ranking", emptyList());
+    CREATE = Command.of(
+        "create",
+        "Creates a new ranking with the given name",
+        List.of(
+            Parameter.of("name", "Name of the ranking", true, OptionType.STRING)
+        )
+    );
+    DELETE = Command.of("delete", "Deletes the specified ranking", emptyList());
+    ADD_ACCOUNTS = Command.of(
+        "add_accounts",
+        "Adds the given accounts (format: summonerName#tagLine)",
+        emptyList()
+    );
+    REMOVE_ACCOUNTS = Command.of(
+        "remove_accounts",
+        "Removes the given accounts (format: summonerName#tagLine)",
+        emptyList()
+    );
   }
 
   String commandId;
   String description;
 
-  public Command(String commandId, String description) {
+  List<Parameter> parameters;
+
+  public Command(String commandId, String description, List<Parameter> parameters) {
     this.commandId = commandId;
     this.description = description;
+    this.parameters = parameters;
   }
 
-  public static Command of(String commandId, String description) {
-    return new Command(commandId, description);
+  public static Command of(String commandId, String description, List<Parameter> parameters) {
+    return new Command(commandId, description, parameters);
   }
 
   public static List<SlashCommandData> getDiscordCommands() {
@@ -50,6 +72,12 @@ public class Command {
   }
 
   private SlashCommandData toDiscordCommand() {
-    return Commands.slash(this.commandId, this.description);
+    SlashCommandData command = Commands.slash(this.commandId, this.description);
+    parameters.forEach(parameter -> {
+      command.addOption(parameter.getOptionType(), parameter.getName(), parameter.getDescription(),
+          parameter.getRequired());
+    });
+    log.info("INTRODUCED COMMAND: " + this.toString());
+    return command;
   }
 }
