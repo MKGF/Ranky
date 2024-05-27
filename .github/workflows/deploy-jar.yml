@@ -35,13 +35,13 @@ jobs:
 
       - name: Deploy latest JAR
         if: ${{ env.IS_COMMIT_EMPTY == 'true' }}
-        uses: ./.github/actions/deploy-latest-jar
+        uses: actions/checkout@v4
 
       - name: Deploy commit JAR
         if: ${{ env.IS_COMMIT_EMPTY == 'false' }}
-        uses: ./.github/actions/deploy-commit-jar
+        uses: actions/checkout@v4
         with:
-          commit: ${{ inputs.commit }}
+          ref: ${{ inputs.commit }}
 
       - name: echo
         run: cat ./todo
