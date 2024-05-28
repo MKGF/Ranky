@@ -110,7 +110,7 @@ public class RankySlashCommandListenerTest {
 
     cut.onSlashCommandInteraction(event);
 
-    verify(createRankingService, times(1)).execute(event.getHook());
+    verify(createRankingService, times(1)).execute(event);
   }
 
   @Test
