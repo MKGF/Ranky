@@ -3,20 +3,25 @@ package com.desierto.Ranky.domain.entity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @EqualsAndHashCode
+@AllArgsConstructor
 public class Ranking {
 
-  private long id;
+  private String id;
 
-  private List<Account> accounts = new ArrayList<>();
+  private List<Account> accounts;
+
+  public Ranking(String id) {
+    this.id = id;
+    this.accounts = new ArrayList<>();
+  }
 
   public void sortByRank() {
     accounts = accounts.stream().sorted(Account::compareTo).collect(Collectors.toList());

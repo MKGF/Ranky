@@ -3,8 +3,6 @@ package com.desierto.Ranky.domain.valueobject;
 import static com.desierto.Ranky.domain.valueobject.Rank.Tier.UNRANKED;
 
 import com.desierto.Ranky.domain.entity.ValueEnum;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -18,10 +16,8 @@ import lombok.Setter;
 @EqualsAndHashCode
 public class Rank implements Comparable<Rank> {
 
-  private Tier tier; //Tier
-  @Min(0)
-  @Max(4)
-  private int division; //Division
+  private Tier tier;
+  private int division;
 
   @Override
   public int compareTo(Rank rank) {

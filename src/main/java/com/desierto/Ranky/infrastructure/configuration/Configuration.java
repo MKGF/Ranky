@@ -31,4 +31,6 @@ public class Configuration implements WebMvcConfigurer {
   public Gson gson() {
     return new Gson();
   }
+
+
 }
