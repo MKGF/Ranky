@@ -30,10 +30,16 @@ public class Command {
         "create",
         "Creates a new ranking with the given name",
         List.of(
-            Parameter.of("name", "Name of the ranking", true, OptionType.STRING)
+            new Parameter("name", "Name of the ranking", true, OptionType.STRING)
         )
     );
-    DELETE = Command.of("delete", "Deletes the specified ranking", emptyList());
+    DELETE = Command.of(
+        "delete",
+        "Deletes the specified ranking",
+        List.of(
+            new Parameter("name", "Name of the ranking", true, OptionType.STRING)
+        )
+    );
     ADD_ACCOUNTS = Command.of(
         "add_accounts",
         "Adds the given accounts (format: summonerName#tagLine)",
@@ -74,9 +80,9 @@ public class Command {
   private SlashCommandData toDiscordCommand() {
     SlashCommandData command = Commands.slash(this.commandId, this.description);
     parameters.forEach(
-        parameter -> command.addOption(parameter.getOptionType(), parameter.getName(),
-            parameter.getDescription(),
-            parameter.getRequired()));
+        parameter -> command.addOption(parameter.optionType(), parameter.name(),
+            parameter.description(),
+            parameter.required()));
     log.info("INTRODUCED COMMAND: " + this);
     return command;
   }

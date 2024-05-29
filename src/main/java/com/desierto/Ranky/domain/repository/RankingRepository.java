@@ -5,4 +5,6 @@ import com.desierto.Ranky.domain.entity.Ranking;
 public interface RankingRepository {
 
   Ranking save(Ranking ranking);
+
+  boolean delete(String rankingId);
 }

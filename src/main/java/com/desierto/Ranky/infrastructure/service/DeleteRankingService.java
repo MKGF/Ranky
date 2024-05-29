@@ -1,14 +1,48 @@
 package com.desierto.Ranky.infrastructure.service;
 
-import lombok.AllArgsConstructor;
-import net.dv8tion.jda.api.interactions.InteractionHook;
+import static com.desierto.Ranky.infrastructure.utils.DiscordExceptionHandler.handleExceptionOnSlashCommandEvent;
+
+import com.desierto.Ranky.domain.exception.ConfigChannelNotFoundException;
+import com.desierto.Ranky.domain.exception.ranking.RankingCouldNotBeDeletedException;
+import com.desierto.Ranky.domain.exception.ranking.RankingNotFoundException;
+import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
+import com.desierto.Ranky.infrastructure.repository.ConfigChannelRankingRepository;
+import com.google.gson.Gson;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
 public class DeleteRankingService {
 
-  public void execute(InteractionHook hook) {
+  private final ConfigLoader config;
+
+  private final Gson gson;
+
+  @Autowired
+  public DeleteRankingService(ConfigLoader config, Gson gson) {
+    this.config = config;
+    this.gson = gson;
+  }
+
+  public void execute(SlashCommandInteractionEvent event) {
+    if (event.isFromGuild()) {
+      try {
+        ConfigChannelRankingRepository rankingRepository = new ConfigChannelRankingRepository(
+            config,
+            event.getGuild(),
+            gson
+        );
+        String rankingName = event.getOptions().stream().findFirst().get().getAsString();
+        if (rankingRepository.delete(rankingName)) {
+          event.getHook().sendMessage("Ranking deleted successfully!").queue();
+        } else {
+          handleExceptionOnSlashCommandEvent(new RankingCouldNotBeDeletedException(), event);
+        }
+      } catch (ConfigChannelNotFoundException | RankingNotFoundException e) {
+        handleExceptionOnSlashCommandEvent(e, event);
+      }
+    }
 
   }
 
