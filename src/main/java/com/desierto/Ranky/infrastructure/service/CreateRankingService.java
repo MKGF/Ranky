@@ -29,8 +29,8 @@ public class CreateRankingService {
     if (event.isFromGuild()) {
       try {
         ConfigChannelRankingRepository rankingRepository = new ConfigChannelRankingRepository(
-            event.getGuild(),
             config,
+            event.getGuild(),
             gson
         );
         String rankingName = event.getOptions().stream().findFirst().get().getAsString();

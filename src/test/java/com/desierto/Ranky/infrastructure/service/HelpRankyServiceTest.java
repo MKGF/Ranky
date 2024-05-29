@@ -1,5 +1,6 @@
 package com.desierto.Ranky.infrastructure.service;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -7,6 +8,7 @@ import static org.mockito.Mockito.when;
 import com.desierto.Ranky.domain.utils.FileReader;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageCreateAction;
 import org.junit.jupiter.api.BeforeAll;
@@ -15,7 +17,6 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -41,11 +42,13 @@ public class HelpRankyServiceTest {
         config.getRankingLimit());
     message.setTitle("Ranky manual");
     message.setDescription(formattedMessage);
-    InteractionHook hook = Mockito.mock(InteractionHook.class);
-    WebhookMessageCreateAction wmca = Mockito.mock(WebhookMessageCreateAction.class);
+    SlashCommandInteractionEvent event = mock(SlashCommandInteractionEvent.class);
+    InteractionHook hook = mock(InteractionHook.class);
+    WebhookMessageCreateAction wmca = mock(WebhookMessageCreateAction.class);
+    when(event.getHook()).thenReturn(hook);
     when(hook.sendMessageEmbeds(message.build())).thenReturn(wmca);
 
-    cut.execute(hook);
+    cut.execute(event);
 
     verify(hook, times(1)).sendMessageEmbeds(message.build());
   }

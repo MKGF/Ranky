@@ -90,7 +90,7 @@ public class RankySlashCommandListenerTest {
 
     cut.onSlashCommandInteraction(event);
 
-    verify(helpRankyService, times(1)).execute(event.getHook());
+    verify(helpRankyService, times(1)).execute(event);
   }
 
   @Test
@@ -100,7 +100,7 @@ public class RankySlashCommandListenerTest {
 
     cut.onSlashCommandInteraction(event);
 
-    verify(getRankingService, times(1)).execute(event.getHook());
+    verify(getRankingService, times(1)).execute(event);
   }
 
   @Test
@@ -120,7 +120,7 @@ public class RankySlashCommandListenerTest {
 
     cut.onSlashCommandInteraction(event);
 
-    verify(deleteRankingService, times(1)).execute(event.getHook());
+    verify(deleteRankingService, times(1)).execute(event);
   }
 
   @Test
@@ -130,7 +130,7 @@ public class RankySlashCommandListenerTest {
 
     cut.onSlashCommandInteraction(event);
 
-    verify(addAccountsService, times(1)).execute(event.getHook());
+    verify(addAccountsService, times(1)).execute(event);
   }
 
   @Test
@@ -140,6 +140,6 @@ public class RankySlashCommandListenerTest {
 
     cut.onSlashCommandInteraction(event);
 
-    verify(removeAccountsService, times(1)).execute(event.getHook());
+    verify(removeAccountsService, times(1)).execute(event);
   }
 }

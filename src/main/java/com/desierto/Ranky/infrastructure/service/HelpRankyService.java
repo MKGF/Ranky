@@ -4,6 +4,7 @@ import com.desierto.Ranky.domain.utils.FileReader;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,8 @@ public class HelpRankyService {
   @Autowired
   private ConfigLoader config;
 
-  public void execute(InteractionHook hook) {
+  public void execute(SlashCommandInteractionEvent event) {
+    InteractionHook hook = event.getHook();
     EmbedBuilder message = new EmbedBuilder();
     String formattedMessage = String.format(FileReader.read(PATH_TO_HELP_RANKY_TXT),
         config.getRankingLimit());

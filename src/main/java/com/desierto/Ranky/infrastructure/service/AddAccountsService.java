@@ -1,6 +1,7 @@
 package com.desierto.Ranky.infrastructure.service;
 
 import lombok.AllArgsConstructor;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import org.springframework.stereotype.Service;
 
@@ -8,7 +9,8 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class AddAccountsService {
 
-  public void execute(InteractionHook hook) {
+  public void execute(SlashCommandInteractionEvent event) {
+    InteractionHook hook = event.getHook();
 
   }
 
