@@ -7,6 +7,7 @@ import com.desierto.Ranky.domain.exception.ConfigChannelNotFoundException;
 import com.desierto.Ranky.domain.exception.RankingAlreadyExistsException;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
 import com.desierto.Ranky.infrastructure.repository.ConfigChannelRankingRepository;
+import com.desierto.Ranky.infrastructure.utils.DiscordOptionRetriever;
 import com.google.gson.Gson;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,7 @@ public class CreateRankingService {
             event.getGuild(),
             gson
         );
-        String rankingName = event.getOptions().stream().findFirst().get().getAsString();
+        String rankingName = DiscordOptionRetriever.fromEventGetRankingName(event);
         rankingRepository.save(new Ranking(rankingName));
         event.getHook().sendMessage("Ranking created successfully!").queue();
       } catch (ConfigChannelNotFoundException | RankingAlreadyExistsException e) {

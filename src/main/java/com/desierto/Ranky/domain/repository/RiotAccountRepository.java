@@ -1,16 +1,11 @@
 package com.desierto.Ranky.domain.repository;
 
 import com.desierto.Ranky.domain.entity.Account;
-import com.desierto.Ranky.domain.valueobject.AccountInformation;
-import java.util.List;
-import java.util.Optional;
+import com.desierto.Ranky.domain.valueobject.Rank;
 
 public interface RiotAccountRepository {
 
-  List<AccountInformation> getAccountInformation(Account account);
+  Account enrichWithId(Account account);
 
-  Optional<Account> getAccountByName(String name);
-
-  Optional<Account> getAccountById(String id, String streamChannel);
-
+  Rank getSoloQRankOfAccount(Account account);
 }

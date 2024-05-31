@@ -1,23 +1,17 @@
 package com.desierto.Ranky.infrastructure.repository;
 
-import static com.desierto.Ranky.domain.enumerates.QueueType.SOLOQ;
-
-import com.desierto.Ranky.domain.builder.RankBuilder;
 import com.desierto.Ranky.domain.entity.Account;
 import com.desierto.Ranky.domain.repository.RiotAccountRepository;
-import com.desierto.Ranky.domain.valueobject.AccountInformation;
 import com.desierto.Ranky.domain.valueobject.Rank;
 import com.desierto.Ranky.domain.valueobject.Rank.Tier;
 import com.desierto.Ranky.domain.valueobject.Winrate;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
 import com.merakianalytics.orianna.Orianna;
+import com.merakianalytics.orianna.types.common.Queue;
 import com.merakianalytics.orianna.types.common.Region;
-import com.merakianalytics.orianna.types.core.league.LeaguePositions;
+import com.merakianalytics.orianna.types.core.league.LeagueEntry;
 import com.merakianalytics.orianna.types.core.summoner.Summoner;
 import jakarta.annotation.PostConstruct;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -34,111 +28,27 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
   }
 
   @Override
-  public List<AccountInformation> getAccountInformation(Account account) {
-    LeaguePositions leaguePositions = Orianna.leaguePositionsForSummoner(
-            Orianna.summonerNamed(account.getName()).get()
-        )
-        .get();
-
-    return leaguePositions.stream().map(leagueEntry ->
-        AccountInformation.builder()
-            .rank(new RankBuilder()
-                .division(leagueEntry.getDivision().ordinal())
-                .tier(Tier.valueOf(leagueEntry.getTier().name()))
-                .build()
-            )
-            .winrate(Winrate.builder()
-                .wins(leagueEntry.getWins())
-                .losses(leagueEntry.getLosses())
-                .build()
-            )
-            .leaguePoints(leagueEntry.getLeaguePoints())
-            .queueType(leagueEntry.getLeague().getQueue().getTag())
-            .build()
-    ).collect(Collectors.toList());
-  }
-
-  @Override
-  public Optional<Account> getAccountByName(String name) {
-    Summoner summoner = Orianna.summonerNamed(name).get();
-    if (summoner.exists()) {
-      LeaguePositions leaguePositions = Orianna.leaguePositionsForSummoner(
-              summoner
-          )
-          .get();
-
-      AccountInformation soloQ = leaguePositions.stream()
-          .filter(leagueEntry -> leagueEntry.getQueue() != null && leagueEntry.getQueue().getTag()
-              .equalsIgnoreCase(SOLOQ.getValue()))
-          .map(leagueEntry -> AccountInformation.builder()
-              .rank(new RankBuilder()
-                  .division(leagueEntry.getDivision().ordinal() + 1)
-                  .tier(Tier.valueOf(leagueEntry.getTier().name()))
-                  .build()
-              )
-              .winrate(Winrate.builder()
-                  .wins(leagueEntry.getWins())
-                  .losses(leagueEntry.getLosses())
-                  .build()
-              )
-              .leaguePoints(leagueEntry.getLeaguePoints())
-              .queueType(leagueEntry.getLeague().getQueue().getTag())
-              .build()).findAny().orElse(
-              AccountInformation.builder().rank(Rank.unranked()).leaguePoints(0)
-                  .queueType(SOLOQ.getValue())
-                  .winrate(Winrate.unranked()).build()
-          );
-      return Optional.of(Account.builder()
-          .id(summoner.getAccountId())
-          .name(leaguePositions.getSummoner().getName())
-          .accountInformation(soloQ)
-          .build());
-    } else {
-      return Optional.empty();
+  public Account enrichWithId(Account account) {
+    try {
+      return new Account(Orianna.accountWithRiotId(
+          account.getName(), account.getTagLine()).get().getPuuid(), account.getName(),
+          account.getTagLine());
+    } catch (IllegalStateException e) {
+      return new Account(account.getName(), account.getTagLine());
     }
   }
 
   @Override
-  public Optional<Account> getAccountById(String id, String streamChannel) {
-    Summoner summoner = Orianna.summonerWithAccountId(id).get();
-    if (summoner.exists()) {
-      LeaguePositions leaguePositions = Orianna.leaguePositionsForSummoner(
-              summoner
-          )
-          .get();
-      Boolean isInGame = summoner.isInGame();
-      AccountInformation soloQ = leaguePositions.stream()
-          .filter(leagueEntry -> leagueEntry.getQueue() != null && leagueEntry.getQueue().getTag()
-              .equalsIgnoreCase(SOLOQ.getValue()))
-          .map(leagueEntry -> AccountInformation.builder()
-              .rank(new RankBuilder()
-                  .division(leagueEntry.getDivision().ordinal() + 1)
-                  .tier(Tier.valueOf(leagueEntry.getTier().name()))
-                  .build()
-              )
-              .winrate(Winrate.builder()
-                  .wins(leagueEntry.getWins())
-                  .losses(leagueEntry.getLosses())
-                  .build()
-              )
-              .leaguePoints(leagueEntry.getLeaguePoints())
-              .queueType(leagueEntry.getLeague().getQueue().getTag())
-              .build()).findAny().orElse(
-              AccountInformation.builder().rank(Rank.unranked()).leaguePoints(0)
-                  .queueType(SOLOQ.getValue())
-                  .winrate(Winrate.unranked()).build()
-          );
-      return Optional.of(Account.builder()
-          .id(summoner.getAccountId())
-          .isInGame(isInGame)
-          .name(leaguePositions.getSummoner().getName())
-          .accountInformation(soloQ)
-          .streamChannel(streamChannel)
-          .build());
-    } else {
-      return Optional.empty();
-    }
-  }
+  public Rank getSoloQRankOfAccount(Account account) {
+    Summoner summoner = Orianna.summonerWithPuuid(account.getId()).get();
+    LeagueEntry leagueEntry = summoner.getLeaguePosition(Queue.RANKED_SOLO);
 
+    return new Rank(
+        Tier.fromString(leagueEntry.getTier().name()),
+        leagueEntry.getDivision().ordinal(),
+        leagueEntry.getLeaguePoints(),
+        new Winrate(leagueEntry.getWins(), leagueEntry.getLosses())
+    );
+  }
 
 }

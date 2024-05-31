@@ -7,4 +7,6 @@ public interface RankingRepository {
   Ranking save(Ranking ranking);
 
   boolean delete(String rankingId);
+
+  Ranking find(String rankingName);
 }

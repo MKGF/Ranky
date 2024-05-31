@@ -19,15 +19,38 @@ public class Rank implements Comparable<Rank> {
   private Tier tier;
   private int division;
 
+  private int leaguePoints;
+
+  private Winrate winrate;
+
+  public static Rank unranked() {
+    return new Rank(UNRANKED, 0, 0, new Winrate());
+  }
+
   @Override
   public int compareTo(Rank rank) {
     if (rank.tier.ordinal() > this.tier.ordinal()) {
       return 1;
-    }
-    if (rank.tier.ordinal() < this.tier.ordinal()) {
+    } else if (rank.tier.ordinal() < this.tier.ordinal()) {
       return -1;
+    } else if (rank.division > this.division) {
+      return 1;
+    } else if (rank.division < this.division) {
+      return -1;
+    } else if (rank.leaguePoints > this.leaguePoints) {
+      return 1;
+    } else if (rank.leaguePoints < this.leaguePoints) {
+      return -1;
+    } else {
+      return rank.winrate.getPercentage().compareTo(this.winrate.getPercentage());
     }
-    return Integer.compare(this.division, rank.division);
+  }
+
+  @Override
+  public String toString() {
+    return tier.toString() + " " + division + " " + leaguePoints + "lp\n" + "Wins: "
+        + winrate.getWins() + " Losses: " + winrate.getLosses() + " Ratio: "
+        + winrate.getPercentage();
   }
 
   public enum Tier implements ValueEnum<String> {
@@ -36,7 +59,7 @@ public class Rank implements Comparable<Rank> {
         "DIAMOND"), MASTER("MASTER"), GRANDMASTER("GRANDMASTER"), CHALLENGER(
         "CHALLENGER");
 
-    private String value;
+    private final String value;
 
 
     Tier(String value) {
@@ -47,6 +70,16 @@ public class Rank implements Comparable<Rank> {
       return value;
     }
 
+    public static Tier fromString(String s) {
+      for (Tier tier :
+          Tier.values()) {
+        if (tier.value.equalsIgnoreCase(s)) {
+          return tier;
+        }
+      }
+      return null;
+    }
+
     public static class Converter {
 
       public Converter() {
@@ -54,14 +87,5 @@ public class Rank implements Comparable<Rank> {
       }
     }
 
-  }
-
-  public static Rank unranked() {
-    return new Rank(UNRANKED, 0);
-  }
-
-  @Override
-  public String toString() {
-    return tier.toString() + " " + division;
   }
 }
