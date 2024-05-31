@@ -42,8 +42,15 @@ public class Command {
     );
     ADD_ACCOUNTS = Command.of(
         "add_accounts",
-        "Adds the given accounts (format: summonerName#tagLine)",
-        emptyList()
+        "Adds the given accounts (being separated by a comma (',')",
+        List.of(
+            new Parameter("ranking_name", "Name of the ranking to add the accounts to", true,
+                OptionType.STRING),
+            new Parameter("accounts",
+                "List of the accounts to add to the ranking (format: summonerName#tagLine,summonerName#tagLine...)",
+                true,
+                OptionType.STRING)
+        )
     );
     REMOVE_ACCOUNTS = Command.of(
         "remove_accounts",

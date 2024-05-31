@@ -48,6 +48,15 @@ public class ConfigChannelRankingRepository implements RankingRepository {
     return removeMessageOfRanking(rankingId);
   }
 
+  @Override
+  public Ranking find(String rankingId) {
+    Optional<Message> messageOfRanking = retrieveMessageOfRanking(rankingId);
+    if (messageOfRanking.isEmpty()) {
+      throw new RankingNotFoundException(rankingId);
+    }
+    return fromMessage(messageOfRanking.get());
+  }
+
   private TextChannel getConfigChannel(Guild guild) {
     return guild.getTextChannels().stream()
         .filter(textChannel -> textChannel.getName().equalsIgnoreCase(config.getConfigChannel()))
@@ -58,9 +67,8 @@ public class ConfigChannelRankingRepository implements RankingRepository {
   private boolean rankingWithIdExists(String rankingId) {
     return configChannel.getHistory().retrievePast(config.getRankingLimit()).complete().stream()
         .anyMatch(message -> {
-          Optional<Ranking> optionalRanking = fromMessageIfPossible(message);
-          return optionalRanking.map(r -> r.getId()
-              .equalsIgnoreCase(rankingId)).orElse(false);
+          Ranking ranking = fromMessage(message);
+          return ranking.getId().equalsIgnoreCase(rankingId);
         });
   }
 
@@ -68,9 +76,8 @@ public class ConfigChannelRankingRepository implements RankingRepository {
     AtomicReference<Boolean> removedSuccessfully = new AtomicReference<>(false);
     configChannel.getHistory().retrievePast(config.getRankingLimit()).complete().stream()
         .filter(message -> {
-          Optional<Ranking> optionalRanking = fromMessageIfPossible(message);
-          return optionalRanking.isPresent() && optionalRanking.get().getId()
-              .equalsIgnoreCase(rankingId);
+          Ranking ranking = fromMessage(message);
+          return ranking.getId().equalsIgnoreCase(rankingId);
         })
         .forEach(message -> {
           message.delete().complete();
@@ -79,11 +86,15 @@ public class ConfigChannelRankingRepository implements RankingRepository {
     return removedSuccessfully.get();
   }
 
-  private Optional<Ranking> fromMessageIfPossible(Message message) {
-    try {
-      return Optional.of(gson.fromJson(message.getContentRaw(), Ranking.class));
-    } catch (Exception e) {
-      return Optional.empty();
-    }
+  private Optional<Message> retrieveMessageOfRanking(String rankingId) {
+    return configChannel.getHistory().retrievePast(config.getRankingLimit()).complete().stream()
+        .filter(message -> {
+          Ranking ranking = fromMessage(message);
+          return ranking.getId().equalsIgnoreCase(rankingId);
+        }).findFirst();
+  }
+
+  private Ranking fromMessage(Message message) {
+    return gson.fromJson(message.getContentRaw(), Ranking.class);
   }
 }

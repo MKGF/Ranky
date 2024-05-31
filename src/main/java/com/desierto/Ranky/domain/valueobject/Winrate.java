@@ -20,11 +20,11 @@ import lombok.Setter;
 @EqualsAndHashCode
 public class Winrate {
 
-  Integer wins;
-  Integer losses;
+  private Integer wins;
+  private Integer losses;
 
   public BigDecimal getPercentage() {
-    Integer totalGames = wins + losses;
+    int totalGames = wins + losses;
     if (totalGames == 0) {
       return ZERO;
     }

@@ -23,3 +23,7 @@ ya que la interfaz de Discord ayuda con guias visuales sobre como escribir cada 
 Esto no significa que Ranky no deba mandar mensajes. El mensaje introductorio siempre debe estar para dar una breve explicacion sobre lo que es
 capaz de hacer. Ademas, puede tener sentido que en cierto momento alguien quiera compartir el ranking con todo el mundo y lo podemos solventar
 incorporando un boton al slash command para que Ranky reenvie el mensaje del hook del comando a todo el servidor.
+
+PARA MAÑANA
+
+Testar que los ranks se comparan bien entre si y el servicio de añadir cuentas + el find del repo de config channel + discordoptionretriever
