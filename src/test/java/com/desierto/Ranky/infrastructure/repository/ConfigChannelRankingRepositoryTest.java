@@ -74,7 +74,7 @@ public class ConfigChannelRankingRepositoryTest {
 
     ConfigChannelRankingRepository cut = fromGuild(guild);
 
-    assertThrows(RankingAlreadyExistsException.class, () -> cut.save(new Ranking("Test")));
+    assertThrows(RankingAlreadyExistsException.class, () -> cut.update(new Ranking("Test")));
   }
 
   @Test
@@ -97,7 +97,7 @@ public class ConfigChannelRankingRepositoryTest {
 
     ConfigChannelRankingRepository cut = fromGuild(guild);
 
-    cut.save(ranking);
+    cut.update(ranking);
   }
 
   private ConfigChannelRankingRepository fromGuild(Guild guild) {

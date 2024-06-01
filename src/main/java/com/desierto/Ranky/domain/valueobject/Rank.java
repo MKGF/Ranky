@@ -17,14 +17,14 @@ import lombok.Setter;
 public class Rank implements Comparable<Rank> {
 
   private Tier tier;
-  private int division;
+  private Division division;
 
   private int leaguePoints;
 
   private Winrate winrate;
 
   public static Rank unranked() {
-    return new Rank(UNRANKED, 0, 0, new Winrate());
+    return new Rank(UNRANKED, Division.IV, 0, new Winrate());
   }
 
   @Override
@@ -33,9 +33,9 @@ public class Rank implements Comparable<Rank> {
       return 1;
     } else if (rank.tier.ordinal() < this.tier.ordinal()) {
       return -1;
-    } else if (rank.division > this.division) {
+    } else if (rank.division.compare(this.division) > 0) {
       return 1;
-    } else if (rank.division < this.division) {
+    } else if (rank.division.compare(this.division) < 0) {
       return -1;
     } else if (rank.leaguePoints > this.leaguePoints) {
       return 1;
@@ -79,13 +79,5 @@ public class Rank implements Comparable<Rank> {
       }
       return null;
     }
-
-    public static class Converter {
-
-      public Converter() {
-
-      }
-    }
-
   }
 }

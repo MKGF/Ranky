@@ -17,6 +17,11 @@ public class DiscordOptionRetriever {
     String rawAccounts = fromSlashCommandInteractionEvent(event).get(1);
     return Arrays.stream(rawAccounts.split(",")).map(s -> {
       String[] strings = s.split("#");
+      if (strings.length == 1) {
+        event.getHook().sendMessage("Account is missing summonerName#tagLine format: " + strings[0])
+            .queue();
+        return new Account();
+      }
       return new Account(strings[0], strings[1]);
     }).collect(Collectors.toList());
   }

@@ -58,10 +58,10 @@ public class CreateRankingServiceTest {
     Ranking ranking = new Ranking(rankingName);
     MockedConstruction<ConfigChannelRankingRepository> repo = Mockito.mockConstruction(
         ConfigChannelRankingRepository.class, (mock, context) -> {
-          when(mock.save(ranking)).thenReturn(ranking);
+          when(mock.update(ranking)).thenReturn(ranking);
         });
     cut.execute(event);
-    verify(repo.constructed().get(0), times(1)).save(ranking);
+    verify(repo.constructed().get(0), times(1)).update(ranking);
     verify(event.getHook().sendMessage(anyString()), times(1)).queue();
   }
 
