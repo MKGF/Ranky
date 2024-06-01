@@ -35,7 +35,7 @@ public class CreateRankingService {
             gson
         );
         String rankingName = DiscordOptionRetriever.fromEventGetRankingName(event);
-        rankingRepository.save(new Ranking(rankingName));
+        rankingRepository.create(new Ranking(rankingName));
         event.getHook().sendMessage("Ranking created successfully!").queue();
       } catch (ConfigChannelNotFoundException | RankingAlreadyExistsException e) {
         handleExceptionOnSlashCommandEvent(e, event);

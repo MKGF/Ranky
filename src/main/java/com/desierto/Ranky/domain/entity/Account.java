@@ -19,7 +19,6 @@ public class Account implements Comparable<Account> {
   private String name;
 
   private String tagLine;
-  private Boolean isInGame;
 
   private Rank rank;
 
@@ -28,16 +27,19 @@ public class Account implements Comparable<Account> {
   private static final String isNotLive = "\uD83D\uDD34";
 
   public Account(String name, String tagLine) {
+    this.id = "";
     this.name = name;
     this.tagLine = tagLine;
-    this.isInGame = false;
   }
 
   public Account(String id, String name, String tagLine) {
     this.id = id;
     this.name = name;
     this.tagLine = tagLine;
-    this.isInGame = false;
+  }
+
+  public Account() {
+
   }
 
   public void updateRank(Rank rank) {
@@ -53,7 +55,7 @@ public class Account implements Comparable<Account> {
     return this.rank.compareTo(other.rank);
   }
 
-  public String getFormattedForRanking(int index) {
+  public String getFormattedForRanking(int index, Boolean isInGame) {
     String isPlaying = (isInGame ? isLive
         : isNotLive);
     return index + " | " + isPlaying + " | " + name + " | "
@@ -65,5 +67,9 @@ public class Account implements Comparable<Account> {
         .getWinrate()
         .getLosses() + "L | " + this.getRank().getWinrate().getPercentage().toString()
         ;
+  }
+
+  public boolean isNotEmpty() {
+    return name != null && !name.isEmpty() && tagLine != null && !tagLine.isEmpty();
   }
 }

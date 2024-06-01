@@ -2,6 +2,7 @@ package com.desierto.Ranky.infrastructure.repository;
 
 import com.desierto.Ranky.domain.entity.Account;
 import com.desierto.Ranky.domain.repository.RiotAccountRepository;
+import com.desierto.Ranky.domain.valueobject.Division;
 import com.desierto.Ranky.domain.valueobject.Rank;
 import com.desierto.Ranky.domain.valueobject.Rank.Tier;
 import com.desierto.Ranky.domain.valueobject.Winrate;
@@ -45,7 +46,7 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
 
     return new Rank(
         Tier.fromString(leagueEntry.getTier().name()),
-        leagueEntry.getDivision().ordinal(),
+        Division.valueOf(leagueEntry.getDivision().name()),
         leagueEntry.getLeaguePoints(),
         new Winrate(leagueEntry.getWins(), leagueEntry.getLosses())
     );

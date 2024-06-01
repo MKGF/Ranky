@@ -32,12 +32,23 @@ public class ConfigChannelRankingRepository implements RankingRepository {
   }
 
   @Override
-  public Ranking save(Ranking ranking) throws RankingAlreadyExistsException {
+  public Ranking create(Ranking ranking) throws RankingAlreadyExistsException {
     if (rankingWithIdExists(ranking.getId())) {
       throw new RankingAlreadyExistsException();
     }
-    configChannel.sendMessage(gson.toJson(ranking)).queue();
+    configChannel.sendMessage(gson.toJson(ranking)).complete();
     return ranking;
+  }
+
+  @Override
+  public Ranking update(Ranking ranking) throws RankingAlreadyExistsException {
+    Optional<Message> rankingMessage = retrieveMessageOfRanking(ranking.getId());
+    if (rankingMessage.isEmpty()) {
+      throw new RankingNotFoundException(ranking.getId());
+    } else {
+      rankingMessage.get().editMessage(gson.toJson(ranking)).complete();
+      return ranking;
+    }
   }
 
   @Override
