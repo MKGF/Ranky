@@ -57,13 +57,15 @@ public class CreateRankingServiceTest {
     SlashCommandInteractionEvent event = getMockedEvent();
     String rankingName = "Test";
     Ranking ranking = new Ranking(rankingName);
-    MockedConstruction<ConfigChannelRankingRepository> repo = Mockito.mockConstruction(
+    when(discordOptionRetriever.fromEventGetRankingName(event)).thenReturn(rankingName);
+    try (MockedConstruction<ConfigChannelRankingRepository> repo = Mockito.mockConstruction(
         ConfigChannelRankingRepository.class, (mock, context) -> {
-          when(mock.update(ranking)).thenReturn(ranking);
-        });
-    cut.execute(event);
-    verify(repo.constructed().get(0), times(1)).update(ranking);
-    verify(event.getHook().sendMessage(anyString()), times(1)).queue();
+          when(mock.create(ranking)).thenReturn(ranking);
+        })) {
+      cut.execute(event);
+      verify(repo.constructed().get(0), times(1)).create(ranking);
+      verify(event.getHook().sendMessage(anyString()), times(1)).queue();
+    }
   }
 
   private SlashCommandInteractionEvent getMockedEvent() {
