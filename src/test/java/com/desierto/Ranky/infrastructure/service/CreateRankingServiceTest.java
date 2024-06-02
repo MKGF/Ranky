@@ -19,10 +19,8 @@ import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageCreateAction;
 import net.dv8tion.jda.api.utils.data.DataObject;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
@@ -30,7 +28,6 @@ import org.mockito.Mockito;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@TestInstance(Lifecycle.PER_CLASS)
 public class CreateRankingServiceTest {
 
   CreateRankingService cut;
@@ -43,7 +40,7 @@ public class CreateRankingServiceTest {
   @Mock
   DiscordOptionRetriever discordOptionRetriever;
 
-  @BeforeAll
+  @BeforeEach
   public void setUp() {
     gson = new Gson();
     cut = new CreateRankingService(config, gson, discordOptionRetriever);

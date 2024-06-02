@@ -129,7 +129,7 @@ public class ConfigChannelRankingRepositoryTest {
   }
 
   @Test
-  public void onUpdateRanking_whenRankingDoesNotExist_updatesSuccessfully() {
+  public void onUpdateRanking_whenRankingDoesNotExist_throwsException() {
     Guild guild = mock(Guild.class);
     TextChannel configChannel = mock(TextChannel.class);
     MessageHistory history = mock(MessageHistory.class);
