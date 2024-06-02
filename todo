@@ -26,5 +26,4 @@ incorporando un boton al slash command para que Ranky reenvie el mensaje del hoo
 
 PARA MAÑANA
 
-A MEDIAS: Testar que los ranks se comparan bien entre si y el servicio de añadir cuentas + el find del repo de config channel + discordoptionretriever
-POR HACER: Revisar por que me falla un test cuando ejecuto toda la suite en AddAccountsServiceTest
+Testar que los ranks se comparan bien entre si + el find y delete del repo de config channel

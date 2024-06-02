@@ -20,10 +20,14 @@ public class CreateRankingService {
 
   private final Gson gson;
 
+  private final DiscordOptionRetriever discordOptionRetriever;
+
   @Autowired
-  public CreateRankingService(ConfigLoader config, Gson gson) {
+  public CreateRankingService(ConfigLoader config, Gson gson,
+      DiscordOptionRetriever discordOptionRetriever) {
     this.config = config;
     this.gson = gson;
+    this.discordOptionRetriever = discordOptionRetriever;
   }
 
   public void execute(SlashCommandInteractionEvent event) {
@@ -34,7 +38,7 @@ public class CreateRankingService {
             event.getGuild(),
             gson
         );
-        String rankingName = DiscordOptionRetriever.fromEventGetRankingName(event);
+        String rankingName = discordOptionRetriever.fromEventGetRankingName(event);
         rankingRepository.create(new Ranking(rankingName));
         event.getHook().sendMessage("Ranking created successfully!").queue();
       } catch (ConfigChannelNotFoundException | RankingAlreadyExistsException e) {

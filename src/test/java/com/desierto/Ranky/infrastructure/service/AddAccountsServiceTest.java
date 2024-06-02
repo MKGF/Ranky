@@ -20,19 +20,15 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageCreateAction;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@TestInstance(Lifecycle.PER_CLASS)
 public class AddAccountsServiceTest {
 
   AddAccountsService cut;
@@ -45,19 +41,19 @@ public class AddAccountsServiceTest {
   @Mock
   RiotAccountRepository riotAccountRepository;
 
-  private MockedStatic<DiscordOptionRetriever> dor;
+  @Mock
+  DiscordOptionRetriever discordOptionRetriever;
 
   private MockedConstruction<ConfigChannelRankingRepository> repo;
 
-  @BeforeAll
+  @BeforeEach
   public void setUp() {
     gson = new Gson();
-    cut = new AddAccountsService(config, gson, riotAccountRepository);
+    cut = new AddAccountsService(config, discordOptionRetriever, gson, riotAccountRepository);
   }
 
   @AfterEach
   public void tearDown() {
-    dor.close();
     repo.close();
   }
 
@@ -66,7 +62,8 @@ public class AddAccountsServiceTest {
     SlashCommandInteractionEvent event = getAMockedEvent();
     String rankingName = "A ranking";
     Ranking ranking = new Ranking(rankingName);
-    setupDiscordOptionRetriever(rankingName, List.of(new Account()), event);
+    when(discordOptionRetriever.fromEventGetRankingName(event)).thenReturn(rankingName);
+    when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of(new Account()));
     repo = mockDiscordRepo(ranking);
 
     cut.execute(event);
@@ -82,7 +79,8 @@ public class AddAccountsServiceTest {
     String rankingName = "A ranking";
     Ranking ranking = new Ranking(rankingName);
     Account delusionalTB = new Account("Delusional TB", "delu");
-    setupDiscordOptionRetriever(rankingName, List.of(delusionalTB), event);
+    when(discordOptionRetriever.fromEventGetRankingName(event)).thenReturn(rankingName);
+    when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of(delusionalTB));
     when(riotAccountRepository.enrichWithId(delusionalTB)).thenReturn(delusionalTB);
     repo = mockDiscordRepo(ranking);
 
@@ -103,7 +101,8 @@ public class AddAccountsServiceTest {
     Ranking ranking = new Ranking(rankingName);
     Account BBXhadow = new Account("BBXhadow", "RFF");
     Account enrichedBBXhadow = new Account("id", BBXhadow.getId(), BBXhadow.getTagLine());
-    setupDiscordOptionRetriever(rankingName, List.of(BBXhadow), event);
+    when(discordOptionRetriever.fromEventGetRankingName(event)).thenReturn(rankingName);
+    when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of(BBXhadow));
     when(riotAccountRepository.enrichWithId(BBXhadow)).thenReturn(enrichedBBXhadow);
     repo = mockDiscordRepo(ranking);
 
@@ -122,15 +121,6 @@ public class AddAccountsServiceTest {
     when(event.getHook()).thenReturn(hook);
     when(hook.sendMessage(anyString())).thenReturn(wmca);
     return event;
-  }
-
-  private void setupDiscordOptionRetriever(String rankingName, List<Account> accounts,
-      SlashCommandInteractionEvent event) {
-    dor = Mockito.mockStatic(DiscordOptionRetriever.class);
-    dor.when(() -> DiscordOptionRetriever.fromEventGetRankingName(event))
-        .thenReturn(rankingName);
-    dor.when(() -> DiscordOptionRetriever.fromEventGetAccountList(event))
-        .thenReturn(accounts);
   }
 
   private MockedConstruction<ConfigChannelRankingRepository> mockDiscordRepo(Ranking ranking) {

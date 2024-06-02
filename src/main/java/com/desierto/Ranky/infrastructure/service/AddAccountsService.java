@@ -29,6 +29,9 @@ public class AddAccountsService {
   private ConfigLoader config;
 
   @Autowired
+  private DiscordOptionRetriever discordOptionRetriever;
+
+  @Autowired
   private Gson gson;
 
   @Autowired
@@ -36,7 +39,7 @@ public class AddAccountsService {
 
   public void execute(SlashCommandInteractionEvent event) {
     InteractionHook hook = event.getHook();
-    String rankingName = DiscordOptionRetriever.fromEventGetRankingName(event);
+    String rankingName = discordOptionRetriever.fromEventGetRankingName(event);
     try {
       ConfigChannelRankingRepository rankingRepository = new ConfigChannelRankingRepository(
           config,
@@ -44,10 +47,13 @@ public class AddAccountsService {
           gson
       );
       Ranking ranking = rankingRepository.find(rankingName);
-      List<Account> accountsToAdd = DiscordOptionRetriever.fromEventGetAccountList(event)
+      List<Account> accountsToAdd = discordOptionRetriever.fromEventGetAccountList(event)
           .stream()
           .filter(Account::isNotEmpty)
-          .map(account -> riotAccountRepository.enrichWithId(account))
+          .map(account -> {
+            log.info("INTO ENRICHMENT WITH ACCOUNT: " + account.getNameAndTagLine());
+            return riotAccountRepository.enrichWithId(account);
+          })
           .filter(account -> {
             if (account.getId().isEmpty()) {
               hook.sendMessage("Couldn't retrieve accountId for the following account: "

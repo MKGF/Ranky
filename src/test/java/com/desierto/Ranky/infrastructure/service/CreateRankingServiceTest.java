@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import com.desierto.Ranky.domain.entity.Ranking;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
 import com.desierto.Ranky.infrastructure.repository.ConfigChannelRankingRepository;
+import com.desierto.Ranky.infrastructure.utils.DiscordOptionRetriever;
 import com.google.gson.Gson;
 import java.util.List;
 import net.dv8tion.jda.api.entities.Guild;
@@ -39,10 +40,13 @@ public class CreateRankingServiceTest {
 
   Gson gson;
 
+  @Mock
+  DiscordOptionRetriever discordOptionRetriever;
+
   @BeforeAll
   public void setUp() {
     gson = new Gson();
-    cut = new CreateRankingService(config, gson);
+    cut = new CreateRankingService(config, gson, discordOptionRetriever);
   }
 
   @Test
