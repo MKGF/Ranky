@@ -41,7 +41,7 @@ public class ConfigChannelRankingRepository implements RankingRepository {
   }
 
   @Override
-  public Ranking update(Ranking ranking) throws RankingAlreadyExistsException {
+  public Ranking update(Ranking ranking) throws RankingNotFoundException {
     Optional<Message> rankingMessage = retrieveMessageOfRanking(ranking.getId());
     if (rankingMessage.isEmpty()) {
       throw new RankingNotFoundException(ranking.getId());

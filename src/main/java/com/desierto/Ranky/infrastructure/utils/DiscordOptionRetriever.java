@@ -6,14 +6,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import org.springframework.stereotype.Component;
 
+@Component
 public class DiscordOptionRetriever {
 
-  public static String fromEventGetRankingName(SlashCommandInteractionEvent event) {
+  public String fromEventGetRankingName(SlashCommandInteractionEvent event) {
     return fromSlashCommandInteractionEvent(event).get(0);
   }
 
-  public static List<Account> fromEventGetAccountList(SlashCommandInteractionEvent event) {
+  public List<Account> fromEventGetAccountList(SlashCommandInteractionEvent event) {
     String rawAccounts = fromSlashCommandInteractionEvent(event).get(1);
     return Arrays.stream(rawAccounts.split(",")).map(s -> {
       String[] strings = s.split("#");

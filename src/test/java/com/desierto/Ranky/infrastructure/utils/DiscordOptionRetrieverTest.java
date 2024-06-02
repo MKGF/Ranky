@@ -13,21 +13,35 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageCreateAction;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+@ExtendWith(SpringExtension.class)
+@TestInstance(Lifecycle.PER_CLASS)
 public class DiscordOptionRetrieverTest {
+
+  private DiscordOptionRetriever cut;
+
+  @BeforeAll
+  public void setUp() {
+    cut = new DiscordOptionRetriever();
+  }
 
   @Test
   public void onEvent_getRankingName() {
     SlashCommandInteractionEvent event = getMockedEventWithRankingName();
-    assertEquals("A ranking", DiscordOptionRetriever.fromEventGetRankingName(event));
+    assertEquals("A ranking", cut.fromEventGetRankingName(event));
   }
 
   @Test
   public void onEvent_getsAccountList() {
     SlashCommandInteractionEvent event = getMockedEventWithRankingNameAndAccounts();
     assertEquals(List.of(new Account("testAcc", "EUW"), new Account("testAcc2", "EUW")),
-        DiscordOptionRetriever.fromEventGetAccountList(event));
+        cut.fromEventGetAccountList(event));
   }
 
   @Test
@@ -38,7 +52,7 @@ public class DiscordOptionRetrieverTest {
     WebhookMessageCreateAction wmca = mock(WebhookMessageCreateAction.class);
     when(hook.sendMessage(anyString())).thenReturn(wmca);
     assertEquals(List.of(new Account(), new Account()),
-        DiscordOptionRetriever.fromEventGetAccountList(event));
+        cut.fromEventGetAccountList(event));
     verify(wmca, times(2)).queue();
   }
 
