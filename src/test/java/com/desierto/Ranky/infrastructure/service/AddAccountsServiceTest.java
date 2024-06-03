@@ -127,7 +127,7 @@ public class AddAccountsServiceTest {
     return Mockito.mockConstruction(
         ConfigChannelRankingRepository.class, (mock, context) -> {
           when(mock.update(ranking)).thenReturn(ranking);
-          when(mock.find(ranking.getId())).thenReturn(ranking);
+          when(mock.read(ranking.getId())).thenReturn(ranking);
         });
   }
 }

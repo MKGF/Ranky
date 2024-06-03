@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.desierto.Ranky.domain.valueobject.Winrate;
 import org.junit.jupiter.api.Test;
 
-public class WinrateTest {
+public class WinrateTest extends BaseTest {
 
   @Test
   public void givenSomeWinsAndLosses_calculatesPercentage() {

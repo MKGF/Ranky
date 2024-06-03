@@ -26,5 +26,4 @@ incorporando un boton al slash command para que Ranky reenvie el mensaje del hoo
 
 PARA MAÑANA
 
-Testar que los ranks se comparan bien entre si + el find y delete del repo de config channel
-checkear por que hay algunos tests que fallan si ejecuto "All in Tests" pero funcionan bien ejecutados individualmente
+Testar que los ranks se comparan bien entre si

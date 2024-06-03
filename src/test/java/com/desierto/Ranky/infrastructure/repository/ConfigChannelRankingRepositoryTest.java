@@ -1,5 +1,6 @@
 package com.desierto.Ranky.infrastructure.repository;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -144,6 +145,45 @@ public class ConfigChannelRankingRepositoryTest {
     ConfigChannelRankingRepository cut = fromGuild(guild);
 
     assertThrows(RankingNotFoundException.class, () -> cut.update(ranking));
+  }
+
+  @Test
+  public void onRead_whenRankingDoesNotExist_throwsException() {
+    Guild guild = mock(Guild.class);
+    TextChannel configChannel = mock(TextChannel.class);
+    MessageHistory history = mock(MessageHistory.class);
+    RestAction restAction = mock(RestAction.class);
+    String rankingId = "Test";
+    when(configChannel.getName()).thenReturn(CONFIG_CHANNEL);
+    when(guild.getTextChannels()).thenReturn(List.of(configChannel));
+    when(configChannel.getHistory()).thenReturn(history);
+    when(history.retrievePast(RANKING_LIMIT)).thenReturn(restAction);
+    when(restAction.complete()).thenReturn(List.of());
+
+    ConfigChannelRankingRepository cut = fromGuild(guild);
+
+    assertThrows(RankingNotFoundException.class, () -> cut.read(rankingId));
+  }
+
+  @Test
+  public void onRead_whenRankingExists_returnsRanking() {
+    String jsonRanking = "{\"id\":\"Test\",\"accounts\":[{\"id\": \"id\", \"name\": \"name\", \"tagLine\": \"tagLine\"}]}";
+    Guild guild = mock(Guild.class);
+    TextChannel configChannel = mock(TextChannel.class);
+    MessageHistory history = mock(MessageHistory.class);
+    RestAction restAction = mock(RestAction.class);
+    Message message = mock(Message.class);
+    Ranking expected = new Ranking("Test", List.of(new Account("id", "name", "tagLine")));
+    when(configChannel.getName()).thenReturn(CONFIG_CHANNEL);
+    when(guild.getTextChannels()).thenReturn(List.of(configChannel));
+    when(configChannel.getHistory()).thenReturn(history);
+    when(history.retrievePast(RANKING_LIMIT)).thenReturn(restAction);
+    when(message.getContentRaw()).thenReturn(jsonRanking);
+    when(restAction.complete()).thenReturn(List.of(message));
+
+    ConfigChannelRankingRepository cut = fromGuild(guild);
+
+    assertEquals(expected, cut.read(expected.getId()));
   }
 
   private ConfigChannelRankingRepository fromGuild(Guild guild) {

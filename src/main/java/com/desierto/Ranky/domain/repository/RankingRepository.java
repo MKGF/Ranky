@@ -10,5 +10,5 @@ public interface RankingRepository {
 
   boolean delete(String rankingId);
 
-  Ranking find(String rankingName);
+  Ranking read(String rankingName);
 }
