@@ -46,7 +46,7 @@ public class AddAccountsService {
           event.getGuild(),
           gson
       );
-      Ranking ranking = rankingRepository.find(rankingName);
+      Ranking ranking = rankingRepository.read(rankingName);
       List<Account> accountsToAdd = discordOptionRetriever.fromEventGetAccountList(event)
           .stream()
           .filter(Account::isNotEmpty)

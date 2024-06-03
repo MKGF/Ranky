@@ -60,7 +60,7 @@ public class ConfigChannelRankingRepository implements RankingRepository {
   }
 
   @Override
-  public Ranking find(String rankingId) {
+  public Ranking read(String rankingId) {
     Optional<Message> messageOfRanking = retrieveMessageOfRanking(rankingId);
     if (messageOfRanking.isEmpty()) {
       throw new RankingNotFoundException(rankingId);
