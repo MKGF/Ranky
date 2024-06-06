@@ -2,6 +2,7 @@ package com.desierto.Ranky.infrastructure.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -20,6 +21,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.api.requests.restaction.AuditableRestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 import org.junit.jupiter.api.BeforeEach;
@@ -184,6 +186,47 @@ public class ConfigChannelRankingRepositoryTest {
     ConfigChannelRankingRepository cut = fromGuild(guild);
 
     assertEquals(expected, cut.read(expected.getId()));
+  }
+
+  @Test
+  public void onDeleteRanking_deletesSuccessfully() {
+    String jsonRanking = "{\"id\":\"Test\",\"accounts\":[{\"id\": \"id\", \"name\": \"name\", \"tagLine\": \"tagLine\"}]}";
+    Guild guild = mock(Guild.class);
+    TextChannel configChannel = mock(TextChannel.class);
+    MessageHistory history = mock(MessageHistory.class);
+    RestAction restAction = mock(RestAction.class);
+    Ranking ranking = new Ranking("Test", List.of(new Account("id", "name", "tagLine")));
+    Message message = mock(Message.class);
+    AuditableRestAction ara = mock(AuditableRestAction.class);
+    when(configChannel.getName()).thenReturn(CONFIG_CHANNEL);
+    when(guild.getTextChannels()).thenReturn(List.of(configChannel));
+    when(configChannel.getHistory()).thenReturn(history);
+    when(history.retrievePast(RANKING_LIMIT)).thenReturn(restAction);
+    when(restAction.complete()).thenReturn(List.of(message));
+    when(message.getContentRaw()).thenReturn(jsonRanking);
+    when(message.delete()).thenReturn(ara);
+
+    ConfigChannelRankingRepository cut = fromGuild(guild);
+
+    assertTrue(cut.delete(ranking.getId()));
+  }
+
+  @Test
+  public void onDeleteRanking_whenRankingDoesNotExist_throwsException() {
+    Guild guild = mock(Guild.class);
+    TextChannel configChannel = mock(TextChannel.class);
+    MessageHistory history = mock(MessageHistory.class);
+    RestAction restAction = mock(RestAction.class);
+    Ranking ranking = new Ranking("Test", List.of(new Account("id", "name", "tagLine")));
+    when(configChannel.getName()).thenReturn(CONFIG_CHANNEL);
+    when(guild.getTextChannels()).thenReturn(List.of(configChannel));
+    when(configChannel.getHistory()).thenReturn(history);
+    when(history.retrievePast(RANKING_LIMIT)).thenReturn(restAction);
+    when(restAction.complete()).thenReturn(List.of());
+
+    ConfigChannelRankingRepository cut = fromGuild(guild);
+
+    assertThrows(RankingNotFoundException.class, () -> cut.delete(ranking.getId()));
   }
 
   private ConfigChannelRankingRepository fromGuild(Guild guild) {
