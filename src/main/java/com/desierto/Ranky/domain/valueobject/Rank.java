@@ -42,7 +42,7 @@ public class Rank implements Comparable<Rank> {
     } else if (rank.leaguePoints < this.leaguePoints) {
       return -1;
     } else {
-      return rank.winrate.getPercentage().compareTo(this.winrate.getPercentage());
+      return rank.winrate.compareTo(this.winrate);
     }
   }
 
