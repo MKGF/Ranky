@@ -22,10 +22,6 @@ public class Account implements Comparable<Account> {
 
   private Rank rank;
 
-  private static final String isLive = "\uD83D\uDFE2";
-
-  private static final String isNotLive = "\uD83D\uDD34";
-
   public Account(String name, String tagLine) {
     this.id = "";
     this.name = name;
@@ -55,10 +51,8 @@ public class Account implements Comparable<Account> {
     return this.rank.compareTo(other.rank);
   }
 
-  public String getFormattedForRanking(int index, Boolean isInGame) {
-    String isPlaying = (isInGame ? isLive
-        : isNotLive);
-    return index + " | " + isPlaying + " | " + name + " | "
+  public String getFormattedForRanking(int index) {
+    return index + " | " + name + " | "
         + this.getRank()
         .toString() + " | "
         + this.getRank()

@@ -13,6 +13,7 @@ import com.merakianalytics.orianna.types.common.Region;
 import com.merakianalytics.orianna.types.core.league.LeagueEntry;
 import com.merakianalytics.orianna.types.core.summoner.Summoner;
 import jakarta.annotation.PostConstruct;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -40,16 +41,20 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
   }
 
   @Override
-  public Rank getSoloQRankOfAccount(Account account) {
-    Summoner summoner = Orianna.summonerWithPuuid(account.getId()).get();
-    LeagueEntry leagueEntry = summoner.getLeaguePosition(Queue.RANKED_SOLO);
-
-    return new Rank(
-        Tier.fromString(leagueEntry.getTier().name()),
-        Division.valueOf(leagueEntry.getDivision().name()),
-        leagueEntry.getLeaguePoints(),
-        new Winrate(leagueEntry.getWins(), leagueEntry.getLosses())
-    );
+  public List<Account> enrichWithSoloQStats(List<Account> accounts) {
+    accounts.forEach(account -> {
+      Summoner summoner = Orianna.summonerWithPuuid(account.getId()).get();
+      LeagueEntry leagueEntry = summoner.getLeaguePosition(Queue.RANKED_SOLO);
+      account.updateRank(
+          new Rank(
+              Tier.fromString(leagueEntry.getTier().name()),
+              Division.valueOf(leagueEntry.getDivision().name()),
+              leagueEntry.getLeaguePoints(),
+              new Winrate(leagueEntry.getWins(), leagueEntry.getLosses())
+          )
+      );
+    });
+    return accounts;
   }
 
 }

@@ -14,6 +14,7 @@ import com.desierto.Ranky.domain.exception.ConfigChannelNotFoundException;
 import com.desierto.Ranky.domain.exception.RankingAlreadyExistsException;
 import com.desierto.Ranky.domain.exception.ranking.RankingNotFoundException;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
+import com.desierto.Ranky.infrastructure.dto.RankingDTO;
 import com.google.gson.Gson;
 import java.util.List;
 import net.dv8tion.jda.api.entities.Guild;
@@ -98,7 +99,7 @@ public class ConfigChannelRankingRepositoryTest {
     when(history.retrievePast(RANKING_LIMIT)).thenReturn(restAction);
     when(message.getContentRaw()).thenReturn(jsonRanking);
     when(restAction.complete()).thenReturn(List.of(message));
-    when(configChannel.sendMessage(gson.toJson(ranking))).thenReturn(mca);
+    when(configChannel.sendMessage(gson.toJson(RankingDTO.fromDomain(ranking)))).thenReturn(mca);
 
     ConfigChannelRankingRepository cut = fromGuild(guild);
 
@@ -115,7 +116,7 @@ public class ConfigChannelRankingRepositoryTest {
     Message message = mock(Message.class);
     Ranking ranking = new Ranking("Test", List.of(new Account("id", "name", "tagLine")));
     MessageEditAction mea = mock(MessageEditAction.class);
-    String jsonUpdatedRanking = gson.toJson(ranking);
+    String jsonUpdatedRanking = gson.toJson(RankingDTO.fromDomain(ranking));
     when(configChannel.getName()).thenReturn(CONFIG_CHANNEL);
     when(guild.getTextChannels()).thenReturn(List.of(configChannel));
     when(configChannel.getHistory()).thenReturn(history);
