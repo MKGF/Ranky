@@ -88,15 +88,11 @@ public class GetRankingServiceTest {
 
     cut.execute(event);
 
-//    MessageCreateData expectedMessage = new MessageCreateBuilder()
-//        .addContent(formattedRanking)
-//        .addActionRow(Button.primary("public", "Make it public"))
-//        .build();
     ArgumentCaptor<MessageCreateData> captor = ArgumentCaptor.captor();
     verify(event.getHook(), times(1)).sendMessage(captor.capture());
-    assertThat(captor.getValue().getContent().equals(formattedRanking));
-    assertThat(captor.getValue().getComponents().get(0) instanceof ActionRow);
-    assertThat(captor.getValue().getComponents().get(0).getButtons().size() > 0);
+    assertThat(captor.getValue().getContent().equals(formattedRanking)).isTrue();
+    assertThat(captor.getValue().getComponents().get(0) instanceof ActionRow).isTrue();
+    assertThat(captor.getValue().getComponents().get(0).getButtons().size() > 0).isTrue();
   }
 
   private SlashCommandInteractionEvent getAMockedEventNotFromAGuild() {
