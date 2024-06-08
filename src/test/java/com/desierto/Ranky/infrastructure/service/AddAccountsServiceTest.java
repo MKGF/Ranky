@@ -70,7 +70,7 @@ public class AddAccountsServiceTest {
 
     verify(event.getHook(), times(0)).sendMessage(anyString());
     verify(repo.constructed().get(0), times(1)).update(ranking);
-    verify(riotAccountRepository, times(0)).enrichWithId(any());
+    verify(riotAccountRepository, times(0)).enrichIdentification(any());
   }
 
   @Test
@@ -81,7 +81,7 @@ public class AddAccountsServiceTest {
     Account delusionalTB = new Account("Delusional TB", "delu");
     when(discordOptionRetriever.fromEventGetRankingName(event)).thenReturn(rankingName);
     when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of(delusionalTB));
-    when(riotAccountRepository.enrichWithId(delusionalTB)).thenReturn(delusionalTB);
+    when(riotAccountRepository.enrichIdentification(delusionalTB)).thenReturn(delusionalTB);
     repo = mockDiscordRepo(ranking);
 
     cut.execute(event);
@@ -91,7 +91,7 @@ public class AddAccountsServiceTest {
         "Couldn't retrieve accountId for the following account: "
             + delusionalTB.getNameAndTagLine());
     verify(repo.constructed().get(0), times(1)).update(ranking);
-    verify(riotAccountRepository, times(1)).enrichWithId(delusionalTB);
+    verify(riotAccountRepository, times(1)).enrichIdentification(delusionalTB);
   }
 
   @Test
@@ -103,7 +103,7 @@ public class AddAccountsServiceTest {
     Account enrichedBBXhadow = new Account("id", BBXhadow.getId(), BBXhadow.getTagLine());
     when(discordOptionRetriever.fromEventGetRankingName(event)).thenReturn(rankingName);
     when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of(BBXhadow));
-    when(riotAccountRepository.enrichWithId(BBXhadow)).thenReturn(enrichedBBXhadow);
+    when(riotAccountRepository.enrichIdentification(BBXhadow)).thenReturn(enrichedBBXhadow);
     repo = mockDiscordRepo(ranking);
 
     cut.execute(event);
@@ -111,7 +111,7 @@ public class AddAccountsServiceTest {
     assertEquals(ranking.getAccounts().size(), 1);
     verify(event.getHook(), times(1)).sendMessage("Accounts added successfully!");
     verify(repo.constructed().get(0), times(1)).update(ranking);
-    verify(riotAccountRepository, times(1)).enrichWithId(BBXhadow);
+    verify(riotAccountRepository, times(1)).enrichIdentification(BBXhadow);
   }
 
   private SlashCommandInteractionEvent getAMockedEvent() {

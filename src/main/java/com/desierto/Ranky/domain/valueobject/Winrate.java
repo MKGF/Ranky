@@ -42,4 +42,9 @@ public class Winrate implements Comparable<Winrate> {
   public int compareTo(@NotNull Winrate another) {
     return this.getPercentage().compareTo(another.getPercentage());
   }
+
+  @Override
+  public String toString() {
+    return "Wins: " + wins + " Losses: " + losses + " Winrate: " + getPercentage() + "%";
+  }
 }

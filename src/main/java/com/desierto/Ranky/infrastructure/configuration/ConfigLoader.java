@@ -28,4 +28,10 @@ public class ConfigLoader {
 
   @Value("${message.listener.enabled}")
   private Boolean isMessageListenerEnabled;
+
+  @Value("${creator}")
+  private String creator;
+
+  @Value("${sponsors}")
+  private String sponsors;
 }

@@ -35,7 +35,6 @@ public class Account implements Comparable<Account> {
   }
 
   public Account() {
-
   }
 
   public void updateRank(Rank rank) {
@@ -49,11 +48,6 @@ public class Account implements Comparable<Account> {
   @Override
   public int compareTo(Account other) {
     return this.rank.compareTo(other.rank);
-  }
-
-  public String getFormattedForRanking(int index) {
-    return index + " - " + name + " | "
-        + this.getRank().toString();
   }
 
   public boolean isNotEmpty() {

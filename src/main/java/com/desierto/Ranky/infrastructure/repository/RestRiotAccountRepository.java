@@ -10,6 +10,7 @@ import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
 import com.merakianalytics.orianna.Orianna;
 import com.merakianalytics.orianna.types.common.Queue;
 import com.merakianalytics.orianna.types.common.Region;
+import com.merakianalytics.orianna.types.core.account.Account.Builder;
 import com.merakianalytics.orianna.types.core.league.LeagueEntry;
 import com.merakianalytics.orianna.types.core.summoner.Summoner;
 import jakarta.annotation.PostConstruct;
@@ -30,10 +31,13 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
   }
 
   @Override
-  public Account enrichWithId(Account account) {
+  public Account enrichIdentification(Account account) {
     try {
-      return new Account(Orianna.accountWithRiotId(
-          account.getName(), account.getTagLine()).get().getPuuid(), account.getName(),
+      Builder builder = Orianna.accountWithRiotId(
+          account.getName(), account.getTagLine());
+      String puuid = builder.get().getPuuid();
+      Summoner summoner = Orianna.summonerWithPuuid(puuid).get();
+      return new Account(puuid, summoner.getName(),
           account.getTagLine());
     } catch (IllegalStateException e) {
       return new Account(account.getName(), account.getTagLine());

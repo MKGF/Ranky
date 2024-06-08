@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface RiotAccountRepository {
 
-  Account enrichWithId(Account account);
+  Account enrichIdentification(Account account);
 
   List<Account> enrichWithSoloQStats(List<Account> account);
 }

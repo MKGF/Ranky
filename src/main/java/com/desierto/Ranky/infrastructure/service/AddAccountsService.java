@@ -52,7 +52,7 @@ public class AddAccountsService {
           .filter(Account::isNotEmpty)
           .map(account -> {
             log.info("INTO ENRICHMENT WITH ACCOUNT: " + account.getNameAndTagLine());
-            return riotAccountRepository.enrichWithId(account);
+            return riotAccountRepository.enrichIdentification(account);
           })
           .filter(account -> {
             if (account.getId().isEmpty()) {
