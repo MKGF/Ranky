@@ -8,3 +8,4 @@ es algo que debemos abordar nosotros para que lo unico que tengamos que hacer se
 -Terminar servicios de sacar ranking y borrar cuentas del ranking
 -Añadir boton para compartir con el canal el ranking que esta viendo
 -Darle salida del comando al usuario cuando ocurre un error (si no se queda "Ranky está pensando..." eternamente)
+-Sacar los emojis del domain y asociar los emojis al rango en un utils para discord
