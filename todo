@@ -7,3 +7,4 @@ es algo que debemos abordar nosotros para que lo unico que tengamos que hacer se
 -Investigar cómo dejar el fichero en app/data o suplir el contenedor de docker o dockerfile en ECR
 -Darle salida del comando al usuario cuando ocurre un error (si no se queda "Ranky está pensando..." eternamente)
 -Checkear si es posible ofrecer autocompletado en funcion a los rankings que ya hay en el canal
+-Recuperar el guardado de rankings en varios mensajes
