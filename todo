@@ -5,7 +5,4 @@ es algo que debemos abordar nosotros para que lo unico que tengamos que hacer se
 -Revisar permisos ranky-sg y ajustarlos al mínimo
 -Crear JSON de permisos para la group policy de ranky-terraform en AWS
 -Investigar cómo dejar el fichero en app/data o suplir el contenedor de docker o dockerfile en ECR
--Terminar servicios de sacar ranking y borrar cuentas del ranking
--Añadir boton para compartir con el canal el ranking que esta viendo
 -Darle salida del comando al usuario cuando ocurre un error (si no se queda "Ranky está pensando..." eternamente)
--Sacar los emojis del domain y asociar los emojis al rango en un utils para discord
