@@ -6,7 +6,8 @@ public enum Division {
   I(4, "Ⅰ"),
   II(3, "Ⅱ"),
   III(2, "Ⅲ"),
-  IV(1, "Ⅳ");
+  IV(1, "Ⅳ"),
+  NONE(0, "");
 
   private final int level;
 

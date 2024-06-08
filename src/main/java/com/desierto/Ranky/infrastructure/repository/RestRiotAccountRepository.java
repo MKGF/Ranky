@@ -40,7 +40,8 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
       Builder builder = Orianna.accountWithRiotId(
           account.getName(), account.getTagLine());
       String puuid = builder.get().getPuuid();
-      return new Account(puuid);
+      GameNameDTO gameName = gson.fromJson(builder.get().toJSON(), GameNameDTO.class);
+      return new Account(puuid, gameName.getGameName(), gameName.getTagLine());
     } catch (IllegalStateException e) {
       return new Account(account.getName(), account.getTagLine());
     }
@@ -57,12 +58,13 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
       GameNameDTO gameName = gson.fromJson(accountBuilder.get().toJSON(), GameNameDTO.class);
       LeagueEntry leagueEntry = summoner.getLeaguePosition(Queue.RANKED_SOLO);
       account.updateRank(
-          new Rank(
-              Tier.fromString(leagueEntry.getTier().name()),
-              Division.valueOf(leagueEntry.getDivision().name()),
-              leagueEntry.getLeaguePoints(),
-              new Winrate(leagueEntry.getWins(), leagueEntry.getLosses())
-          )
+          leagueEntry != null ?
+              new Rank(
+                  Tier.fromString(leagueEntry.getTier().name()),
+                  Division.valueOf(leagueEntry.getDivision().name()),
+                  leagueEntry.getLeaguePoints(),
+                  new Winrate(leagueEntry.getWins(), leagueEntry.getLosses())
+              ) : Rank.unranked()
       );
       account.updateGameName(gameName.getGameName(), gameName.getTagLine());
     });

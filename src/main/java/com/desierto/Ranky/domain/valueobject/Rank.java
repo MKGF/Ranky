@@ -24,7 +24,7 @@ public class Rank implements Comparable<Rank> {
   private Winrate winrate;
 
   public static Rank unranked() {
-    return new Rank(UNRANKED, Division.IV, 0, new Winrate());
+    return new Rank(UNRANKED, Division.NONE, 0, Winrate.unranked());
   }
 
   @Override
