@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import com.desierto.Ranky.domain.entity.Account;
 import com.desierto.Ranky.domain.entity.Ranking;
+import com.desierto.Ranky.domain.repository.RiotAccountRepository;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
 import com.desierto.Ranky.infrastructure.repository.ConfigChannelRankingRepository;
 import com.desierto.Ranky.infrastructure.utils.DiscordOptionRetriever;
@@ -46,12 +47,15 @@ public class RemoveAccountsServiceTest {
   @Mock
   DiscordOptionRetriever discordOptionRetriever;
 
+  @Mock
+  RiotAccountRepository riotAccountRepository;
+
   private MockedConstruction<ConfigChannelRankingRepository> repo;
 
   @BeforeEach
   public void setUp() {
     gson = new Gson();
-    cut = new RemoveAccountsService(config, discordOptionRetriever, gson);
+    cut = new RemoveAccountsService(config, discordOptionRetriever, gson, riotAccountRepository);
     when(config.getRankyUserRole()).thenReturn(RANKY_USER);
   }
 
@@ -107,10 +111,11 @@ public class RemoveAccountsServiceTest {
   public void onExecute_withAccountsToRemove_removesAccountsAndInformsInHook() {
     SlashCommandInteractionEvent event = getAMockedEvent();
     String rankingName = "A ranking";
-    Account BBXhadow = new Account("BBXhadow", "RFF");
+    Account BBXhadow = new Account("id", "BBXhadow", "RFF");
     Ranking ranking = new Ranking(rankingName, List.of(BBXhadow));
     when(discordOptionRetriever.fromEventGetRankingName(event)).thenReturn(rankingName);
     when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of(BBXhadow));
+    when(riotAccountRepository.enrichIdentification(BBXhadow)).thenReturn(BBXhadow);
     repo = mockDiscordRepo(ranking);
 
     cut.execute(event);

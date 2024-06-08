@@ -7,6 +7,8 @@ import com.desierto.Ranky.domain.valueobject.Rank;
 import com.desierto.Ranky.domain.valueobject.Rank.Tier;
 import com.desierto.Ranky.domain.valueobject.Winrate;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
+import com.desierto.Ranky.infrastructure.dto.GameNameDTO;
+import com.google.gson.Gson;
 import com.merakianalytics.orianna.Orianna;
 import com.merakianalytics.orianna.types.common.Queue;
 import com.merakianalytics.orianna.types.common.Region;
@@ -24,6 +26,8 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
 
   private final ConfigLoader configLoader;
 
+  private final Gson gson;
+
   @PostConstruct
   public void setUp() {
     Orianna.setRiotAPIKey(configLoader.getRiotApiKey());
@@ -36,9 +40,7 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
       Builder builder = Orianna.accountWithRiotId(
           account.getName(), account.getTagLine());
       String puuid = builder.get().getPuuid();
-      Summoner summoner = Orianna.summonerWithPuuid(puuid).get();
-      return new Account(puuid, summoner.getName(),
-          account.getTagLine());
+      return new Account(puuid);
     } catch (IllegalStateException e) {
       return new Account(account.getName(), account.getTagLine());
     }
@@ -48,6 +50,11 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
   public List<Account> enrichWithSoloQStats(List<Account> accounts) {
     accounts.forEach(account -> {
       Summoner summoner = Orianna.summonerWithPuuid(account.getId()).get();
+      Builder accountBuilder = Orianna.accountWithPuuid(account.getId());
+      //We need to do this JSON parse because when we try to retrieve the coreData object from the Orianna.Account
+      //we get the string we sent in the beginning, which might not be properly cased
+      //It looks like a bug in Orianna, this is a workaround since parsing it to a string returns the correct name/tagLine coming from Riot
+      GameNameDTO gameName = gson.fromJson(accountBuilder.get().toJSON(), GameNameDTO.class);
       LeagueEntry leagueEntry = summoner.getLeaguePosition(Queue.RANKED_SOLO);
       account.updateRank(
           new Rank(
@@ -57,6 +64,7 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
               new Winrate(leagueEntry.getWins(), leagueEntry.getLosses())
           )
       );
+      account.updateGameName(gameName.getGameName(), gameName.getTagLine());
     });
     return accounts;
   }

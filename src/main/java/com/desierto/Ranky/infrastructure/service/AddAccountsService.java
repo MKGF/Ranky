@@ -65,6 +65,11 @@ public class AddAccountsService {
                       + account.getNameAndTagLine()).queue();
                   return false;
                 }
+                if (ranking.getAccounts().stream().map(Account::getName)
+                    .anyMatch(gameName -> gameName.equalsIgnoreCase(account.getName()))) {
+                  hook.sendMessage("This account is already present in the ranking.").queue();
+                  return false;
+                }
                 return true;
               })
               .toList();

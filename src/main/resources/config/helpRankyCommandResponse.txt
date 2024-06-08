@@ -1,8 +1,7 @@
 This Discord bot will use one of your channels as storage for different SoloQ rankings made in the server.
 This channel is referred to as #config-channel and only uses the last %d messages as storage. So please do not spam in it. If something escapes the threshold it won't be able to retrieve it anymore.
-- /create \"RANKINGNAME\" creates a ranking with that name.
-- /addAccount \"RANKINGNAME\" ACCOUNT adds the account to the ranking if it exists. Supports spaces in the name.
-- /addMultiple \"RANKINGNAME\" ACCOUNT1,ACCOUNT2... adds all the accounts to the ranking if they exist.
-- /removeAccount \"RANKINGNAME\" ACCOUNT removes the account from the ranking if it exists.
-- /ranking \"RANKINGNAME\" gives the soloQ information of the accounts in the ranking ordered by rank, along with a bubble that displays whether the player is in game or not and the link to the user's stream in case there is any.
-- /addStream \"RANKINGNAME\" \"ACCOUNT\" LINKTOSTREAM adds a link that refers to the player's stream.
+- /create :RANKINGNAME: creates a ranking with that name. (Role protected command)
+- /delete :RANKINGNAME: deletes a ranking with that name. (Role protected command)
+- /add_accounts :RANKINGNAME: ACCOUNTS... Adds the given accounts to the ranking (being separated by a comma (','). (format: summonerName#tagLine,summonerName#tagLine...) (Role protected command)
+- /remove_accounts :RANKINGNAME: ACCOUNTS... Removes the given accounts from the ranking (being separated by a comma (','). (format: summonerName#tagLine,summonerName#tagLine...) (Role protected command)
+- /ranking :RANKINGNAME: gives the soloQ information of the accounts in the ranking ordered by rank

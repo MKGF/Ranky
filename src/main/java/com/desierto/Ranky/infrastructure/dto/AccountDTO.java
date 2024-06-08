@@ -12,15 +12,11 @@ public class AccountDTO {
 
   String id;
 
-  String name;
-
-  String tagLine;
-
   public static AccountDTO fromDomain(Account account) {
-    return new AccountDTO(account.getId(), account.getName(), account.getTagLine());
+    return new AccountDTO(account.getId());
   }
 
   public Account toDomain() {
-    return new Account(id, name, tagLine);
+    return new Account(id);
   }
 }

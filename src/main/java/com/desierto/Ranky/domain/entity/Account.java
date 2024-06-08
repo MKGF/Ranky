@@ -22,6 +22,10 @@ public class Account implements Comparable<Account> {
 
   private Rank rank;
 
+  public Account(String id) {
+    this.id = id;
+  }
+
   public Account(String name, String tagLine) {
     this.id = "";
     this.name = name;
@@ -52,5 +56,10 @@ public class Account implements Comparable<Account> {
 
   public boolean isNotEmpty() {
     return name != null && !name.isEmpty() && tagLine != null && !tagLine.isEmpty();
+  }
+
+  public void updateGameName(String gameName, String tagLine) {
+    this.name = gameName;
+    this.tagLine = tagLine;
   }
 }

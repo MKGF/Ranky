@@ -8,6 +8,7 @@ import com.desierto.Ranky.domain.entity.Account;
 import com.desierto.Ranky.domain.entity.Ranking;
 import com.desierto.Ranky.domain.exception.ConfigChannelNotFoundException;
 import com.desierto.Ranky.domain.exception.ranking.RankingNotFoundException;
+import com.desierto.Ranky.domain.repository.RiotAccountRepository;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
 import com.desierto.Ranky.infrastructure.repository.ConfigChannelRankingRepository;
 import com.desierto.Ranky.infrastructure.utils.DiscordOptionRetriever;
@@ -35,6 +36,9 @@ public class RemoveAccountsService {
   @Autowired
   private Gson gson;
 
+  @Autowired
+  private RiotAccountRepository riotAccountRepository;
+
   public void execute(SlashCommandInteractionEvent event) {
     if (event.getMember().getRoles().stream()
         .anyMatch(role -> role.getName().equalsIgnoreCase(config.getRankyUserRole()))) {
@@ -51,6 +55,10 @@ public class RemoveAccountsService {
           List<Account> accountsToRemove = discordOptionRetriever.fromEventGetAccountList(event)
               .stream()
               .filter(Account::isNotEmpty)
+              .map(account -> {
+                log.info("INTO ENRICHMENT WITH ACCOUNT: " + account.getNameAndTagLine());
+                return riotAccountRepository.enrichIdentification(account);
+              })
               .toList();
           accountsToRemove.forEach(ranking::removeAccount);
           rankingRepository.update(ranking);

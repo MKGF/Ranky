@@ -170,13 +170,13 @@ public class ConfigChannelRankingRepositoryTest {
 
   @Test
   public void onRead_whenRankingExists_returnsRanking() {
-    String jsonRanking = "{\"id\":\"Test\",\"accounts\":[{\"id\": \"id\", \"name\": \"name\", \"tagLine\": \"tagLine\"}]}";
+    String jsonRanking = "{\"id\":\"Test\",\"accounts\":[{\"id\": \"id\"}]}";
     Guild guild = mock(Guild.class);
     TextChannel configChannel = mock(TextChannel.class);
     MessageHistory history = mock(MessageHistory.class);
     RestAction restAction = mock(RestAction.class);
     Message message = mock(Message.class);
-    Ranking expected = new Ranking("Test", List.of(new Account("id", "name", "tagLine")));
+    Ranking expected = new Ranking("Test", List.of(new Account("id")));
     when(configChannel.getName()).thenReturn(CONFIG_CHANNEL);
     when(guild.getTextChannels()).thenReturn(List.of(configChannel));
     when(configChannel.getHistory()).thenReturn(history);
