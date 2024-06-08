@@ -73,6 +73,6 @@ public class DiscordRankingFormatter {
   }
 
   private String footer() {
-    return LINE_BREAK + config.getCreator() + LINE_BREAK + config.getSponsors();
+    return LINE_BREAK + config.getCreator() /*+ LINE_BREAK + config.getSponsors()*/;
   }
 }
