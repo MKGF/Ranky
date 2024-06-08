@@ -19,6 +19,8 @@ import java.util.logging.Logger;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -70,7 +72,12 @@ public class GetRankingService {
           .toList();
       String formattedRanking = discordRankingFormatter.formatRankingEntries(rankingEntries,
           rankingName);
-      hook.sendMessage(formattedRanking).queue();
+      MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
+      messageBuilder.addContent(formattedRanking);
+      Button button = Button.primary("public", "Make it public");
+      messageBuilder.addActionRow(button);
+      hook.sendMessage(messageBuilder.build()).queue();
+
     } catch (ConfigChannelNotFoundException | RankingNotFoundException e) {
       handleExceptionOnSlashCommandEvent(e, event);
     }
