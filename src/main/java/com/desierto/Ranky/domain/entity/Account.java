@@ -52,15 +52,8 @@ public class Account implements Comparable<Account> {
   }
 
   public String getFormattedForRanking(int index) {
-    return index + " | " + name + " | "
-        + this.getRank()
-        .toString() + " | "
-        + this.getRank()
-        .getLeaguePoints()
-        + "LP | " + this.getRank().getWinrate().getWins() + "W/" + this.getRank()
-        .getWinrate()
-        .getLosses() + "L | " + this.getRank().getWinrate().getPercentage().toString()
-        ;
+    return index + " - " + name + " | "
+        + this.getRank().toString();
   }
 
   public boolean isNotEmpty() {
