@@ -46,6 +46,7 @@ public class HelpRankyServiceTest {
     InteractionHook hook = mock(InteractionHook.class);
     WebhookMessageCreateAction wmca = mock(WebhookMessageCreateAction.class);
     when(event.getHook()).thenReturn(hook);
+    when(event.isFromGuild()).thenReturn(true);
     when(hook.sendMessageEmbeds(message.build())).thenReturn(wmca);
 
     cut.execute(event);

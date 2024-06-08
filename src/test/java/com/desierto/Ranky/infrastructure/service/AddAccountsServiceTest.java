@@ -1,5 +1,7 @@
 package com.desierto.Ranky.infrastructure.service;
 
+import static com.desierto.Ranky.infrastructure.utils.DiscordMessages.COMMAND_NOT_ALLOWED;
+import static com.desierto.Ranky.infrastructure.utils.DiscordMessages.EXECUTE_COMMAND_FROM_SERVER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -16,6 +18,8 @@ import com.desierto.Ranky.infrastructure.repository.ConfigChannelRankingReposito
 import com.desierto.Ranky.infrastructure.utils.DiscordOptionRetriever;
 import com.google.gson.Gson;
 import java.util.List;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageCreateAction;
@@ -31,6 +35,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 public class AddAccountsServiceTest {
 
+  public static final String RANKY_USER = "rankyUser";
   AddAccountsService cut;
 
   @Mock
@@ -50,11 +55,42 @@ public class AddAccountsServiceTest {
   public void setUp() {
     gson = new Gson();
     cut = new AddAccountsService(config, discordOptionRetriever, gson, riotAccountRepository);
+    when(config.getRankyUserRole()).thenReturn(RANKY_USER);
   }
 
   @AfterEach
   public void tearDown() {
     repo.close();
+  }
+
+  @Test
+  public void onExecute_withoutRankyUserRole_doesNothingAndInforms() {
+    SlashCommandInteractionEvent event = getAMockedEventWithMemberWithoutRole();
+    String rankingName = "A ranking";
+    Ranking ranking = new Ranking(rankingName);
+    when(discordOptionRetriever.fromEventGetRankingName(event)).thenReturn(rankingName);
+    when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of(new Account()));
+    repo = mockDiscordRepo(ranking);
+
+    cut.execute(event);
+
+    verify(event.getHook(), times(1)).sendMessage(COMMAND_NOT_ALLOWED.getMessage());
+    verify(riotAccountRepository, times(0)).enrichIdentification(any());
+  }
+
+  @Test
+  public void onExecute_withEventNotComingFromAGuild_doesNothingAndInforms() {
+    SlashCommandInteractionEvent event = getAMockedEventNotFromAGuild();
+    String rankingName = "A ranking";
+    Ranking ranking = new Ranking(rankingName);
+    when(discordOptionRetriever.fromEventGetRankingName(event)).thenReturn(rankingName);
+    when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of(new Account()));
+    repo = mockDiscordRepo(ranking);
+
+    cut.execute(event);
+
+    verify(event.getHook(), times(1)).sendMessage(EXECUTE_COMMAND_FROM_SERVER.getMessage());
+    verify(riotAccountRepository, times(0)).enrichIdentification(any());
   }
 
   @Test
@@ -114,11 +150,44 @@ public class AddAccountsServiceTest {
     verify(riotAccountRepository, times(1)).enrichIdentification(BBXhadow);
   }
 
+  private SlashCommandInteractionEvent getAMockedEventWithMemberWithoutRole() {
+    SlashCommandInteractionEvent event = mock(SlashCommandInteractionEvent.class);
+    InteractionHook hook = mock(InteractionHook.class);
+    Member member = mock(Member.class);
+    WebhookMessageCreateAction wmca = mock(WebhookMessageCreateAction.class);
+    when(event.getHook()).thenReturn(hook);
+    when(event.getMember()).thenReturn(member);
+    when(member.getRoles()).thenReturn(List.of());
+    when(hook.sendMessage(anyString())).thenReturn(wmca);
+    return event;
+  }
+
+  private SlashCommandInteractionEvent getAMockedEventNotFromAGuild() {
+    SlashCommandInteractionEvent event = mock(SlashCommandInteractionEvent.class);
+    InteractionHook hook = mock(InteractionHook.class);
+    Member member = mock(Member.class);
+    Role role = mock(Role.class);
+    WebhookMessageCreateAction wmca = mock(WebhookMessageCreateAction.class);
+    when(event.isFromGuild()).thenReturn(false);
+    when(event.getHook()).thenReturn(hook);
+    when(event.getMember()).thenReturn(member);
+    when(member.getRoles()).thenReturn(List.of(role));
+    when(role.getName()).thenReturn(RANKY_USER);
+    when(hook.sendMessage(anyString())).thenReturn(wmca);
+    return event;
+  }
+
   private SlashCommandInteractionEvent getAMockedEvent() {
     SlashCommandInteractionEvent event = mock(SlashCommandInteractionEvent.class);
     InteractionHook hook = mock(InteractionHook.class);
+    Member member = mock(Member.class);
+    Role role = mock(Role.class);
     WebhookMessageCreateAction wmca = mock(WebhookMessageCreateAction.class);
+    when(event.isFromGuild()).thenReturn(true);
     when(event.getHook()).thenReturn(hook);
+    when(event.getMember()).thenReturn(member);
+    when(member.getRoles()).thenReturn(List.of(role));
+    when(role.getName()).thenReturn(RANKY_USER);
     when(hook.sendMessage(anyString())).thenReturn(wmca);
     return event;
   }

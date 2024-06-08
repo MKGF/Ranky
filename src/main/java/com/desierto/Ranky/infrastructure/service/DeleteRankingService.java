@@ -1,6 +1,8 @@
 package com.desierto.Ranky.infrastructure.service;
 
 import static com.desierto.Ranky.infrastructure.utils.DiscordExceptionHandler.handleExceptionOnSlashCommandEvent;
+import static com.desierto.Ranky.infrastructure.utils.DiscordMessages.COMMAND_NOT_ALLOWED;
+import static com.desierto.Ranky.infrastructure.utils.DiscordMessages.EXECUTE_COMMAND_FROM_SERVER;
 
 import com.desierto.Ranky.domain.exception.ConfigChannelNotFoundException;
 import com.desierto.Ranky.domain.exception.ranking.RankingCouldNotBeDeletedException;
@@ -26,22 +28,29 @@ public class DeleteRankingService {
   }
 
   public void execute(SlashCommandInteractionEvent event) {
-    if (event.isFromGuild()) {
-      try {
-        ConfigChannelRankingRepository rankingRepository = new ConfigChannelRankingRepository(
-            config,
-            event.getGuild(),
-            gson
-        );
-        String rankingName = event.getOptions().stream().findFirst().get().getAsString();
-        if (rankingRepository.delete(rankingName)) {
-          event.getHook().sendMessage("Ranking deleted successfully!").queue();
-        } else {
-          handleExceptionOnSlashCommandEvent(new RankingCouldNotBeDeletedException(), event);
+    if (event.getMember().getRoles().stream()
+        .anyMatch(role -> role.getName().equalsIgnoreCase(config.getRankyUserRole()))) {
+      if (event.isFromGuild()) {
+        try {
+          ConfigChannelRankingRepository rankingRepository = new ConfigChannelRankingRepository(
+              config,
+              event.getGuild(),
+              gson
+          );
+          String rankingName = event.getOptions().stream().findFirst().get().getAsString();
+          if (rankingRepository.delete(rankingName)) {
+            event.getHook().sendMessage("Ranking deleted successfully!").queue();
+          } else {
+            handleExceptionOnSlashCommandEvent(new RankingCouldNotBeDeletedException(), event);
+          }
+        } catch (ConfigChannelNotFoundException | RankingNotFoundException e) {
+          handleExceptionOnSlashCommandEvent(e, event);
         }
-      } catch (ConfigChannelNotFoundException | RankingNotFoundException e) {
-        handleExceptionOnSlashCommandEvent(e, event);
+      } else {
+        event.getHook().sendMessage(EXECUTE_COMMAND_FROM_SERVER.getMessage()).queue();
       }
+    } else {
+      event.getHook().sendMessage(COMMAND_NOT_ALLOWED.getMessage()).queue();
     }
 
   }

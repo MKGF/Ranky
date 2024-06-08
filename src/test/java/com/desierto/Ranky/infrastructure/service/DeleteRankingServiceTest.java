@@ -1,5 +1,7 @@
 package com.desierto.Ranky.infrastructure.service;
 
+import static com.desierto.Ranky.infrastructure.utils.DiscordMessages.COMMAND_NOT_ALLOWED;
+import static com.desierto.Ranky.infrastructure.utils.DiscordMessages.EXECUTE_COMMAND_FROM_SERVER;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
@@ -14,6 +16,8 @@ import com.desierto.Ranky.infrastructure.repository.ConfigChannelRankingReposito
 import com.google.gson.Gson;
 import java.util.List;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -33,6 +37,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @TestInstance(Lifecycle.PER_CLASS)
 public class DeleteRankingServiceTest {
 
+  private static final String RANKY_USER = "rankyUser";
+
   DeleteRankingService cut;
 
   @Mock
@@ -44,12 +50,37 @@ public class DeleteRankingServiceTest {
   public void setUp() {
     gson = new Gson();
     cut = new DeleteRankingService(config, gson);
+    when(config.getRankyUserRole()).thenReturn(RANKY_USER);
+  }
+
+  @Test
+  public void onEvent_withMemberWithoutRole_doNothing() {
+    SlashCommandInteractionEvent event = mock(SlashCommandInteractionEvent.class);
+    Member member = mock(Member.class);
+    InteractionHook hook = mock(InteractionHook.class);
+    WebhookMessageCreateAction wmca = mock(WebhookMessageCreateAction.class);
+    when(event.getMember()).thenReturn(member);
+    when(member.getRoles()).thenReturn(List.of());
+    when(event.getHook()).thenReturn(hook);
+    when(hook.sendMessage(anyString())).thenReturn(wmca);
+    cut.execute(event);
+    verify(event.getHook(), times(1)).sendMessage(COMMAND_NOT_ALLOWED.getMessage());
   }
 
   @Test
   public void onNonGuildEvent_doNothing() {
     SlashCommandInteractionEvent event = mock(SlashCommandInteractionEvent.class);
+    Member member = mock(Member.class);
+    Role role = mock(Role.class);
+    InteractionHook hook = mock(InteractionHook.class);
+    WebhookMessageCreateAction wmca = mock(WebhookMessageCreateAction.class);
+    when(event.getMember()).thenReturn(member);
+    when(member.getRoles()).thenReturn(List.of(role));
+    when(role.getName()).thenReturn(RANKY_USER);
+    when(event.getHook()).thenReturn(hook);
+    when(hook.sendMessage(anyString())).thenReturn(wmca);
     cut.execute(event);
+    verify(event.getHook(), times(1)).sendMessage(EXECUTE_COMMAND_FROM_SERVER.getMessage());
   }
 
   @Test
@@ -84,7 +115,13 @@ public class DeleteRankingServiceTest {
     SlashCommandInteractionEvent event = mock(SlashCommandInteractionEvent.class);
     Guild guild = mock(Guild.class);
     InteractionHook hook = mock(InteractionHook.class);
+    Member member = mock(Member.class);
+    Role role = mock(Role.class);
     WebhookMessageCreateAction wmca = mock(WebhookMessageCreateAction.class);
+    when(event.getHook()).thenReturn(hook);
+    when(event.getMember()).thenReturn(member);
+    when(member.getRoles()).thenReturn(List.of(role));
+    when(role.getName()).thenReturn(RANKY_USER);
     when(event.isFromGuild()).thenReturn(true);
     when(event.getGuild()).thenReturn(guild);
     when(event.getOptions()).thenReturn(

@@ -1,6 +1,7 @@
 package com.desierto.Ranky.infrastructure.service;
 
 import static com.desierto.Ranky.infrastructure.utils.DiscordExceptionHandler.handleExceptionOnSlashCommandEvent;
+import static com.desierto.Ranky.infrastructure.utils.DiscordMessages.EXECUTE_COMMAND_FROM_SERVER;
 import static com.desierto.Ranky.infrastructure.utils.DiscordRankingToEmojiMapper.emojiFromTier;
 
 import com.desierto.Ranky.domain.entity.Ranking;
@@ -46,41 +47,45 @@ public class GetRankingService {
   private DiscordRankingFormatter discordRankingFormatter;
 
   public void execute(SlashCommandInteractionEvent event) {
-    InteractionHook hook = event.getHook();
-    String rankingName = discordOptionRetriever.fromEventGetRankingName(event);
-    try {
-      ConfigChannelRankingRepository rankingRepository = new ConfigChannelRankingRepository(
-          config,
-          event.getGuild(),
-          gson
-      );
-      Ranking ranking = rankingRepository.read(rankingName);
-      AtomicInteger index = new AtomicInteger(1);
-      List<EntryDTO> rankingEntries = riotAccountRepository.enrichWithSoloQStats(
-              ranking.getAccounts())
-          .stream()
-          .sorted()
-          .map(account -> new EntryDTO(
-                  index.getAndIncrement(),
-                  account.getName(),
-                  emojiFromTier(account.getRank().getTier()),
-                  account.getRank().getDivision().toString(),
-                  account.getRank().getLeaguePoints(),
-                  account.getRank().getWinrate().toString()
-              )
-          )
-          .toList();
-      String formattedRanking = discordRankingFormatter.formatRankingEntries(rankingEntries,
-          rankingName);
-      MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
-      messageBuilder.addContent(formattedRanking);
-      Button button = Button.primary("public", "Make it public");
-      messageBuilder.addActionRow(button);
-      hook.sendMessage(messageBuilder.build()).queue();
+    if (event.isFromGuild()) {
+      InteractionHook hook = event.getHook();
+      String rankingName = discordOptionRetriever.fromEventGetRankingName(event);
+      try {
+        ConfigChannelRankingRepository rankingRepository = new ConfigChannelRankingRepository(
+            config,
+            event.getGuild(),
+            gson
+        );
+        Ranking ranking = rankingRepository.read(rankingName);
+        AtomicInteger index = new AtomicInteger(1);
+        List<EntryDTO> rankingEntries = riotAccountRepository.enrichWithSoloQStats(
+                ranking.getAccounts())
+            .stream()
+            .sorted()
+            .map(account -> new EntryDTO(
+                    index.getAndIncrement(),
+                    account.getName(),
+                    emojiFromTier(account.getRank().getTier()),
+                    account.getRank().getDivision().toString(),
+                    account.getRank().getLeaguePoints(),
+                    account.getRank().getWinrate().toString()
+                )
+            )
+            .toList();
+        String formattedRanking = discordRankingFormatter.formatRankingEntries(rankingEntries,
+            rankingName);
+        MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
+        messageBuilder.addContent(formattedRanking);
+        Button button = Button.primary("public", "Make it public");
+        messageBuilder.addActionRow(button);
+        hook.sendMessage(messageBuilder.build()).queue();
 
-    } catch (ConfigChannelNotFoundException | RankingNotFoundException e) {
-      handleExceptionOnSlashCommandEvent(e, event);
+      } catch (ConfigChannelNotFoundException | RankingNotFoundException e) {
+        handleExceptionOnSlashCommandEvent(e, event);
+      }
+
+    } else {
+      event.getHook().sendMessage(EXECUTE_COMMAND_FROM_SERVER.getMessage()).queue();
     }
-
   }
 }

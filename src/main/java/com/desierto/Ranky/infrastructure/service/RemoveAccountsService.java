@@ -1,6 +1,8 @@
 package com.desierto.Ranky.infrastructure.service;
 
 import static com.desierto.Ranky.infrastructure.utils.DiscordExceptionHandler.handleExceptionOnSlashCommandEvent;
+import static com.desierto.Ranky.infrastructure.utils.DiscordMessages.COMMAND_NOT_ALLOWED;
+import static com.desierto.Ranky.infrastructure.utils.DiscordMessages.EXECUTE_COMMAND_FROM_SERVER;
 
 import com.desierto.Ranky.domain.entity.Account;
 import com.desierto.Ranky.domain.entity.Ranking;
@@ -34,26 +36,35 @@ public class RemoveAccountsService {
   private Gson gson;
 
   public void execute(SlashCommandInteractionEvent event) {
-    InteractionHook hook = event.getHook();
-    String rankingName = discordOptionRetriever.fromEventGetRankingName(event);
-    try {
-      ConfigChannelRankingRepository rankingRepository = new ConfigChannelRankingRepository(
-          config,
-          event.getGuild(),
-          gson
-      );
-      Ranking ranking = rankingRepository.read(rankingName);
-      List<Account> accountsToRemove = discordOptionRetriever.fromEventGetAccountList(event)
-          .stream()
-          .filter(Account::isNotEmpty)
-          .toList();
-      accountsToRemove.forEach(ranking::removeAccount);
-      rankingRepository.update(ranking);
-      if (!accountsToRemove.isEmpty()) {
-        hook.sendMessage("Accounts removed successfully!").queue();
+    if (event.getMember().getRoles().stream()
+        .anyMatch(role -> role.getName().equalsIgnoreCase(config.getRankyUserRole()))) {
+      if (event.isFromGuild()) {
+        InteractionHook hook = event.getHook();
+        String rankingName = discordOptionRetriever.fromEventGetRankingName(event);
+        try {
+          ConfigChannelRankingRepository rankingRepository = new ConfigChannelRankingRepository(
+              config,
+              event.getGuild(),
+              gson
+          );
+          Ranking ranking = rankingRepository.read(rankingName);
+          List<Account> accountsToRemove = discordOptionRetriever.fromEventGetAccountList(event)
+              .stream()
+              .filter(Account::isNotEmpty)
+              .toList();
+          accountsToRemove.forEach(ranking::removeAccount);
+          rankingRepository.update(ranking);
+          if (!accountsToRemove.isEmpty()) {
+            hook.sendMessage("Accounts removed successfully!").queue();
+          }
+        } catch (ConfigChannelNotFoundException | RankingNotFoundException e) {
+          handleExceptionOnSlashCommandEvent(e, event);
+        }
+      } else {
+        event.getHook().sendMessage(EXECUTE_COMMAND_FROM_SERVER.getMessage()).queue();
       }
-    } catch (ConfigChannelNotFoundException | RankingNotFoundException e) {
-      handleExceptionOnSlashCommandEvent(e, event);
+    } else {
+      event.getHook().sendMessage(COMMAND_NOT_ALLOWED.getMessage()).queue();
     }
   }
 }

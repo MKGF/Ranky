@@ -1,5 +1,7 @@
 package com.desierto.Ranky.infrastructure.service;
 
+import static com.desierto.Ranky.infrastructure.utils.DiscordMessages.EXECUTE_COMMAND_FROM_SERVER;
+
 import com.desierto.Ranky.domain.utils.FileReader;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
 import lombok.AllArgsConstructor;
@@ -18,12 +20,16 @@ public class HelpRankyService {
   private ConfigLoader config;
 
   public void execute(SlashCommandInteractionEvent event) {
-    InteractionHook hook = event.getHook();
-    EmbedBuilder message = new EmbedBuilder();
-    String formattedMessage = String.format(FileReader.read(PATH_TO_HELP_RANKY_TXT),
-        config.getRankingLimit());
-    message.setTitle("Ranky manual");
-    message.setDescription(formattedMessage);
-    hook.sendMessageEmbeds(message.build()).queue();
+    if (event.isFromGuild()) {
+      InteractionHook hook = event.getHook();
+      EmbedBuilder message = new EmbedBuilder();
+      String formattedMessage = String.format(FileReader.read(PATH_TO_HELP_RANKY_TXT),
+          config.getRankingLimit());
+      message.setTitle("Ranky manual");
+      message.setDescription(formattedMessage);
+      hook.sendMessageEmbeds(message.build()).queue();
+    } else {
+      event.getHook().sendMessage(EXECUTE_COMMAND_FROM_SERVER.getMessage()).queue();
+    }
   }
 }
