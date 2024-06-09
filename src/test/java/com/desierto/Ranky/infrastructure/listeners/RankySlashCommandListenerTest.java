@@ -3,7 +3,7 @@ package com.desierto.Ranky.infrastructure.listeners;
 import static com.desierto.Ranky.infrastructure.commands.Command.ADD_ACCOUNTS;
 import static com.desierto.Ranky.infrastructure.commands.Command.CREATE;
 import static com.desierto.Ranky.infrastructure.commands.Command.DELETE;
-import static com.desierto.Ranky.infrastructure.commands.Command.HELP_RANKY;
+import static com.desierto.Ranky.infrastructure.commands.Command.HELP;
 import static com.desierto.Ranky.infrastructure.commands.Command.RANKING;
 import static com.desierto.Ranky.infrastructure.commands.Command.REMOVE_ACCOUNTS;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -16,7 +16,7 @@ import com.desierto.Ranky.infrastructure.service.AddAccountsService;
 import com.desierto.Ranky.infrastructure.service.CreateRankingService;
 import com.desierto.Ranky.infrastructure.service.DeleteRankingService;
 import com.desierto.Ranky.infrastructure.service.GetRankingService;
-import com.desierto.Ranky.infrastructure.service.HelpRankyService;
+import com.desierto.Ranky.infrastructure.service.HelpService;
 import com.desierto.Ranky.infrastructure.service.RemoveAccountsService;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -42,7 +42,7 @@ public class RankySlashCommandListenerTest {
   JDA bot;
 
   @Mock
-  HelpRankyService helpRankyService;
+  HelpService helpService;
 
   @Mock
   GetRankingService getRankingService;
@@ -63,7 +63,7 @@ public class RankySlashCommandListenerTest {
   @BeforeAll
   public void setUp() {
 
-    cut = new RankySlashCommandListener(helpRankyService,
+    cut = new RankySlashCommandListener(helpService,
         getRankingService,
         createRankingService,
         deleteRankingService,
@@ -84,13 +84,13 @@ public class RankySlashCommandListenerTest {
   }
 
   @Test
-  public void onHelpRankyCommand_callsHelpRankyService() {
+  public void onHelpCommand_callsHelpService() {
     SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
-    when(event.getCommandString()).thenReturn("/" + HELP_RANKY.getCommandId());
+    when(event.getCommandString()).thenReturn("/" + HELP.getCommandId());
 
     cut.onSlashCommandInteraction(event);
 
-    verify(helpRankyService, times(1)).execute(event);
+    verify(helpService, times(1)).execute(event);
   }
 
   @Test

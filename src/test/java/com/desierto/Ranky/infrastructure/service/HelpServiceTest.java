@@ -21,24 +21,24 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @TestInstance(Lifecycle.PER_CLASS)
-public class HelpRankyServiceTest {
+public class HelpServiceTest {
 
-  public static final String PATH_TO_HELP_RANKY_TXT = "src/main/resources/config/helpRankyCommandResponse.txt";
+  public static final String PATH_TO_HELP_TXT = "src/main/resources/config/helpCommandResponse.txt";
 
-  HelpRankyService cut;
+  HelpService cut;
 
   @Mock
   ConfigLoader config;
 
   @BeforeAll
   public void setUp() {
-    cut = new HelpRankyService(config);
+    cut = new HelpService(config);
   }
 
   @Test
   public void onExecute_buildsEmbedMessage_andQueuesMessageInInteractionHook() {
     EmbedBuilder message = new EmbedBuilder();
-    String formattedMessage = String.format(FileReader.read(PATH_TO_HELP_RANKY_TXT),
+    String formattedMessage = String.format(FileReader.read(PATH_TO_HELP_TXT),
         config.getRankingLimit());
     message.setTitle("Ranky manual");
     message.setDescription(formattedMessage);

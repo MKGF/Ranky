@@ -3,7 +3,7 @@ package com.desierto.Ranky.infrastructure.listeners;
 import static com.desierto.Ranky.infrastructure.commands.Command.ADD_ACCOUNTS;
 import static com.desierto.Ranky.infrastructure.commands.Command.CREATE;
 import static com.desierto.Ranky.infrastructure.commands.Command.DELETE;
-import static com.desierto.Ranky.infrastructure.commands.Command.HELP_RANKY;
+import static com.desierto.Ranky.infrastructure.commands.Command.HELP;
 import static com.desierto.Ranky.infrastructure.commands.Command.RANKING;
 import static com.desierto.Ranky.infrastructure.commands.Command.REMOVE_ACCOUNTS;
 
@@ -11,7 +11,7 @@ import com.desierto.Ranky.infrastructure.service.AddAccountsService;
 import com.desierto.Ranky.infrastructure.service.CreateRankingService;
 import com.desierto.Ranky.infrastructure.service.DeleteRankingService;
 import com.desierto.Ranky.infrastructure.service.GetRankingService;
-import com.desierto.Ranky.infrastructure.service.HelpRankyService;
+import com.desierto.Ranky.infrastructure.service.HelpService;
 import com.desierto.Ranky.infrastructure.service.RemoveAccountsService;
 import jakarta.annotation.PostConstruct;
 import java.util.logging.Logger;
@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service;
 public class RankySlashCommandListener extends ListenerAdapter {
 
   @Autowired
-  private HelpRankyService helpRankyService;
+  private HelpService helpService;
   @Autowired
   private GetRankingService getRankingService;
   @Autowired
@@ -56,8 +56,8 @@ public class RankySlashCommandListener extends ListenerAdapter {
     log.info("ENTERED SLASH COMMAND LISTENER");
     event.deferReply(true).queue();
     event.getHook().setEphemeral(true);
-    if (event.getCommandString().contains("/" + HELP_RANKY.getCommandId())) {
-      helpRankyService.execute(event);
+    if (event.getCommandString().contains("/" + HELP.getCommandId())) {
+      helpService.execute(event);
     }
     if (event.getCommandString().contains("/" + RANKING.getCommandId())) {
       getRankingService.execute(event);

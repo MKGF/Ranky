@@ -13,9 +13,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class HelpRankyService {
+public class HelpService {
 
-  public static final String PATH_TO_HELP_RANKY_TXT = "src/main/resources/config/helpRankyCommandResponse.txt";
+  public static final String PATH_TO_HELP_TXT = "src/main/resources/config/helpCommandResponse.txt";
   @Autowired
   private ConfigLoader config;
 
@@ -23,7 +23,7 @@ public class HelpRankyService {
     if (event.isFromGuild()) {
       InteractionHook hook = event.getHook();
       EmbedBuilder message = new EmbedBuilder();
-      String formattedMessage = String.format(FileReader.read(PATH_TO_HELP_RANKY_TXT),
+      String formattedMessage = String.format(FileReader.read(PATH_TO_HELP_TXT),
           config.getRankingLimit());
       message.setTitle("Ranky manual");
       message.setDescription(formattedMessage);

@@ -15,7 +15,7 @@ import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 public class Command {
 
   public static final Logger log = Logger.getLogger("Command.class");
-  public static final Command HELP_RANKY;
+  public static final Command HELP;
   public static final Command RANKING;
   public static final Command CREATE;
   public static final Command DELETE;
@@ -23,7 +23,7 @@ public class Command {
   public static final Command REMOVE_ACCOUNTS;
 
   static {
-    HELP_RANKY = Command.of("help_ranky",
+    HELP = Command.of("help",
         "Shows a detailed explanation of the possibilites of Ranky", emptyList());
     RANKING = Command.of(
         "ranking",
@@ -99,7 +99,7 @@ public class Command {
   }
 
   public static List<SlashCommandData> getDiscordCommands() {
-    return List.of(HELP_RANKY.toDiscordCommand(),
+    return List.of(HELP.toDiscordCommand(),
         RANKING.toDiscordCommand(),
         CREATE.toDiscordCommand(),
         DELETE.toDiscordCommand(),

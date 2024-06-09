@@ -1,5 +1,5 @@
 This Discord bot will use one of your channels as storage for different SoloQ rankings made in the server.
-The complete use of my commands is only given to the users with a role named "%s" (which I already created myself). Otherwise, just '/help_ranky' and '/ranking' are open to the users.
+The complete use of my commands is only given to the users with a role named "%s" (which I already created myself). Otherwise, just '/help' and '/ranking' are open to the users.
 This channel is referred to as "%s" (I already created it as well) and only uses the last %d messages as storage. So please do not spam in it. If something escapes the threshold I won't be able to retrieve it anymore.
 
 - /create :RANKINGNAME: creates a ranking with that name. (Role protected command)
