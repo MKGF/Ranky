@@ -8,3 +8,5 @@ es algo que debemos abordar nosotros para que lo unico que tengamos que hacer se
 -Darle salida del comando al usuario cuando ocurre un error (si no se queda "Ranky está pensando..." eternamente)
 -Checkear si es posible ofrecer autocompletado en funcion a los rankings que ya hay en el canal
 -Recuperar el guardado de rankings en varios mensajes
+-Optimizar las llamadas a riot agrupandolas todas (si se puede -> si riot soporta llamadas con varias cuentas de golpe)
+-Mostrar una barra de progreso al usuario mientras saca el ranking
