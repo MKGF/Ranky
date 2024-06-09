@@ -3,6 +3,7 @@ package com.desierto.Ranky.infrastructure.repository;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -24,7 +25,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.AuditableRestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
-import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -115,7 +115,8 @@ public class ConfigChannelRankingRepositoryTest {
     RestAction restAction = mock(RestAction.class);
     Message message = mock(Message.class);
     Ranking ranking = new Ranking("Test", List.of(new Account("id", "name", "tagLine")));
-    MessageEditAction mea = mock(MessageEditAction.class);
+    MessageCreateAction mca = mock(MessageCreateAction.class);
+    AuditableRestAction ara = mock(AuditableRestAction.class);
     String jsonUpdatedRanking = gson.toJson(RankingDTO.fromDomain(ranking));
     when(configChannel.getName()).thenReturn(CONFIG_CHANNEL);
     when(guild.getTextChannels()).thenReturn(List.of(configChannel));
@@ -123,13 +124,15 @@ public class ConfigChannelRankingRepositoryTest {
     when(history.retrievePast(RANKING_LIMIT)).thenReturn(restAction);
     when(message.getContentRaw()).thenReturn(jsonRanking);
     when(restAction.complete()).thenReturn(List.of(message));
-    when(message.editMessage(jsonUpdatedRanking)).thenReturn(mea);
+    when(configChannel.sendMessage(anyString())).thenReturn(mca);
+    when(message.delete()).thenReturn(ara);
 
     ConfigChannelRankingRepository cut = fromGuild(guild);
 
     cut.update(ranking);
 
-    verify(message.editMessage(jsonUpdatedRanking), times(1)).complete();
+    verify(configChannel.sendMessage(jsonUpdatedRanking), times(1)).complete();
+    verify(message.delete(), times(1)).complete();
   }
 
   @Test

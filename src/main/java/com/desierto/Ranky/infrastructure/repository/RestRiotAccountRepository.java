@@ -16,7 +16,6 @@ import com.merakianalytics.orianna.types.core.account.Account.Builder;
 import com.merakianalytics.orianna.types.core.league.LeagueEntry;
 import com.merakianalytics.orianna.types.core.summoner.Summoner;
 import jakarta.annotation.PostConstruct;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -48,27 +47,27 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
   }
 
   @Override
-  public List<Account> enrichWithSoloQStats(List<Account> accounts) {
-    accounts.forEach(account -> {
-      Summoner summoner = Orianna.summonerWithPuuid(account.getId()).get();
-      Builder accountBuilder = Orianna.accountWithPuuid(account.getId());
-      //We need to do this JSON parse because when we try to retrieve the coreData object from the Orianna.Account
-      //we get the string we sent in the beginning, which might not be properly cased
-      //It looks like a bug in Orianna, this is a workaround since parsing it to a string returns the correct name/tagLine coming from Riot
-      GameNameDTO gameName = gson.fromJson(accountBuilder.get().toJSON(), GameNameDTO.class);
-      LeagueEntry leagueEntry = summoner.getLeaguePosition(Queue.RANKED_SOLO);
-      account.updateRank(
-          leagueEntry != null ?
-              new Rank(
-                  Tier.fromString(leagueEntry.getTier().name()),
-                  Division.valueOf(leagueEntry.getDivision().name()),
-                  leagueEntry.getLeaguePoints(),
-                  new Winrate(leagueEntry.getWins(), leagueEntry.getLosses())
-              ) : Rank.unranked()
-      );
-      account.updateGameName(gameName.getGameName(), gameName.getTagLine());
-    });
-    return accounts;
+  public Account enrichWithSoloQStats(Account account) {
+
+    Summoner summoner = Orianna.summonerWithPuuid(account.getId()).get();
+    Builder accountBuilder = Orianna.accountWithPuuid(account.getId());
+    //We need to do this JSON parse because when we try to retrieve the coreData object from the Orianna.Account
+    //we get the string we sent in the beginning, which might not be properly cased
+    //It looks like a bug in Orianna, this is a workaround since parsing it to a string returns the correct name/tagLine coming from Riot
+    GameNameDTO gameName = gson.fromJson(accountBuilder.get().toJSON(), GameNameDTO.class);
+    LeagueEntry leagueEntry = summoner.getLeaguePosition(Queue.RANKED_SOLO);
+    account.updateRank(
+        leagueEntry != null ?
+            new Rank(
+                Tier.fromString(leagueEntry.getTier().name()),
+                Division.valueOf(leagueEntry.getDivision().name()),
+                leagueEntry.getLeaguePoints(),
+                new Winrate(leagueEntry.getWins(), leagueEntry.getLosses())
+            ) : Rank.unranked()
+    );
+    account.updateGameName(gameName.getGameName(), gameName.getTagLine());
+   
+    return account;
   }
 
 }

@@ -3,10 +3,10 @@ package com.desierto.Ranky.domain.valueobject;
 import java.util.Comparator;
 
 public enum Division {
-  I(4, "Ⅰ"),
-  II(3, "Ⅱ"),
-  III(2, "Ⅲ"),
-  IV(1, "Ⅳ"),
+  I(4, "I  "),
+  II(3, "II "),
+  III(2, "III"),
+  IV(1, "IV "),
   NONE(0, "");
 
   private final int level;

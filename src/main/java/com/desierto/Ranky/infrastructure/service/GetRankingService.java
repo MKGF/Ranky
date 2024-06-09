@@ -12,12 +12,14 @@ import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
 import com.desierto.Ranky.infrastructure.dto.EntryDTO;
 import com.desierto.Ranky.infrastructure.repository.ConfigChannelRankingRepository;
 import com.desierto.Ranky.infrastructure.utils.DiscordOptionRetriever;
+import com.desierto.Ranky.infrastructure.utils.DiscordProgressBar;
 import com.desierto.Ranky.infrastructure.utils.DiscordRankingFormatter;
 import com.google.gson.Gson;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 import lombok.AllArgsConstructor;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -57,19 +59,33 @@ public class GetRankingService {
             gson
         );
         Ranking ranking = rankingRepository.read(rankingName);
+        Message progressBar = hook.sendMessage(DiscordProgressBar.getProgress(0)).complete();
         AtomicInteger index = new AtomicInteger(1);
-        List<EntryDTO> rankingEntries = riotAccountRepository.enrichWithSoloQStats(
-                ranking.getAccounts())
-            .stream()
+        AtomicInteger indexForEnrichment = new AtomicInteger(1);
+        int numberOfAccounts = ranking.getAccounts().size();
+        List<EntryDTO> rankingEntries = ranking.getAccounts().stream().map(account -> {
+              progressBar.editMessage(
+                      DiscordProgressBar.getProgress(
+                          (indexForEnrichment.getAndIncrement() * 100 / numberOfAccounts) / 2))
+                  .complete();
+              return riotAccountRepository.enrichWithSoloQStats(account);
+            })
             .sorted()
-            .map(account -> new EntryDTO(
-                    index.getAndIncrement(),
-                    account.getName(),
-                    emojiFromTier(account.getRank().getTier()),
-                    account.getRank().getDivision().toString(),
-                    account.getRank().getLeaguePoints(),
-                    account.getRank().getWinrate().toString()
-                )
+            .map(account -> {
+                  progressBar.editMessage(
+                          DiscordProgressBar.getProgress((index.get() * 100 / numberOfAccounts) / 2 + 50))
+                      .complete();
+                  return new EntryDTO(
+                      index.getAndIncrement(),
+                      account.getName(),
+                      emojiFromTier(account.getRank().getTier()),
+                      account.getRank().getDivision().toString(),
+                      account.getRank().getLeaguePoints(),
+                      account.getRank().getWinrate().getWins().toString(),
+                      account.getRank().getWinrate().getLosses().toString(),
+                      account.getRank().getWinrate().getPercentage().toString()
+                  );
+                }
             )
             .toList();
         String formattedRanking = discordRankingFormatter.formatRankingEntries(rankingEntries,

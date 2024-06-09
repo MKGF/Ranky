@@ -3,6 +3,7 @@ package com.desierto.Ranky.infrastructure.utils;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
 import com.desierto.Ranky.infrastructure.dto.EntryDTO;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,10 @@ public class DiscordRankingFormatter {
   private static final String SEPARATOR = " | ";
   private static final String SPACE = " ";
   private static final int NAME_LENGTH = 22;
+  public static final double PERCENTAGE_OF_PIXELS_BIGGER = 0.571428;
+  private static final int LP_LENGTH = 4;
+  private static final int WINS_LOSSES_LENGTH = 6;
+  private static final int WINRATE_LENGTH = 8;
   @Autowired
   private ConfigLoader config;
 
@@ -43,10 +48,14 @@ public class DiscordRankingFormatter {
       sb.append(CODE_LINE);
       sb.append(entry.division());
       sb.append(spaces(1));
-      sb.append(entry.leaguePoints());
-      sb.append(LP);
+      sb.append(appendLeaguePoints(entry.leaguePoints()));
       sb.append(SEPARATOR);
-      sb.append(entry.winrate());
+      sb.append(appendWins(entry.wins()));
+      sb.append(spaces(1));
+      sb.append(appendLosses(entry.losses()));
+      sb.append(SEPARATOR);
+      sb.append(spaces(3));
+      sb.append(appendWinrate(entry.winrate()));
       sb.append(CODE_LINE);
       sb.append(LINE_BREAK);
     });
@@ -68,8 +77,35 @@ public class DiscordRankingFormatter {
   }
 
   private String appendName(String name) {
-    int length = name.length();
-    return name + spaces(NAME_LENGTH - length);
+    double length = name.length();
+    AtomicInteger amountOfIdeographicChars = new AtomicInteger(0);
+    name.codePoints().forEach(codePoint -> {
+      if (Character.getType(codePoint) == 5) { //If it's korean, chinese, vietnamese... character
+        amountOfIdeographicChars.getAndIncrement();
+      }
+    });
+    length += PERCENTAGE_OF_PIXELS_BIGGER * amountOfIdeographicChars.get();
+    return name + spaces(NAME_LENGTH - Double.valueOf(length).intValue());
+  }
+
+  private String appendLeaguePoints(int lp) {
+    int length = String.valueOf(lp).length();
+    return lp + LP + spaces(LP_LENGTH - length);
+  }
+
+  private String appendWins(String wins) {
+    int length = wins.length();
+    return "Wins: " + wins + spaces(WINS_LOSSES_LENGTH - length);
+  }
+
+  private String appendLosses(String losses) {
+    int length = losses.length();
+    return "Losses: " + losses + spaces(WINS_LOSSES_LENGTH - length);
+  }
+
+  private String appendWinrate(String winrate) {
+    int length = winrate.length();
+    return "Winrate: " + winrate + "%" + spaces(WINRATE_LENGTH - length);
   }
 
   private String footer() {
