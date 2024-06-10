@@ -1,4 +1,8 @@
 locals {
   region = "eu-west-3"
-  AWS_ACCOUNT_ID = "637423483220"
+}
+
+variable "AWS_ACCOUNT_ID" {
+  description = "AWS Account ID"
+  type = string
 }
