@@ -22,7 +22,7 @@ public class DiscordRankingFormatter {
   public static final String HEADER = "# ";
   private static final String SEPARATOR = " | ";
   private static final String SPACE = " ";
-  private static final int NAME_LENGTH = 22;
+  private static final int NAME_LENGTH = 20;
   public static final double PERCENTAGE_OF_PIXELS_BIGGER = 0.571428;
   private static final int LP_LENGTH = 4;
   private static final int WINS_LOSSES_LENGTH = 6;
@@ -51,10 +51,8 @@ public class DiscordRankingFormatter {
       sb.append(appendLeaguePoints(entry.leaguePoints()));
       sb.append(SEPARATOR);
       sb.append(appendWins(entry.wins()));
-      sb.append(spaces(1));
       sb.append(appendLosses(entry.losses()));
       sb.append(SEPARATOR);
-      sb.append(spaces(3));
       sb.append(appendWinrate(entry.winrate()));
       sb.append(CODE_LINE);
       sb.append(LINE_BREAK);
@@ -105,7 +103,7 @@ public class DiscordRankingFormatter {
 
   private String appendWinrate(String winrate) {
     int length = winrate.length();
-    return "Winrate: " + winrate + "%" + spaces(WINRATE_LENGTH - length);
+    return "Winrate: " + winrate + "%";
   }
 
   private String footer() {
