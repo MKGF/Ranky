@@ -2,7 +2,7 @@ name: Create Release
 
 on:
   workflow_dispatch:
-    inputs: 
+    inputs:
       commit:
         description: 'Commit ID to deploy(latest by default)'
         required: false
@@ -13,9 +13,36 @@ on:
         type: string
       
 jobs:
+  jobs:
+    select-version-to-deploy:
+      steps:
+        - name: Set environment variables
+          run: |
+            if [ -z "${{ inputs.commit }}" ]; then
+              echo "IS_COMMIT_EMPTY=true" >> $GITHUB_ENV
+            else
+              echo "IS_COMMIT_EMPTY=false" >> $GITHUB_ENV
+            fi
+            if [ -z "${{ inputs.version }}" ]; then
+              echo "IS_VERSION_EMPTY=true" >> $GITHUB_ENV
+            else
+              echo "IS_VERSION_EMPTY=false" >> $GITHUB_ENV
+            fi
   
-  call-deploy-jar:
-    uses: ./.github/workflows/deploy-jar.yml
-    with:
-      commit: ${{ inputs.commit }}
-      version: ${{ inputs.version }}
+        - name: Deploy latest JAR
+          if: ${{ env.IS_COMMIT_EMPTY == 'true' }}
+          uses: actions/checkout@v4
+  
+        - name: Deploy commit JAR
+          if: ${{ env.IS_COMMIT_EMPTY == 'false' }}
+          uses: actions/checkout@v4
+          with:
+            ref: ${{ inputs.commit }}
+  
+        - name: echo
+          run: cat ./todo
+  
+    tag-selected-version:
+  
+    # call-deploy-jar:
+    #   uses: ./.github/workflows/deploy-jar.yml
