@@ -11,6 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 
 @Builder
 @NoArgsConstructor
@@ -18,7 +19,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @EqualsAndHashCode
-public class Winrate {
+public class Winrate implements Comparable<Winrate> {
 
   private Integer wins;
   private Integer losses;
@@ -35,5 +36,15 @@ public class Winrate {
 
   public static Winrate unranked() {
     return new Winrate(0, 0);
+  }
+
+  @Override
+  public int compareTo(@NotNull Winrate another) {
+    return this.getPercentage().compareTo(another.getPercentage());
+  }
+
+  @Override
+  public String toString() {
+    return "Wins: " + wins + " Losses: " + losses + " Winrate: " + getPercentage() + "%";
   }
 }

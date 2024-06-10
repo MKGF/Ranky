@@ -24,7 +24,7 @@ public class Rank implements Comparable<Rank> {
   private Winrate winrate;
 
   public static Rank unranked() {
-    return new Rank(UNRANKED, Division.IV, 0, new Winrate());
+    return new Rank(UNRANKED, Division.NONE, 0, Winrate.unranked());
   }
 
   @Override
@@ -42,22 +42,22 @@ public class Rank implements Comparable<Rank> {
     } else if (rank.leaguePoints < this.leaguePoints) {
       return -1;
     } else {
-      return rank.winrate.getPercentage().compareTo(this.winrate.getPercentage());
+      return rank.winrate.compareTo(this.winrate);
     }
   }
 
-  @Override
-  public String toString() {
-    return tier.toString() + " " + division + " " + leaguePoints + "lp\n" + "Wins: "
-        + winrate.getWins() + " Losses: " + winrate.getLosses() + " Ratio: "
-        + winrate.getPercentage();
-  }
-
   public enum Tier implements ValueEnum<String> {
-    UNRANKED("UNRANKED"), IRON("IRON"), BRONZE("BRONZE"), SILVER("SILVER"), GOLD("GOLD"), PLATINUM(
-        "PLATINUM"), EMERALD("EMERALD"), DIAMOND(
-        "DIAMOND"), MASTER("MASTER"), GRANDMASTER("GRANDMASTER"), CHALLENGER(
-        "CHALLENGER");
+    UNRANKED("UNRANKED"),
+    IRON("IRON"),
+    BRONZE("BRONZE"),
+    SILVER("SILVER"),
+    GOLD("GOLD"),
+    PLATINUM("PLATINUM"),
+    EMERALD("EMERALD"),
+    DIAMOND("DIAMOND"),
+    MASTER("MASTER"),
+    GRANDMASTER("GRANDMASTER"),
+    CHALLENGER("CHALLENGER");
 
     private final String value;
 

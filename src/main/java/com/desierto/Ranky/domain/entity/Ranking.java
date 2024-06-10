@@ -2,8 +2,6 @@ package com.desierto.Ranky.domain.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +9,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @EqualsAndHashCode
-@AllArgsConstructor
 public class Ranking {
 
   private String id;
@@ -23,11 +20,16 @@ public class Ranking {
     this.accounts = new ArrayList<>();
   }
 
-  public void sortByRank() {
-    accounts = accounts.stream().sorted(Account::compareTo).collect(Collectors.toList());
+  public Ranking(String id, List<Account> accounts) {
+    this.id = id;
+    this.accounts = new ArrayList<>(accounts);
   }
 
   public boolean addAccount(Account account) {
     return this.accounts.add(account);
+  }
+
+  public boolean removeAccount(Account accountToRemove) {
+    return this.accounts.removeIf(account -> account.getId().equals(accountToRemove.getId()));
   }
 }

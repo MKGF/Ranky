@@ -27,7 +27,8 @@ public class RankyButtonClickListener extends ListenerAdapter {
   @Override
   public void onButtonInteraction(ButtonInteractionEvent event) {
     log.info("ENTERED BUTTON INTERACTION LISTENER");
-    event.reply("Hi!").queue();
+    event.getChannel().sendMessage(event.getMessage().getContentRaw()).complete();
+    event.reply("Shared successfully").setEphemeral(true).queue();
   }
 
 }

@@ -6,14 +6,18 @@ import com.desierto.Ranky.domain.exception.RankingAlreadyExistsException;
 import com.desierto.Ranky.domain.exception.ranking.RankingNotFoundException;
 import com.desierto.Ranky.domain.repository.RankingRepository;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
+import com.desierto.Ranky.infrastructure.dto.RankingDTO;
 import com.google.gson.Gson;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 public class ConfigChannelRankingRepository implements RankingRepository {
+
+  public static final int ACCOUNT_LIMIT = 10;
 
   private final TextChannel configChannel;
 
@@ -36,17 +40,34 @@ public class ConfigChannelRankingRepository implements RankingRepository {
     if (rankingWithIdExists(ranking.getId())) {
       throw new RankingAlreadyExistsException();
     }
-    configChannel.sendMessage(gson.toJson(ranking)).complete();
+    configChannel.sendMessage(gson.toJson(RankingDTO.fromDomain(ranking))).complete();
     return ranking;
   }
 
   @Override
   public Ranking update(Ranking ranking) throws RankingNotFoundException {
-    Optional<Message> rankingMessage = retrieveMessageOfRanking(ranking.getId());
-    if (rankingMessage.isEmpty()) {
+    List<Message> rankingMessages = retrieveMessagesOfRanking(ranking.getId());
+    if (rankingMessages.isEmpty()) {
       throw new RankingNotFoundException(ranking.getId());
     } else {
-      rankingMessage.get().editMessage(gson.toJson(ranking)).complete();
+      if (ranking.getAccounts().isEmpty()) {
+        configChannel.sendMessage(gson.toJson(RankingDTO.fromDomain(ranking))).complete();
+      } else {
+        int numberOfAccounts = ranking.getAccounts().size();
+        int numberOfFractions = numberOfAccounts / ACCOUNT_LIMIT + 1;
+        List<Ranking> fractions = new ArrayList<>();
+        for (int i = 0; i < numberOfFractions; i++) {
+          int beginning = ACCOUNT_LIMIT * i;
+          int possibleEnd = (ACCOUNT_LIMIT * (i + 1)) - 1;
+          int end = Math.min(possibleEnd, numberOfAccounts);
+          fractions.add(
+              new Ranking(ranking.getId(), ranking.getAccounts().subList(beginning, end)));
+        }
+        fractions.forEach(
+            fraction -> configChannel.sendMessage(gson.toJson(RankingDTO.fromDomain(fraction)))
+                .complete());
+      }
+      rankingMessages.forEach(message -> message.delete().complete());
       return ranking;
     }
   }
@@ -61,11 +82,11 @@ public class ConfigChannelRankingRepository implements RankingRepository {
 
   @Override
   public Ranking read(String rankingId) {
-    Optional<Message> messageOfRanking = retrieveMessageOfRanking(rankingId);
-    if (messageOfRanking.isEmpty()) {
+    List<Message> messagesOfRanking = new ArrayList<>(retrieveMessagesOfRanking(rankingId));
+    if (messagesOfRanking.isEmpty()) {
       throw new RankingNotFoundException(rankingId);
     }
-    return fromMessage(messageOfRanking.get());
+    return fromMessages(messagesOfRanking).toDomain();
   }
 
   private TextChannel getConfigChannel(Guild guild) {
@@ -78,8 +99,8 @@ public class ConfigChannelRankingRepository implements RankingRepository {
   private boolean rankingWithIdExists(String rankingId) {
     return configChannel.getHistory().retrievePast(config.getRankingLimit()).complete().stream()
         .anyMatch(message -> {
-          Ranking ranking = fromMessage(message);
-          return ranking.getId().equalsIgnoreCase(rankingId);
+          RankingDTO rankingDTO = fromMessages(new ArrayList<>(List.of(message)));
+          return rankingDTO.getId().equalsIgnoreCase(rankingId);
         });
   }
 
@@ -87,8 +108,8 @@ public class ConfigChannelRankingRepository implements RankingRepository {
     AtomicReference<Boolean> removedSuccessfully = new AtomicReference<>(false);
     configChannel.getHistory().retrievePast(config.getRankingLimit()).complete().stream()
         .filter(message -> {
-          Ranking ranking = fromMessage(message);
-          return ranking.getId().equalsIgnoreCase(rankingId);
+          RankingDTO rankingDTO = fromMessages(new ArrayList<>(List.of(message)));
+          return rankingDTO.getId().equalsIgnoreCase(rankingId);
         })
         .forEach(message -> {
           message.delete().complete();
@@ -97,15 +118,19 @@ public class ConfigChannelRankingRepository implements RankingRepository {
     return removedSuccessfully.get();
   }
 
-  private Optional<Message> retrieveMessageOfRanking(String rankingId) {
+  private List<Message> retrieveMessagesOfRanking(String rankingId) {
     return configChannel.getHistory().retrievePast(config.getRankingLimit()).complete().stream()
         .filter(message -> {
-          Ranking ranking = fromMessage(message);
-          return ranking.getId().equalsIgnoreCase(rankingId);
-        }).findFirst();
+          RankingDTO rankingDTO = fromMessages(new ArrayList<>(List.of(message)));
+          return rankingDTO.getId().equalsIgnoreCase(rankingId);
+        }).toList();
   }
 
-  private Ranking fromMessage(Message message) {
-    return gson.fromJson(message.getContentRaw(), Ranking.class);
+  private RankingDTO fromMessages(List<Message> messages) {
+    RankingDTO grouped = gson.fromJson(messages.get(0).getContentRaw(), RankingDTO.class);
+    messages.remove(0);
+    messages.forEach(message -> grouped.getAccounts()
+        .addAll(gson.fromJson(message.getContentRaw(), RankingDTO.class).getAccounts()));
+    return grouped;
   }
 }

@@ -15,7 +15,7 @@ import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 public class Command {
 
   public static final Logger log = Logger.getLogger("Command.class");
-  public static final Command HELP_RANKY;
+  public static final Command HELP;
   public static final Command RANKING;
   public static final Command CREATE;
   public static final Command DELETE;
@@ -23,9 +23,15 @@ public class Command {
   public static final Command REMOVE_ACCOUNTS;
 
   static {
-    HELP_RANKY = Command.of("help_ranky",
+    HELP = Command.of("help",
         "Shows a detailed explanation of the possibilites of Ranky", emptyList());
-    RANKING = Command.of("ranking", "Shows information of the specified ranking", emptyList());
+    RANKING = Command.of(
+        "ranking",
+        "Shows information of the specified ranking",
+        List.of(
+            new Parameter("name", "Name of the ranking", true, OptionType.STRING)
+        )
+    );
     CREATE = Command.of(
         "create",
         "Creates a new ranking with the given name",
@@ -44,18 +50,36 @@ public class Command {
         "add_accounts",
         "Adds the given accounts (being separated by a comma (',')",
         List.of(
-            new Parameter("ranking_name", "Name of the ranking to add the accounts to", true,
-                OptionType.STRING),
-            new Parameter("accounts",
-                "List of the accounts to add to the ranking (format: summonerName#tagLine,summonerName#tagLine...)",
+            new Parameter(
+                "ranking_name",
+                "Name of the ranking to add the accounts to",
                 true,
-                OptionType.STRING)
+                OptionType.STRING
+            ),
+            new Parameter("accounts",
+                "Accounts to add to the ranking (format: summonerName#tagLine,summonerName#tagLine...)",
+                true,
+                OptionType.STRING
+            )
         )
     );
     REMOVE_ACCOUNTS = Command.of(
         "remove_accounts",
         "Removes the given accounts (format: summonerName#tagLine)",
-        emptyList()
+        List.of(
+            new Parameter(
+                "ranking_name",
+                "Name of the ranking to add the accounts to",
+                true,
+                OptionType.STRING
+            ),
+            new Parameter(
+                "accounts",
+                "Accounts to remove from the ranking (format: summonerName#tagLine,summonerName#tagLine...)",
+                true,
+                OptionType.STRING
+            )
+        )
     );
   }
 
@@ -75,7 +99,7 @@ public class Command {
   }
 
   public static List<SlashCommandData> getDiscordCommands() {
-    return List.of(HELP_RANKY.toDiscordCommand(),
+    return List.of(HELP.toDiscordCommand(),
         RANKING.toDiscordCommand(),
         CREATE.toDiscordCommand(),
         DELETE.toDiscordCommand(),
