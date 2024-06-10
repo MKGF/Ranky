@@ -13,9 +13,34 @@ on:
         type: string
       
 jobs:
-  
+  select-version-to-deploy:
+    steps:
+
+      - name: Set environment variables
+        run: |
+          if [ -z "${{ inputs.commit }}" ]; then
+            echo "IS_COMMIT_EMPTY=true" >> $GITHUB_ENV
+          else
+            echo "IS_COMMIT_EMPTY=false" >> $GITHUB_ENV
+          fi
+          if [ -z "${{ inputs.version }}" ]; then
+            echo "IS_VERSION_EMPTY=true" >> $GITHUB_ENV
+          else
+            echo "IS_VERSION_EMPTY=false" >> $GITHUB_ENV
+          fi
+
+      - name: Deploy latest JAR
+        if: ${{ env.IS_COMMIT_EMPTY == 'true' }}
+        uses: actions/checkout@v4
+
+      - name: Deploy commit JAR
+        if: ${{ env.IS_COMMIT_EMPTY == 'false' }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.commit }}
+
+      - name: echo
+        run: cat ./todo
+
   call-deploy-jar:
     uses: ./.github/workflows/deploy-jar.yml
-    with:
-      commit: ${{ inputs.commit }}
-      version: ${{ inputs.version }}
