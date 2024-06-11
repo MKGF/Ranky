@@ -1,4 +1,4 @@
-name: Release AWS Infrastructure Pipeline
+name: AWS Infrastructure Create Pipeline
 
 on:
   workflow_dispatch:
@@ -58,6 +58,17 @@ jobs:
       run: |
         aws ecr get-login-password --region eu-west-3 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-west-3.amazonaws.com
 
+    - name: Download terraform.tfstate from S3 if it exists
+      run: |
+        BUCKET_NAME=ranky-s3
+        FILE_PATH=terraform/terraform.tfstate
+        if aws s3 ls "s3://$BUCKET_NAME" 2>&1 | grep -q 'NoSuchBucket'; then
+          echo "Bucket not found, creating..."
+          aws s3api create-bucket --bucket $BUCKET_NAME --region eu-west-3 --create-bucket-configuration LocationConstraint=eu-west-3
+        else
+          aws s3 cp "s3://$BUCKET_NAME/$FILE_PATH" ./terraform/
+        fi
+  
     - name: Terraform Init
       run: terraform init
       working-directory: ./terraform
@@ -65,23 +76,12 @@ jobs:
     - name: Terraform Apply
       run: terraform apply -auto-approve -var="AWS_ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID }}"
       working-directory: ./terraform
-
-    - name: Configure git_config
-      run: |
-        git config --global user.email "actions@github.com"
-        git config --global user.name "GitHub Actions"
-
-    - name: Changing .tfstate name to date/Add/Commit/Push changes
-      run: |
-        DATE=$(date +%Y%m%d)
-        mv ./terraform/terraform.tfstate ./terraform/${DATE}.tfstate
-        git add ./terraform/${DATE}.tfstate
-        git commit -m "Added .tfstate with date ${DATE}"
-        git push origin HEAD:develop
     
-    - name: Trigger tfstate-push-to-branches
+    - name: Upload file changes to S3 bucket
+      if: always()
       run: |
-        curl -X POST -H "Accept: application/vnd.github.v3+json" \
-          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-          https://api.github.com/repos/${{ github.repository }}/dispatches \
-          -d '{"event_type":"trigger_tfstate-push-to-branches"}'
+        BUCKET_NAME=ranky-s3
+        FILE_PATH=./terraform/terraform.tfstate
+        aws s3 cp $FILE_PATH s3://$BUCKET_NAME/terraform
+      env:
+        BUCKET_NAME: ranky-s3

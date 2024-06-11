@@ -1,0 +1,52 @@
+name: AWS Destroy Infrastructure Pipeline
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Install Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-west-3
+
+    - name: Download terraform.tfstate from S3 if it exists
+      run: |
+        BUCKET_NAME=ranky-s3
+        FILE_PATH=terraform/terraform.tfstate
+        aws s3 cp "s3://$BUCKET_NAME/$FILE_PATH" ./terraform/
+
+  
+    - name: Terraform Init
+      run: terraform init
+      working-directory: ./terraform
+
+    - name: Terraform Apply
+      run: terraform destroy -auto-approve -var="AWS_ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID }}"
+      working-directory: ./terraform
+    
+    - name: Empty and delete S3 bucket
+      run: |
+        BUCKET_NAME=ranky-s3
+        FILE_PATH=./terraform/terraform.tfstate
+        aws s3 rm s3://$BUCKET_NAME --recursive || echo "Bucket is already empty or does not exist"
+        aws s3api delete-bucket --bucket $BUCKET_NAME --region eu-west-3 || echo "Bucket does not exist or could not be deleted"
+      env:
+        BUCKET_NAME: ranky-s3
