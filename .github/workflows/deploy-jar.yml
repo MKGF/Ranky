@@ -44,9 +44,10 @@ jobs:
         run: mvn clean test
         
       - name: Build with Maven and moving it
-        run: |
-          mvn clean package
-          cp target/Ranky.jar $GITHUB_WORKSPACE/Ranky.jar
+        run: mvn clean package
+          
+      - name: Preparing JAR for next Job
+        run: cp target/Ranky.jar $GITHUB_WORKSPACE/Ranky.jar
 
   Upload-Push-JAR:
     runs-on: ubuntu-latest
