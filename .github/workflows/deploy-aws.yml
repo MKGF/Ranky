@@ -60,7 +60,7 @@ jobs:
 
     - name: Download terraform.tfstate from S3 if it exists
       run: |
-        BUCKET_NAME=Ranky-s3
+        BUCKET_NAME=ranky-s3
         FILE_PATH=terraform/terraform.tfstate
         if aws s3 ls "s3://$BUCKET_NAME" 2>&1 | grep -q 'NoSuchBucket'; then
           echo "Bucket not found, creating..."
@@ -78,11 +78,11 @@ jobs:
     
     - name: Upload file changes to S3 bucket
       run: |
-        BUCKET_NAME=Ranky-s3
+        BUCKET_NAME=ranky-s3
         FILE_PATH=./terraform/terraform.tfstate
         aws s3 cp $FILE_PATH s3://$BUCKET_NAME/terraform
       env:
-        BUCKET_NAME: Ranky-s3
+        BUCKET_NAME: ranky-s3
 
     - name: Trigger tfstate-push-to-branches
       run: |
