@@ -10,6 +10,12 @@ jobs:
   Initial-Set-Up:
     runs-on: ubuntu-latest
     steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: develop  # Borrar cuando se active on-push
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
