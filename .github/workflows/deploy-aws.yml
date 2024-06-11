@@ -78,6 +78,7 @@ jobs:
       working-directory: ./terraform
     
     - name: Upload file changes to S3 bucket
+      if: always()
       run: |
         BUCKET_NAME=ranky-s3
         FILE_PATH=./terraform/terraform.tfstate
