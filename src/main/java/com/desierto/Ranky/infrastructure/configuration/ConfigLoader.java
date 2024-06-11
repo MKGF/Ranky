@@ -1,5 +1,6 @@
 package com.desierto.Ranky.infrastructure.configuration;
 
+import java.util.List;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -34,4 +35,8 @@ public class ConfigLoader {
 
   @Value("${sponsors}")
   private String sponsors;
+
+  @Value("${admin.ids}")
+  private List<String> adminIds;
+
 }
