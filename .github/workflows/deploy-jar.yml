@@ -43,15 +43,33 @@ jobs:
       - name: Test with Maven
         run: mvn clean test
         
-      - name: Build with Maven and moving it
+      - name: Build with Maven
         run: mvn clean package
           
       - name: Preparing JAR for next Job
         run: cp target/Ranky.jar $GITHUB_WORKSPACE/Ranky.jar
 
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Ranky-jar
+          path: $GITHUB_WORKSPACE/Ranky.jar
+
   Upload-Push-JAR:
     runs-on: ubuntu-latest
     needs: Initial-Set-Up
     steps:
-      - name: Test
-        run: ls $GITHUB_WORKSPACE
+
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: develop  # Borrar cuando se active on-push
+
+    - name: Download JAR artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: Ranky-jar
+        path: $GITHUB_WORKSPACE
+    
+    - name: Test
+      run: ls $GITHUB_WORKSPACE
