@@ -62,3 +62,4 @@ build/
 
 ### PROJECT FILES ###
 *application-secret.properties
+*application-dev.properties
