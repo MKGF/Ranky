@@ -1,4 +1,4 @@
-name: AWS Infrastructure Create Pipeline
+name: AWS Create Infrastructure Pipeline
 
 on:
   workflow_dispatch:
