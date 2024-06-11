@@ -65,8 +65,9 @@ jobs:
         if aws s3 ls "s3://$BUCKET_NAME" 2>&1 | grep -q 'NoSuchBucket'; then
           echo "Bucket not found, creating..."
           aws s3api create-bucket --bucket $BUCKET_NAME --region eu-west-3 --create-bucket-configuration LocationConstraint=eu-west-3
+        else
+          aws s3 cp "s3://$BUCKET_NAME/$FILE_PATH" ./terraform/
         fi
-        aws s3 cp "s3://$BUCKET_NAME/$FILE_PATH" ./terraform/
   
     - name: Terraform Init
       run: terraform init
