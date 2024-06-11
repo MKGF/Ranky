@@ -33,11 +33,11 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
-      - name: Test with Maven
-        run: mvn clean test
+    - name: Test with Maven
+      run: mvn clean test
       
-      - name: Build with Maven
-        run: mvn clean package
+    - name: Build with Maven
+      run: mvn clean package
   
   Upload-Push-JAR:
     runs-on: ubuntu-latest
