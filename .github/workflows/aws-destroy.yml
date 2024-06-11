@@ -31,7 +31,7 @@ jobs:
       run: |
         BUCKET_NAME=ranky-s3
         FILE_PATH=terraform/terraform.tfstate
-        aws s3 cp "s3://$BUCKET_NAME/terraform ./terraform/terraform.tfstate
+        aws s3 cp "s3://$BUCKET_NAME/$FILE_PATH ./terraform/
 
   
     - name: Terraform Init
