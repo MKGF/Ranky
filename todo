@@ -8,3 +8,7 @@ es algo que debemos abordar nosotros para que lo unico que tengamos que hacer se
 -Darle salida del comando al usuario cuando ocurre un error (si no se queda "Ranky está pensando..." eternamente)
 -Checkear si es posible ofrecer autocompletado en funcion a los rankings que ya hay en el canal
 -Sustituir Orianna por nuestra propia implementacion de comunicacion con Riot
+-Sustituir el comando de añadir cuentas con un comando que permita al usuario elegir a que ranking quiere añadir las cuentas en un dropdown menu
+https://jda.wiki/using-jda/interactions/#select-menus-dropdowns
+-Explorar la opcion de abrir una modal para que el usuario meta las cuentas en un espacio mayor
+-API de gestion para los admins
