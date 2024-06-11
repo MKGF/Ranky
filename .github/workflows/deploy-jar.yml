@@ -43,12 +43,14 @@ jobs:
       - name: Test with Maven
         run: mvn clean test
         
-      - name: Build with Maven
-        run: mvn clean package
-  
+      - name: Build with Maven and moving it
+        run: |
+          mvn clean package
+          cp target/ranky.jar $GITHUB_WORKSPACE/ranky.jar
+
   Upload-Push-JAR:
     runs-on: ubuntu-latest
     needs: Initial-Set-Up
     steps:
       - name: Test
-        run: ls -la
+        run: ls $GITHUB_WORKSPACE
