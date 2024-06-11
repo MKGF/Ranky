@@ -45,15 +45,12 @@ jobs:
         
       - name: Build with Maven
         run: mvn clean package
-          
-      - name: Preparing JAR for next Job
-        run: cp target/Ranky.jar $GITHUB_WORKSPACE/Ranky.jar
 
       - name: Upload JAR artifact
         uses: actions/upload-artifact@v2
         with:
           name: Ranky-jar
-          path: $GITHUB_WORKSPACE/Ranky.jar
+          path: target/Ranky.jar
 
   Upload-Push-JAR:
     runs-on: ubuntu-latest
@@ -69,7 +66,7 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: Ranky-jar
-        path: $GITHUB_WORKSPACE
+        path: target/Ranky.jar
     
     - name: Test
-      run: ls $GITHUB_WORKSPACE
+      run: ls target
