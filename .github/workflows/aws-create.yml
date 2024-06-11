@@ -58,16 +58,11 @@ jobs:
       run: |
         aws ecr get-login-password --region eu-west-3 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-west-3.amazonaws.com
 
-    - name: Download terraform.tfstate from S3 if it exists
+    - name: Create S3 bucket for terraform.tfstate
       run: |
         BUCKET_NAME=ranky-s3
         FILE_PATH=terraform/terraform.tfstate
-        if aws s3 ls "s3://$BUCKET_NAME" 2>&1 | grep -q 'NoSuchBucket'; then
-          echo "Bucket not found, creating..."
-          aws s3api create-bucket --bucket $BUCKET_NAME --region eu-west-3 --create-bucket-configuration LocationConstraint=eu-west-3
-        else
-          aws s3 cp "s3://$BUCKET_NAME/$FILE_PATH" ./terraform/
-        fi
+        aws s3api create-bucket --bucket $BUCKET_NAME --region eu-west-3 --create-bucket-configuration LocationConstraint=eu-west-3
   
     - name: Terraform Init
       run: terraform init
@@ -82,6 +77,6 @@ jobs:
       run: |
         BUCKET_NAME=ranky-s3
         FILE_PATH=./terraform/terraform.tfstate
-        aws s3 cp $FILE_PATH s3://$BUCKET_NAME/terraform
+        aws s3 cp $FILE_PATH s3://$BUCKET_NAME/terraform.tfstate
       env:
         BUCKET_NAME: ranky-s3

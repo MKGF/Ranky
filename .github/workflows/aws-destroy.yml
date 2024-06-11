@@ -30,8 +30,8 @@ jobs:
     - name: Download terraform.tfstate from S3 if it exists
       run: |
         BUCKET_NAME=ranky-s3
-        S3_PATH=terraform
-        aws s3 cp "s3://$BUCKET_NAME/$S3_PATH" ./terraform/terraform.tfstate
+        FILE_PATH=terraform.tfstate
+        aws s3 cp "s3://$BUCKET_NAME/$FILE_PATH" "./terraform/$FILE_PATH"
 
   
     - name: Terraform Init
