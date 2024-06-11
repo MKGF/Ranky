@@ -46,7 +46,7 @@ jobs:
       - name: Build with Maven and moving it
         run: |
           mvn clean package
-          cp target/ranky.jar $GITHUB_WORKSPACE/ranky.jar
+          cp target/Ranky.jar $GITHUB_WORKSPACE/Ranky.jar
 
   Upload-Push-JAR:
     runs-on: ubuntu-latest
