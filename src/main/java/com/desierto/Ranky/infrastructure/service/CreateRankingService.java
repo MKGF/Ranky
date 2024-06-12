@@ -42,7 +42,7 @@ public class CreateRankingService {
               event.getGuild(),
               gson
           );
-          String rankingName = discordOptionRetriever.fromEventGetRankingName(event);
+          String rankingName = discordOptionRetriever.fromEventGetObjectName(event);
           rankingRepository.create(new Ranking(rankingName));
           event.getHook().sendMessage("Ranking created successfully!").queue();
         } catch (ConfigChannelNotFoundException | RankingAlreadyExistsException e) {

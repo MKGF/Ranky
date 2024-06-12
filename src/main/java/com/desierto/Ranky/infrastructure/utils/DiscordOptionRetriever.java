@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DiscordOptionRetriever {
 
-  public String fromEventGetRankingName(SlashCommandInteractionEvent event) {
+  public String fromEventGetObjectName(SlashCommandInteractionEvent event) {
     return fromSlashCommandInteractionEvent(event).get(0);
   }
 

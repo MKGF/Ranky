@@ -34,7 +34,7 @@ public class DiscordOptionRetrieverTest {
   @Test
   public void onEvent_getRankingName() {
     SlashCommandInteractionEvent event = getMockedEventWithRankingName();
-    assertEquals("A ranking", cut.fromEventGetRankingName(event));
+    assertEquals("A ranking", cut.fromEventGetObjectName(event));
   }
 
   @Test

@@ -1,5 +1,8 @@
 package com.desierto.Ranky.infrastructure.service.admin;
 
+import static com.desierto.Ranky.infrastructure.utils.DiscordMessages.COMMAND_NOT_ALLOWED;
+import static com.desierto.Ranky.infrastructure.utils.DiscordMessages.NOT_A_SERVER_COMMAND;
+
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -20,10 +23,10 @@ public class GuildRetriever {
 
   public void execute(SlashCommandInteractionEvent event) {
     if (event.isFromGuild()) {
-      event.getHook().sendMessage("This command can't be used from a server.").queue();
+      event.getHook().sendMessage(NOT_A_SERVER_COMMAND.getMessage()).queue();
     } else {
       if (!isAdmin(event.getInteraction().getUser().getId())) {
-        event.getHook().sendMessage("You are not allowed to execute this command.").queue();
+        event.getHook().sendMessage(COMMAND_NOT_ALLOWED.getMessage()).queue();
       } else {
         //Meter paginacion por parametros en un futuro con sublist(begin*page, end*page)
         String message = bot.getGuilds().stream()
@@ -37,6 +40,4 @@ public class GuildRetriever {
   private boolean isAdmin(String userId) {
     return config.getAdminIds().stream().anyMatch(id -> id.equals(userId));
   }
-
-
 }

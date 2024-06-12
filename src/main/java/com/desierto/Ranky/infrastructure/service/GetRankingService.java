@@ -51,7 +51,7 @@ public class GetRankingService {
   public void execute(SlashCommandInteractionEvent event) {
     if (event.isFromGuild()) {
       InteractionHook hook = event.getHook();
-      String rankingName = discordOptionRetriever.fromEventGetRankingName(event);
+      String rankingName = discordOptionRetriever.fromEventGetObjectName(event);
       try {
         ConfigChannelRankingRepository rankingRepository = new ConfigChannelRankingRepository(
             config,

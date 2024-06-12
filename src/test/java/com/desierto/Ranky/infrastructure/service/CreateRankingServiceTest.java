@@ -92,7 +92,7 @@ public class CreateRankingServiceTest {
     when(role.getName()).thenReturn(RANKY_USER);
     String rankingName = "Test";
     Ranking ranking = new Ranking(rankingName);
-    when(discordOptionRetriever.fromEventGetRankingName(event)).thenReturn(rankingName);
+    when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingName);
     try (MockedConstruction<ConfigChannelRankingRepository> repo = Mockito.mockConstruction(
         ConfigChannelRankingRepository.class, (mock, context) -> {
           when(mock.create(ranking)).thenReturn(ranking);
