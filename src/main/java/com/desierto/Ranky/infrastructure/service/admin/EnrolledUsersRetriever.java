@@ -42,11 +42,15 @@ public class EnrolledUsersRetriever {
         } else {
           optionalGuild.get().findMembers(member -> member.getRoles().stream()
                   .anyMatch(role -> role.getName().equals(config.getRankyUserRole())))
-              .onSuccess(members ->
-                  event.getHook().sendMessage(
-                          members.stream().map(Member::toString).collect(Collectors.joining("\n")))
-                      .queue()
-
+              .onSuccess(members -> {
+                    String message = members.stream().map(Member::toString)
+                        .collect(Collectors.joining("\n"));
+                    if (message.isEmpty()) {
+                      event.getHook().sendMessage("No users with the power role found.").queue();
+                    } else {
+                      event.getHook().sendMessage(message).queue();
+                    }
+                  }
               );
         }
       } else {
