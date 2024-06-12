@@ -68,7 +68,7 @@ public class AddAccountsServiceTest {
     SlashCommandInteractionEvent event = getAMockedEventWithMemberWithoutRole();
     String rankingName = "A ranking";
     Ranking ranking = new Ranking(rankingName);
-    when(discordOptionRetriever.fromEventGetRankingName(event)).thenReturn(rankingName);
+    when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingName);
     when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of(new Account()));
     repo = mockDiscordRepo(ranking);
 
@@ -83,7 +83,7 @@ public class AddAccountsServiceTest {
     SlashCommandInteractionEvent event = getAMockedEventNotFromAGuild();
     String rankingName = "A ranking";
     Ranking ranking = new Ranking(rankingName);
-    when(discordOptionRetriever.fromEventGetRankingName(event)).thenReturn(rankingName);
+    when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingName);
     when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of(new Account()));
     repo = mockDiscordRepo(ranking);
 
@@ -98,7 +98,7 @@ public class AddAccountsServiceTest {
     SlashCommandInteractionEvent event = getAMockedEvent();
     String rankingName = "A ranking";
     Ranking ranking = new Ranking(rankingName);
-    when(discordOptionRetriever.fromEventGetRankingName(event)).thenReturn(rankingName);
+    when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingName);
     when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of(new Account()));
     repo = mockDiscordRepo(ranking);
 
@@ -115,7 +115,7 @@ public class AddAccountsServiceTest {
     String rankingName = "A ranking";
     Ranking ranking = new Ranking(rankingName);
     Account delusionalTB = new Account("Delusional TB", "delu");
-    when(discordOptionRetriever.fromEventGetRankingName(event)).thenReturn(rankingName);
+    when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingName);
     when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of(delusionalTB));
     when(riotAccountRepository.enrichIdentification(delusionalTB)).thenReturn(delusionalTB);
     repo = mockDiscordRepo(ranking);
@@ -137,7 +137,7 @@ public class AddAccountsServiceTest {
     Ranking ranking = new Ranking(rankingName);
     Account BBXhadow = new Account("BBXhadow", "RFF");
     Account enrichedBBXhadow = new Account("id", BBXhadow.getId(), BBXhadow.getTagLine());
-    when(discordOptionRetriever.fromEventGetRankingName(event)).thenReturn(rankingName);
+    when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingName);
     when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of(BBXhadow));
     when(riotAccountRepository.enrichIdentification(BBXhadow)).thenReturn(enrichedBBXhadow);
     repo = mockDiscordRepo(ranking);

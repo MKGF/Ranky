@@ -69,7 +69,7 @@ public class RemoveAccountsServiceTest {
     SlashCommandInteractionEvent event = getAMockedEventWithMemberWithoutRole();
     String rankingName = "A ranking";
     Ranking ranking = new Ranking(rankingName);
-    when(discordOptionRetriever.fromEventGetRankingName(event)).thenReturn(rankingName);
+    when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingName);
     when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of(new Account()));
     repo = mockDiscordRepo(ranking);
 
@@ -83,7 +83,7 @@ public class RemoveAccountsServiceTest {
     SlashCommandInteractionEvent event = getAMockedEventNotFromAGuild();
     String rankingName = "A ranking";
     Ranking ranking = new Ranking(rankingName);
-    when(discordOptionRetriever.fromEventGetRankingName(event)).thenReturn(rankingName);
+    when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingName);
     when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of(new Account()));
     repo = mockDiscordRepo(ranking);
 
@@ -97,7 +97,7 @@ public class RemoveAccountsServiceTest {
     SlashCommandInteractionEvent event = getAMockedEvent();
     String rankingName = "A ranking";
     Ranking ranking = new Ranking(rankingName);
-    when(discordOptionRetriever.fromEventGetRankingName(event)).thenReturn(rankingName);
+    when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingName);
     when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of(new Account()));
     repo = mockDiscordRepo(ranking);
 
@@ -113,7 +113,7 @@ public class RemoveAccountsServiceTest {
     String rankingName = "A ranking";
     Account BBXhadow = new Account("id", "BBXhadow", "RFF");
     Ranking ranking = new Ranking(rankingName, List.of(BBXhadow));
-    when(discordOptionRetriever.fromEventGetRankingName(event)).thenReturn(rankingName);
+    when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingName);
     when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of(BBXhadow));
     when(riotAccountRepository.enrichIdentification(BBXhadow)).thenReturn(BBXhadow);
     repo = mockDiscordRepo(ranking);

@@ -12,3 +12,13 @@ es algo que debemos abordar nosotros para que lo unico que tengamos que hacer se
 https://jda.wiki/using-jda/interactions/#select-menus-dropdowns
 -Explorar la opcion de abrir una modal para que el usuario meta las cuentas en un espacio mayor
 -API de gestion para los admins
+-Añadir una lista de vetos puede ser interesante?
+-Añadir el culpable del mensaje escrito por el bot en el footer del mensaje
+-Hacer los servicios de los comandos asincronos
+-En los ToS de discord dice que no podemos mandar MDs sin permiso. Revisar si podemos enviar el mensaje de presentacion.
+
+API de gestion:
+  - Sacar las guilds en las que estamos (paginar?)
+  - Sacar los usuarios con el rol Ranky user en una guild
+  - Comprobar la existencia de config channel en una guild
+  - Sacar el contenido del config channel de una guild

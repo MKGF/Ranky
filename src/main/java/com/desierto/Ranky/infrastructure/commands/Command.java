@@ -22,6 +22,15 @@ public class Command {
   public static final Command ADD_ACCOUNTS;
   public static final Command REMOVE_ACCOUNTS;
 
+  public static final Command GET_GUILDS;
+
+  public static final Command GET_ENROLLED_USERS;
+
+  public static final Command EXISTS_CONFIG_CHANNEL;
+
+  public static final Command RETRIEVE_CONFIG_CHANNEL_CONTENT;
+
+
   static {
     HELP = Command.of("help",
         "Shows a detailed explanation of the possibilites of Ranky", emptyList());
@@ -81,6 +90,43 @@ public class Command {
             )
         )
     );
+    GET_GUILDS = Command.of("get_guilds",
+        "Retrieves all the guild names in which Ranky is present",
+        emptyList()
+    );
+    GET_ENROLLED_USERS = Command.of("get_enrolled_users",
+        "Retrieves all users with the power role in a guild",
+        List.of(
+            new Parameter(
+                "guild",
+                "Guild name",
+                true,
+                OptionType.STRING
+            )
+        )
+    );
+    EXISTS_CONFIG_CHANNEL = Command.of("exists_config_channel",
+        "Checks the existence of a config channel in a guild",
+        List.of(
+            new Parameter(
+                "guild",
+                "Guild name",
+                true,
+                OptionType.STRING
+            )
+        )
+    );
+    RETRIEVE_CONFIG_CHANNEL_CONTENT = Command.of("retrieve_config_channel_content",
+        "Retrieves the content of the config channel of the guild",
+        List.of(
+            new Parameter(
+                "guild",
+                "Guild name",
+                true,
+                OptionType.STRING
+            )
+        )
+    );
   }
 
   String commandId;
@@ -104,7 +150,11 @@ public class Command {
         CREATE.toDiscordCommand(),
         DELETE.toDiscordCommand(),
         ADD_ACCOUNTS.toDiscordCommand(),
-        REMOVE_ACCOUNTS.toDiscordCommand()
+        REMOVE_ACCOUNTS.toDiscordCommand(),
+        GET_GUILDS.toDiscordCommand(),
+        GET_ENROLLED_USERS.toDiscordCommand(),
+        EXISTS_CONFIG_CHANNEL.toDiscordCommand(),
+        RETRIEVE_CONFIG_CHANNEL_CONTENT.toDiscordCommand()
     );
   }
 

@@ -5,4 +5,4 @@ FROM openjdk:17-jdk
 COPY ./Ranky.jar /app/Ranky.jar
 
 # Run application on container init
-ENTRYPOINT ["java", "-Dspring.profiles.active=secret", "-jar", "/app/Ranky.jar"]
+ENTRYPOINT ["java", "-jar", "/app/Ranky.jar", "--spring.profiles.active=secret"]

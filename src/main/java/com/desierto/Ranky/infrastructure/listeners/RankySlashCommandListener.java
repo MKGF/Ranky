@@ -3,9 +3,13 @@ package com.desierto.Ranky.infrastructure.listeners;
 import static com.desierto.Ranky.infrastructure.commands.Command.ADD_ACCOUNTS;
 import static com.desierto.Ranky.infrastructure.commands.Command.CREATE;
 import static com.desierto.Ranky.infrastructure.commands.Command.DELETE;
+import static com.desierto.Ranky.infrastructure.commands.Command.EXISTS_CONFIG_CHANNEL;
+import static com.desierto.Ranky.infrastructure.commands.Command.GET_ENROLLED_USERS;
+import static com.desierto.Ranky.infrastructure.commands.Command.GET_GUILDS;
 import static com.desierto.Ranky.infrastructure.commands.Command.HELP;
 import static com.desierto.Ranky.infrastructure.commands.Command.RANKING;
 import static com.desierto.Ranky.infrastructure.commands.Command.REMOVE_ACCOUNTS;
+import static com.desierto.Ranky.infrastructure.commands.Command.RETRIEVE_CONFIG_CHANNEL_CONTENT;
 
 import com.desierto.Ranky.infrastructure.service.AddAccountsService;
 import com.desierto.Ranky.infrastructure.service.CreateRankingService;
@@ -13,6 +17,10 @@ import com.desierto.Ranky.infrastructure.service.DeleteRankingService;
 import com.desierto.Ranky.infrastructure.service.GetRankingService;
 import com.desierto.Ranky.infrastructure.service.HelpService;
 import com.desierto.Ranky.infrastructure.service.RemoveAccountsService;
+import com.desierto.Ranky.infrastructure.service.admin.ConfigChannelChecker;
+import com.desierto.Ranky.infrastructure.service.admin.ConfigChannelContentRetriever;
+import com.desierto.Ranky.infrastructure.service.admin.EnrolledUsersRetriever;
+import com.desierto.Ranky.infrastructure.service.admin.GuildRetriever;
 import jakarta.annotation.PostConstruct;
 import java.util.logging.Logger;
 import lombok.AllArgsConstructor;
@@ -38,6 +46,18 @@ public class RankySlashCommandListener extends ListenerAdapter {
   private AddAccountsService addAccountsService;
   @Autowired
   private RemoveAccountsService removeAccountsService;
+
+  @Autowired
+  private GuildRetriever guildRetriever;
+
+  @Autowired
+  private EnrolledUsersRetriever enrolledUsersRetriever;
+
+  @Autowired
+  private ConfigChannelChecker configChannelChecker;
+
+  @Autowired
+  private ConfigChannelContentRetriever configChannelContentRetriever;
 
   @Autowired
   private JDA bot;
@@ -73,6 +93,18 @@ public class RankySlashCommandListener extends ListenerAdapter {
     }
     if (event.getCommandString().contains("/" + REMOVE_ACCOUNTS.getCommandId())) {
       removeAccountsService.execute(event);
+    }
+    if (event.getCommandString().contains("/" + GET_GUILDS.getCommandId())) {
+      guildRetriever.execute(event);
+    }
+    if (event.getCommandString().contains("/" + GET_ENROLLED_USERS.getCommandId())) {
+      enrolledUsersRetriever.execute(event);
+    }
+    if (event.getCommandString().contains("/" + EXISTS_CONFIG_CHANNEL.getCommandId())) {
+      configChannelChecker.execute(event);
+    }
+    if (event.getCommandString().contains("/" + RETRIEVE_CONFIG_CHANNEL_CONTENT.getCommandId())) {
+      configChannelContentRetriever.execute(event);
     }
   }
 }

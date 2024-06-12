@@ -1,71 +1,73 @@
 name: Deploy JAR Pipeline
 
 on:
-  workflow_call:
-    inputs:
-      commit:
-        description: 'Commit ID to deploy'
-        required: false
-        type: string
-      version:
-        description: 'Version to deploy'
-        required: false
-        type: string
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - master
+
 jobs:
-  deploy-jar:
-    if: ${{ github.event.workflow == '.github/workflows/create-release.yml' }}
+  Initial-Set-Up:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Set environment variables
-        run: |
-          if [ -z "${{ inputs.commit }}" ]; then
-            echo "IS_COMMIT_EMPTY=true" >> $GITHUB_ENV
-          else
-            echo "IS_COMMIT_EMPTY=false" >> $GITHUB_ENV
-          fi
-          if [ -z "${{ inputs.version }}" ]; then
-            echo "IS_VERSION_EMPTY=true" >> $GITHUB_ENV
-          else
-            echo "IS_VERSION_EMPTY=false" >> $GITHUB_ENV
-          fi
-
-      - name: Deploy latest JAR
-        if: ${{ env.IS_COMMIT_EMPTY == 'true' }}
-        uses: actions/checkout@v4
-
-      - name: Deploy commit JAR
-        if: ${{ env.IS_COMMIT_EMPTY == 'false' }}
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.commit }}
+          ref: develop  # Borrar cuando se active on-push
 
-      - name: echo
-        run: cat ./todo
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-3
 
-    # - name: Configure AWS credentials
-    #   uses: aws-actions/configure-aws-credentials@v1
-    #   with:
-    #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    #     aws-region: eu-west-3
+      - name: Create Secrets
+        uses: 1arp/create-a-file-action@0.4.5
+        with:
+          path: 'src/main/resources'
+          is AbsolutePath: false
+          file: 'application-secret.properties'
+          content: |
+            riot.api.key=${{ secrets.RIOT_API_KEY }}
+            disc.api.key=${{ secrets.DISCORD_API_KEY }}
+            admin.ids=${{ secrets.DISCORD_ADMIN_IDS }}
 
-    # - name: Create Secrets
-    #   uses: 1arp/create-a-file-action@0.4.5
-    #   with:
-    #     path: 'src/main/resources'
-    #     is AbsolutePath: false
-    #     file: 'application-secret.properties'
-    #     content: |
-    #       riot.api.key=${{ secrets.RIOT_API_KEY }}
-    #       disc.api.key=${{ secrets.DISCORD_API_KEY }}
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
 
-    # - name: Set up JDK 17
-    #   uses: actions/setup-java@v3
-    #   with:
-    #     java-version: '17'
-    #     distribution: 'adopt'
-    #     cache: maven
+      - name: Test with Maven
+        run: mvn clean test
+        
+      - name: Build with Maven
+        run: mvn clean package
 
-    # - name: Build with Maven
-    #   run: mvn clean package
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Ranky-jar
+          path: target/Ranky.jar
+
+  Upload-Push-JAR:
+    runs-on: ubuntu-latest
+    needs: Initial-Set-Up
+    steps:
+
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: develop  # Borrar cuando se active on-push
+
+    - name: Download JAR artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: Ranky-jar
+        path: target/Ranky.jar
+    
+    - name: Test
+      run: ls target
