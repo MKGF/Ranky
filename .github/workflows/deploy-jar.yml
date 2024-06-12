@@ -32,6 +32,7 @@ jobs:
           content: |
             riot.api.key=${{ secrets.RIOT_API_KEY }}
             disc.api.key=${{ secrets.DISCORD_API_KEY }}
+            admin.ids=${{ secrets.DISCORD_ADMIN_IDS }}
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
