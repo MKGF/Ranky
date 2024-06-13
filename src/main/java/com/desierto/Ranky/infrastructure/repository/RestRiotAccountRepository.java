@@ -16,12 +16,15 @@ import com.merakianalytics.orianna.types.core.account.Account.Builder;
 import com.merakianalytics.orianna.types.core.league.LeagueEntry;
 import com.merakianalytics.orianna.types.core.summoner.Summoner;
 import jakarta.annotation.PostConstruct;
+import java.util.logging.Logger;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
 public class RestRiotAccountRepository implements RiotAccountRepository {
+
+  public static final Logger log = Logger.getLogger("RestRiotAccountRepository.class");
 
   private final ConfigLoader configLoader;
 
@@ -39,6 +42,9 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
       Builder builder = Orianna.accountWithRiotId(
           account.getName(), account.getTagLine());
       String puuid = builder.get().getPuuid();
+      if (puuid == null) {
+        return new Account(account.getName(), account.getTagLine());
+      }
       GameNameDTO gameName = gson.fromJson(builder.get().toJSON(), GameNameDTO.class);
       return new Account(puuid, gameName.getGameName(), gameName.getTagLine());
     } catch (IllegalStateException e) {
@@ -55,18 +61,24 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
     //we get the string we sent in the beginning, which might not be properly cased
     //It looks like a bug in Orianna, this is a workaround since parsing it to a string returns the correct name/tagLine coming from Riot
     GameNameDTO gameName = gson.fromJson(accountBuilder.get().toJSON(), GameNameDTO.class);
-    LeagueEntry leagueEntry = summoner.getLeaguePosition(Queue.RANKED_SOLO);
-    account.updateRank(
-        leagueEntry != null ?
-            new Rank(
-                Tier.fromString(leagueEntry.getTier().name()),
-                Division.valueOf(leagueEntry.getDivision().name()),
-                leagueEntry.getLeaguePoints(),
-                new Winrate(leagueEntry.getWins(), leagueEntry.getLosses())
-            ) : Rank.unranked()
-    );
+    try {
+      LeagueEntry leagueEntry = summoner.getLeaguePosition(Queue.RANKED_SOLO);
+      account.updateRank(
+          leagueEntry != null ?
+              new Rank(
+                  Tier.fromString(leagueEntry.getTier().name()),
+                  Division.valueOf(leagueEntry.getDivision().name()),
+                  leagueEntry.getLeaguePoints(),
+                  new Winrate(leagueEntry.getWins(), leagueEntry.getLosses())
+              ) : Rank.unranked()
+      );
+    } catch (NullPointerException e) {
+      log.info(
+          String.format("Couldn't retrieve SoloQ rank of account %s#%s", gameName.getGameName(),
+              gameName.getTagLine()));
+      account.updateRank(Rank.unranked());
+    }
     account.updateGameName(gameName.getGameName(), gameName.getTagLine());
-   
     return account;
   }
 

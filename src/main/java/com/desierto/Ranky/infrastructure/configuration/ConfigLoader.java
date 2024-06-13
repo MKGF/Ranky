@@ -39,4 +39,6 @@ public class ConfigLoader {
   @Value("${admin.ids}")
   private List<String> adminIds;
 
+  @Value("${account.limit}")
+  private int accountLimit;
 }

@@ -83,7 +83,7 @@ public class GetRankingServiceTest {
     String formattedRanking = "formattedRanking";
     repo = mockDiscordRepo(ranking);
     when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn("id");
-    when(discordRankingFormatter.formatRankingEntries(any(), any())).thenReturn("formattedRanking");
+    when(discordRankingFormatter.formatRankingEntries(any())).thenReturn("formattedRanking");
 
     cut.execute(event);
 

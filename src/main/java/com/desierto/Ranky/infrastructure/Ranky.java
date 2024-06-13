@@ -15,8 +15,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
+@EnableScheduling
 public class Ranky extends SpringBootServletInitializer {
 
   public static String prefix = "/";
@@ -80,7 +82,7 @@ public class Ranky extends SpringBootServletInitializer {
         welcomeOwnerService.execute(guild, owner, welcomeEmbedMessage, nonRiotEndorsementMessage);
       }
     });
-    
+
     context.getBean(BotStatusUpdaterService.class).execute();
   }
 

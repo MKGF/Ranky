@@ -27,7 +27,7 @@ public class Winrate implements Comparable<Winrate> {
   public BigDecimal getPercentage() {
     int totalGames = wins + losses;
     if (totalGames == 0) {
-      return ZERO;
+      return ZERO.setScale(2, RoundingMode.HALF_UP);
     }
     return valueOf(wins)
         .divide(valueOf(totalGames), 4, RoundingMode.HALF_UP)

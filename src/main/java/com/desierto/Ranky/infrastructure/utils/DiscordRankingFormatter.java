@@ -22,25 +22,19 @@ public class DiscordRankingFormatter {
   public static final String HEADER = "# ";
   private static final String SEPARATOR = " | ";
   private static final String SPACE = " ";
-  private static final int NAME_LENGTH = 20;
+  private static final int NAME_LENGTH = 25;
   public static final double PERCENTAGE_OF_PIXELS_BIGGER = 0.571428;
   private static final int LP_LENGTH = 4;
   private static final int WINS_LOSSES_LENGTH = 6;
-  private static final int WINRATE_LENGTH = 8;
+  private static final int WINRATE_LENGTH = 5;
   @Autowired
   private ConfigLoader config;
 
-  public String formatRankingEntries(List<EntryDTO> entries, String title) {
+  public String formatRankingEntries(List<EntryDTO> entries) {
     StringBuilder sb = new StringBuilder();
-    sb.append(HEADER).append(title.toUpperCase());
-    sb.append(LINE_BREAK);
-    sb.append(LINE_BREAK);
     entries.forEach(entry -> {
-      sb.append(TAB);
       sb.append(CODE_LINE);
-      sb.append(entry.index());
-      sb.append(DASH);
-      sb.append(appendName(entry.name()));
+      sb.append(appendName(entry.index() + DASH + entry.name()));
       sb.append(CODE_LINE);
       sb.append(spaces(1));
       sb.append(entry.emoji());
@@ -57,7 +51,6 @@ public class DiscordRankingFormatter {
       sb.append(CODE_LINE);
       sb.append(LINE_BREAK);
     });
-    sb.append(footer());
     if (!entries.isEmpty()) {
       return sb.toString();
     }
@@ -103,10 +96,18 @@ public class DiscordRankingFormatter {
 
   private String appendWinrate(String winrate) {
     int length = winrate.length();
-    return "Winrate: " + winrate + "%";
+    return "Winrate: " + winrate + "%" + spaces(WINRATE_LENGTH - length);
   }
 
-  private String footer() {
+  public String footer() {
     return LINE_BREAK + config.getCreator() /*+ LINE_BREAK + config.getSponsors()*/;
+  }
+
+  public String title(String title, String page) {
+    return HEADER + title.toUpperCase() + " / PAGE " + page + LINE_BREAK + LINE_BREAK;
+  }
+
+  public String title(String title) {
+    return HEADER + title.toUpperCase() + LINE_BREAK + LINE_BREAK;
   }
 }

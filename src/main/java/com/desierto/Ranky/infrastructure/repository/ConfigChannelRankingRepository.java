@@ -17,8 +17,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 public class ConfigChannelRankingRepository implements RankingRepository {
 
-  public static final int ACCOUNT_LIMIT = 10;
-
   private final TextChannel configChannel;
 
   private final ConfigLoader config;
@@ -54,11 +52,11 @@ public class ConfigChannelRankingRepository implements RankingRepository {
         configChannel.sendMessage(gson.toJson(RankingDTO.fromDomain(ranking))).complete();
       } else {
         int numberOfAccounts = ranking.getAccounts().size();
-        int numberOfFractions = numberOfAccounts / ACCOUNT_LIMIT + 1;
+        int numberOfFractions = numberOfAccounts / config.getAccountLimit() + 1;
         List<Ranking> fractions = new ArrayList<>();
         for (int i = 0; i < numberOfFractions; i++) {
-          int beginning = ACCOUNT_LIMIT * i;
-          int possibleEnd = (ACCOUNT_LIMIT * (i + 1)) - 1;
+          int beginning = config.getAccountLimit() * i;
+          int possibleEnd = (config.getAccountLimit() * (i + 1)) - 1;
           int end = Math.min(possibleEnd, numberOfAccounts);
           fractions.add(
               new Ranking(ranking.getId(), ranking.getAccounts().subList(beginning, end)));

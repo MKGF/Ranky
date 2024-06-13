@@ -80,7 +80,8 @@ public class RankySlashCommandListener extends ListenerAdapter {
       helpService.execute(event);
     }
     if (event.getCommandString().contains("/" + RANKING.getCommandId())) {
-      getRankingService.execute(event);
+      Thread thread = new Thread(() -> getRankingService.execute(event));
+      thread.start();
     }
     if (event.getCommandString().contains("/" + CREATE.getCommandId())) {
       createRankingService.execute(event);
