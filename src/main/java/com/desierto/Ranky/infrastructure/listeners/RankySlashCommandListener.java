@@ -77,35 +77,44 @@ public class RankySlashCommandListener extends ListenerAdapter {
     event.deferReply(true).queue();
     event.getHook().setEphemeral(true);
     if (event.getCommandString().contains("/" + HELP.getCommandId())) {
-      helpService.execute(event);
+      Thread thread = new Thread(() -> helpService.execute(event));
+      thread.start();
     }
     if (event.getCommandString().contains("/" + RANKING.getCommandId())) {
       Thread thread = new Thread(() -> getRankingService.execute(event));
       thread.start();
     }
     if (event.getCommandString().contains("/" + CREATE.getCommandId())) {
-      createRankingService.execute(event);
+      Thread thread = new Thread(() -> createRankingService.execute(event));
+      thread.start();
     }
     if (event.getCommandString().contains("/" + DELETE.getCommandId())) {
-      deleteRankingService.execute(event);
+      Thread thread = new Thread(() -> deleteRankingService.execute(event));
+      thread.start();
     }
     if (event.getCommandString().contains("/" + ADD_ACCOUNTS.getCommandId())) {
-      addAccountsService.execute(event);
+      Thread thread = new Thread(() -> addAccountsService.execute(event));
+      thread.start();
     }
     if (event.getCommandString().contains("/" + REMOVE_ACCOUNTS.getCommandId())) {
-      removeAccountsService.execute(event);
+      Thread thread = new Thread(() -> removeAccountsService.execute(event));
+      thread.start();
     }
     if (event.getCommandString().contains("/" + GET_GUILDS.getCommandId())) {
-      guildRetriever.execute(event);
+      Thread thread = new Thread(() -> guildRetriever.execute(event));
+      thread.start();
     }
     if (event.getCommandString().contains("/" + GET_ENROLLED_USERS.getCommandId())) {
-      enrolledUsersRetriever.execute(event);
+      Thread thread = new Thread(() -> enrolledUsersRetriever.execute(event));
+      thread.start();
     }
     if (event.getCommandString().contains("/" + EXISTS_CONFIG_CHANNEL.getCommandId())) {
-      configChannelChecker.execute(event);
+      Thread thread = new Thread(() -> configChannelChecker.execute(event));
+      thread.start();
     }
     if (event.getCommandString().contains("/" + RETRIEVE_CONFIG_CHANNEL_CONTENT.getCommandId())) {
-      configChannelContentRetriever.execute(event);
+      Thread thread = new Thread(() -> configChannelContentRetriever.execute(event));
+      thread.start();
     }
   }
 }
