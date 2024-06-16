@@ -23,6 +23,7 @@ import java.util.Optional;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -80,7 +81,7 @@ public class RankyButtonClickListenerTest {
 
     cut.onButtonInteraction(event);
 
-    verify(event.getChannel(), times(1)).sendMessage("expected\n");
+    verify(event.getChannel(), times(1)).sendMessage("expected\n\n\nRequested by mention");
     verify(discordRankingFormatter, times(1)).footer();
   }
 
@@ -91,7 +92,7 @@ public class RankyButtonClickListenerTest {
 
     cut.onButtonInteraction(event);
 
-    verify(event.getChannel(), times(1)).sendMessage("expected");
+    verify(event.getChannel(), times(1)).sendMessage("expected\n\nRequested by mention");
     verify(discordRankingFormatter, times(0)).footer();
   }
 
@@ -142,6 +143,9 @@ public class RankyButtonClickListenerTest {
     MessageCreateAction mca = mock(MessageCreateAction.class);
     ReplyCallbackAction rca = mock(ReplyCallbackAction.class);
     String expected = "expected";
+    User user = mock(User.class);
+    when(event.getUser()).thenReturn(user);
+    when(user.getAsMention()).thenReturn("mention");
     when(event.getChannel()).thenReturn(channel);
     when(event.getMessage()).thenReturn(message);
     when(message.getContentRaw()).thenReturn(expected);
@@ -162,6 +166,9 @@ public class RankyButtonClickListenerTest {
     MessageCreateAction mca = mock(MessageCreateAction.class);
     ReplyCallbackAction rca = mock(ReplyCallbackAction.class);
     String expected = "expected";
+    User user = mock(User.class);
+    when(event.getUser()).thenReturn(user);
+    when(user.getAsMention()).thenReturn("mention");
     when(event.getChannel()).thenReturn(channel);
     when(event.getMessage()).thenReturn(message);
     when(message.getContentRaw()).thenReturn(expected);
@@ -183,6 +190,9 @@ public class RankyButtonClickListenerTest {
     ReplyCallbackAction rca = mock(ReplyCallbackAction.class);
     Guild guild = mock(Guild.class);
     String expected = "expected";
+    User user = mock(User.class);
+    when(event.getUser()).thenReturn(user);
+    when(user.getAsMention()).thenReturn("mention");
     when(event.getChannel()).thenReturn(channel);
     when(event.getMessage()).thenReturn(message);
     when(message.getContentRaw()).thenReturn(expected);
