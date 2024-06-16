@@ -63,6 +63,7 @@ build/
 ### PROJECT FILES ###
 *application-secret.properties
 *application-dev.properties
+*application-local.properties
 
 ### Terraform Init Files ###
 /terraform/.terraform/*

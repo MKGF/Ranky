@@ -10,6 +10,7 @@ import static com.desierto.Ranky.infrastructure.commands.Command.HELP;
 import static com.desierto.Ranky.infrastructure.commands.Command.RANKING;
 import static com.desierto.Ranky.infrastructure.commands.Command.REMOVE_ACCOUNTS;
 import static com.desierto.Ranky.infrastructure.commands.Command.RETRIEVE_CONFIG_CHANNEL_CONTENT;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
@@ -26,22 +27,20 @@ import com.desierto.Ranky.infrastructure.service.admin.ConfigChannelChecker;
 import com.desierto.Ranky.infrastructure.service.admin.ConfigChannelContentRetriever;
 import com.desierto.Ranky.infrastructure.service.admin.EnrolledUsersRetriever;
 import com.desierto.Ranky.infrastructure.service.admin.GuildRetriever;
+import java.util.concurrent.ExecutorService;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@TestInstance(Lifecycle.PER_CLASS)
 public class RankySlashCommandListenerTest {
 
   RankySlashCommandListener cut;
@@ -79,8 +78,11 @@ public class RankySlashCommandListenerTest {
   @Mock
   ConfigChannelContentRetriever configChannelContentRetriever;
 
+  @Mock
+  ExecutorService executorService;
 
-  @BeforeAll
+
+  @BeforeEach
   public void setUp() {
 
     cut = new RankySlashCommandListener(helpService,
@@ -93,6 +95,7 @@ public class RankySlashCommandListenerTest {
         enrolledUsersRetriever,
         configChannelChecker,
         configChannelContentRetriever,
+        executorService,
         bot
     );
   }
@@ -109,102 +112,112 @@ public class RankySlashCommandListenerTest {
   }
 
   @Test
-  public void onHelpCommand_callsHelpService() {
+  public void onHelpCommand_opensThread() {
     SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
     when(event.getCommandString()).thenReturn("/" + HELP.getCommandId());
 
     cut.onSlashCommandInteraction(event);
 
-    verify(helpService, times(1)).execute(event);
+    verify(executorService, times(1)).execute(any());
   }
 
   @Test
-  public void onRankingCommand_callsGetRankingService() {
+  public void onRankingCommand_opensThread() {
     SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
     when(event.getCommandString()).thenReturn("/" + RANKING.getCommandId());
 
     cut.onSlashCommandInteraction(event);
 
-    verify(getRankingService, times(1)).execute(event);
+    verify(executorService, times(1)).execute(any());
   }
 
   @Test
-  public void onCreateCommand_callsCreateRankingService() {
+  public void onCreateCommand_opensThread() {
     SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
     when(event.getCommandString()).thenReturn("/" + CREATE.getCommandId());
 
     cut.onSlashCommandInteraction(event);
 
-    verify(createRankingService, times(1)).execute(event);
+    verify(executorService, times(1)).execute(any());
   }
 
   @Test
-  public void onDeleteCommand_callsDeleteRankingService() {
+  public void onDeleteCommand_opensThread() {
     SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
     when(event.getCommandString()).thenReturn("/" + DELETE.getCommandId());
 
     cut.onSlashCommandInteraction(event);
 
-    verify(deleteRankingService, times(1)).execute(event);
+    verify(executorService, times(1)).execute(any());
   }
 
   @Test
-  public void onAddAccountsCommand_callsAddAccountsService() {
+  public void onAddAccountsCommand_opensThread() {
     SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
     when(event.getCommandString()).thenReturn("/" + ADD_ACCOUNTS.getCommandId());
 
     cut.onSlashCommandInteraction(event);
 
-    verify(addAccountsService, times(1)).execute(event);
+    verify(executorService, times(1)).execute(any());
   }
 
   @Test
-  public void onRemoveAccountsCommand_callsRemoveAccountsService() {
+  public void onRemoveAccountsCommand_opensThread() {
     SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
     when(event.getCommandString()).thenReturn("/" + REMOVE_ACCOUNTS.getCommandId());
 
     cut.onSlashCommandInteraction(event);
 
-    verify(removeAccountsService, times(1)).execute(event);
+    verify(executorService, times(1)).execute(any());
   }
 
   @Test
-  public void onGetGuildsCommand_callsGuildRetriever() {
+  public void onGetGuildsCommand_opensThread() {
     SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
     when(event.getCommandString()).thenReturn("/" + GET_GUILDS.getCommandId());
 
     cut.onSlashCommandInteraction(event);
 
-    verify(guildRetriever, times(1)).execute(event);
+    verify(executorService, times(1)).execute(any());
   }
 
   @Test
-  public void onGetEnrolledUsersCommand_callsEnrolledAccountRetriever() {
+  public void onGetEnrolledUsersCommand_opensThread() {
     SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
     when(event.getCommandString()).thenReturn("/" + GET_ENROLLED_USERS.getCommandId());
 
     cut.onSlashCommandInteraction(event);
 
-    verify(enrolledUsersRetriever, times(1)).execute(event);
+    verify(executorService, times(1)).execute(any());
   }
 
   @Test
-  public void onExistsConfigChannelCommand_callsConfigChannelChecker() {
+  public void onExistsConfigChannelCommand_opensThread() {
     SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
     when(event.getCommandString()).thenReturn("/" + EXISTS_CONFIG_CHANNEL.getCommandId());
 
     cut.onSlashCommandInteraction(event);
 
-    verify(configChannelChecker, times(1)).execute(event);
+    verify(executorService, times(1)).execute(any());
   }
 
   @Test
-  public void onRetrieveConfigChannelContentCommand_callsConfigChannelContentRetriever() {
+  public void onRetrieveConfigChannelContentCommand_opensThread() {
     SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
     when(event.getCommandString()).thenReturn("/" + RETRIEVE_CONFIG_CHANNEL_CONTENT.getCommandId());
 
     cut.onSlashCommandInteraction(event);
 
-    verify(configChannelContentRetriever, times(1)).execute(event);
+    verify(executorService, times(1)).execute(any());
+  }
+
+  @Test
+  public void onUnknownCommand_opensNoThreads() {
+    SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
+    when(event.getCommandString()).thenReturn("Unknown command");
+
+    cut.onSlashCommandInteraction(event);
+
+    verify(executorService, times(0)).execute(any());
   }
 }

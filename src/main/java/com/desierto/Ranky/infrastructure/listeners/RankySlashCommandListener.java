@@ -22,6 +22,7 @@ import com.desierto.Ranky.infrastructure.service.admin.ConfigChannelContentRetri
 import com.desierto.Ranky.infrastructure.service.admin.EnrolledUsersRetriever;
 import com.desierto.Ranky.infrastructure.service.admin.GuildRetriever;
 import jakarta.annotation.PostConstruct;
+import java.util.concurrent.ExecutorService;
 import java.util.logging.Logger;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.JDA;
@@ -60,6 +61,9 @@ public class RankySlashCommandListener extends ListenerAdapter {
   private ConfigChannelContentRetriever configChannelContentRetriever;
 
   @Autowired
+  private ExecutorService executorService;
+
+  @Autowired
   private JDA bot;
 
   public static final Logger log = Logger.getLogger("RankySlashCommandListener.class");
@@ -77,34 +81,35 @@ public class RankySlashCommandListener extends ListenerAdapter {
     event.deferReply(true).queue();
     event.getHook().setEphemeral(true);
     if (event.getCommandString().contains("/" + HELP.getCommandId())) {
-      helpService.execute(event);
+      executorService.execute(() -> helpService.execute(event));
     }
     if (event.getCommandString().contains("/" + RANKING.getCommandId())) {
-      getRankingService.execute(event);
+      executorService.execute(() -> getRankingService.execute(event));
+
     }
     if (event.getCommandString().contains("/" + CREATE.getCommandId())) {
-      createRankingService.execute(event);
+      executorService.execute(() -> createRankingService.execute(event));
     }
     if (event.getCommandString().contains("/" + DELETE.getCommandId())) {
-      deleteRankingService.execute(event);
+      executorService.execute(() -> deleteRankingService.execute(event));
     }
     if (event.getCommandString().contains("/" + ADD_ACCOUNTS.getCommandId())) {
-      addAccountsService.execute(event);
+      executorService.execute(() -> addAccountsService.execute(event));
     }
     if (event.getCommandString().contains("/" + REMOVE_ACCOUNTS.getCommandId())) {
-      removeAccountsService.execute(event);
+      executorService.execute(() -> removeAccountsService.execute(event));
     }
     if (event.getCommandString().contains("/" + GET_GUILDS.getCommandId())) {
-      guildRetriever.execute(event);
+      executorService.execute(() -> guildRetriever.execute(event));
     }
     if (event.getCommandString().contains("/" + GET_ENROLLED_USERS.getCommandId())) {
-      enrolledUsersRetriever.execute(event);
+      executorService.execute(() -> enrolledUsersRetriever.execute(event));
     }
     if (event.getCommandString().contains("/" + EXISTS_CONFIG_CHANNEL.getCommandId())) {
-      configChannelChecker.execute(event);
+      executorService.execute(() -> configChannelChecker.execute(event));
     }
     if (event.getCommandString().contains("/" + RETRIEVE_CONFIG_CHANNEL_CONTENT.getCommandId())) {
-      configChannelContentRetriever.execute(event);
+      executorService.execute(() -> configChannelContentRetriever.execute(event));
     }
   }
 }

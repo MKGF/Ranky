@@ -2,6 +2,8 @@ package com.desierto.Ranky.infrastructure.configuration;
 
 import com.desierto.Ranky.infrastructure.commands.Command;
 import com.google.gson.Gson;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -35,5 +37,8 @@ public class Configuration implements WebMvcConfigurer {
     return new Gson();
   }
 
-
+  @Bean
+  public ExecutorService executorService() {
+    return Executors.newFixedThreadPool(20);
+  }
 }

@@ -17,14 +17,13 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class WelcomeGuildService {
 
-  public static final String PATH_TO_MESSAGE_TO_GUILD_TXT = "src/main/resources/config/onGuildJoinMessageToGuild.txt";
   @Autowired
   public ConfigLoader config;
 
   public void execute(Guild guild, String welcomeEmbedMessage,
       String nonRiotEndorsementMessage) {
     String welcomeMessage = String.format(read(
-            PATH_TO_MESSAGE_TO_GUILD_TXT),
+            config.getPathToGuildPresentationMessage()),
         guild.getName());
 
     TextChannel systemChannel;
