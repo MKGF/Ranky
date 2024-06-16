@@ -56,7 +56,7 @@ public class ConfigChannelRankingRepository implements RankingRepository {
         List<Ranking> fractions = new ArrayList<>();
         for (int i = 0; i < numberOfFractions; i++) {
           int beginning = config.getAccountLimit() * i;
-          int possibleEnd = (config.getAccountLimit() * (i + 1)) - 1;
+          int possibleEnd = (config.getAccountLimit() * (i + 1));
           int end = Math.min(possibleEnd, numberOfAccounts);
           fractions.add(
               new Ranking(ranking.getId(), ranking.getAccounts().subList(beginning, end)));
