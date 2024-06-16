@@ -62,7 +62,8 @@ public class RankyButtonClickListener extends ListenerAdapter {
     if (isPageButton(
         event)) { //Case for a big ranking that needed to be paged, and we just want to show a fraction of the ranking
       event.getChannel()
-          .sendMessage(event.getMessage().getContentRaw() + "\n" + discordRankingFormatter.footer())
+          .sendMessage(event.getMessage().getContentRaw() + "\n" + discordRankingFormatter.footer()
+              + "\n\nRequested by " + event.getUser().getAsMention())
           .complete();
       try {
         TimeUnit.SECONDS.sleep(1);
@@ -71,7 +72,9 @@ public class RankyButtonClickListener extends ListenerAdapter {
       event.reply("Shared successfully").setEphemeral(true).queue();
     } else if (isFinalPageButton(
         event)) { //Case for a big ranking that needed to be paged, and we want to show the latest fraction (doesn't need a footer)
-      event.getChannel().sendMessage(event.getMessage().getContentRaw()).complete();
+      event.getChannel().sendMessage(
+              event.getMessage().getContentRaw() + "\n\nRequested by " + event.getUser().getAsMention())
+          .complete();
       try {
         TimeUnit.SECONDS.sleep(1);
       } catch (InterruptedException ignored) {
@@ -103,8 +106,11 @@ public class RankyButtonClickListener extends ListenerAdapter {
     return (genericEvent, formattedRanking) -> {
       ButtonInteractionEvent specificEvent = (ButtonInteractionEvent) genericEvent;
       MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
-      messageBuilder.addContent(discordRankingFormatter.title(title) + formattedRanking
-          + discordRankingFormatter.footer());
+      messageBuilder.addContent(
+          discordRankingFormatter.title(title)
+              + formattedRanking
+              + discordRankingFormatter.footer() + "\n\nRequested by " + specificEvent.getUser()
+              .getAsMention());
       specificEvent.getChannel().sendMessage(messageBuilder.build()).complete();
     };
   }
@@ -133,7 +139,9 @@ public class RankyButtonClickListener extends ListenerAdapter {
       public void printEnding(GenericEvent genericEvent, String formattedRanking) {
         ButtonInteractionEvent specificEvent = (ButtonInteractionEvent) genericEvent;
         MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
-        messageBuilder.addContent(formattedRanking + discordRankingFormatter.footer());
+        messageBuilder.addContent(
+            formattedRanking + discordRankingFormatter.footer() + "\n\nRequested by "
+                + specificEvent.getUser().getAsMention());
         specificEvent.getChannel().sendMessage(messageBuilder.build()).complete();
       }
     };
