@@ -11,72 +11,73 @@ jobs:
 
     steps:
 
-    - name: Checkout
-      uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Install Terraform
-      uses: hashicorp/setup-terraform@v3
-      with:
-        aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: eu-west-3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-3
 
-    - name: Create Secrets
-      uses: 1arp/create-a-file-action@0.4.5
-      with:
-        path: 'src/main/resources/config'
-        is AbsolutePath: false
-        file: 'application-secret.properties'
-        content: |
-          riot.api.key=${{ secrets.RIOT_API_KEY }}
-          disc.api.key=${{ secrets.DISCORD_API_KEY }}
+      - name: Create Secrets
+        uses: 1arp/create-a-file-action@0.4.5
+        with:
+          path: 'src/main/resources/config'
+          is AbsolutePath: false
+          file: 'application-secret.properties'
+          content: |
+            riot.api.key=${{ secrets.RIOT_API_KEY }}
+            disc.api.key=${{ secrets.DISCORD_API_KEY }}
+            admin.ids=${{ secrets.DISCORD_ADMIN_IDS }}
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: maven
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
 
-    - name: Test with Maven
-      run: mvn clean test
-    
-    - name: Build with Maven
-      run: mvn clean package
+      - name: Test with Maven
+        run: mvn clean test
 
-    - name: Moving JAR to a visible directory for Terraform
-      run: |
-        mv ./target/Ranky.jar ./terraform/Ranky.jar
+      - name: Build with Maven
+        run: mvn clean package
 
-    - name: Login to Amazon ECR
-      run: |
-        aws ecr get-login-password --region eu-west-3 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-west-3.amazonaws.com
+      - name: Moving JAR to a visible directory for Terraform
+        run: |
+          mv ./target/Ranky.jar ./terraform/Ranky.jar
 
-    - name: Create S3 bucket for terraform.tfstate
-      run: |
-        BUCKET_NAME=ranky-s3
-        FILE_PATH=terraform/terraform.tfstate
-        aws s3api create-bucket --bucket $BUCKET_NAME --region eu-west-3 --create-bucket-configuration LocationConstraint=eu-west-3
-  
-    - name: Terraform Init
-      run: terraform init
-      working-directory: ./terraform
+      - name: Login to Amazon ECR
+        run: |
+          aws ecr get-login-password --region eu-west-3 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-west-3.amazonaws.com
 
-    - name: Terraform Apply
-      run: terraform apply -auto-approve -var="AWS_ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID }}"
-      working-directory: ./terraform
-    
-    - name: Upload file changes to S3 bucket
-      if: always()
-      run: |
-        BUCKET_NAME=ranky-s3
-        FILE_PATH=./terraform/terraform.tfstate
-        aws s3 cp $FILE_PATH s3://$BUCKET_NAME/terraform.tfstate
-      env:
-        BUCKET_NAME: ranky-s3
+      - name: Create S3 bucket for terraform.tfstate
+        run: |
+          BUCKET_NAME=ranky-s3
+          FILE_PATH=terraform/terraform.tfstate
+          aws s3api create-bucket --bucket $BUCKET_NAME --region eu-west-3 --create-bucket-configuration LocationConstraint=eu-west-3
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ./terraform
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -var="AWS_ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID }}"
+        working-directory: ./terraform
+
+      - name: Upload file changes to S3 bucket
+        if: always()
+        run: |
+          BUCKET_NAME=ranky-s3
+          FILE_PATH=./terraform/terraform.tfstate
+          aws s3 cp $FILE_PATH s3://$BUCKET_NAME/terraform.tfstate
+        env:
+          BUCKET_NAME: ranky-s3
