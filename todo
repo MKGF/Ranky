@@ -18,3 +18,4 @@ https://jda.wiki/using-jda/interactions/#select-menus-dropdowns
 -Limpiar y ordenar el codigo del button listener y del getrankingservice + testarlo
 -Testar la cache de cuentas
 -Segregar responsabilidades en el button listener e intentar unificar la forma de montar los mensajes efimeros y publicos
+-Empacar los txt dentro del jar

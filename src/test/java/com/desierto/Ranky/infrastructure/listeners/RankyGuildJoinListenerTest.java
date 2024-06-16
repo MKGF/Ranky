@@ -66,6 +66,9 @@ public class RankyGuildJoinListenerTest {
   public void setUp() {
     when(config.getConfigChannel()).thenReturn(CONFIG_CHANNEL);
     when(config.getRankyUserRole()).thenReturn(RANKY_USER_ROLE);
+    when(config.getPathToNonRiotEndorsementMessage()).thenReturn(
+        PATH_TO_NON_RIOT_ENDORSEMENT_MESSAGE_TXT);
+    when(config.getPathToEmbedMessage()).thenReturn(PATH_TO_EMBED_MESSAGE_TXT);
     when(config.getRankingLimit()).thenReturn(100);
     welcomeEmbedMessage = String.format(read(
             PATH_TO_EMBED_MESSAGE_TXT),

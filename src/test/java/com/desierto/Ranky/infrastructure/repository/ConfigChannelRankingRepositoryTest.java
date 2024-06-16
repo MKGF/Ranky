@@ -46,6 +46,7 @@ public class ConfigChannelRankingRepositoryTest {
     gson = new Gson();
     when(config.getRankingLimit()).thenReturn(RANKING_LIMIT);
     when(config.getConfigChannel()).thenReturn(CONFIG_CHANNEL);
+    when(config.getAccountLimit()).thenReturn(10);
   }
 
   @Test

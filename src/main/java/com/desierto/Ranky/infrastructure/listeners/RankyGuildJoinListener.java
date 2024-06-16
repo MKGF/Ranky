@@ -22,8 +22,6 @@ import org.springframework.stereotype.Service;
 public class RankyGuildJoinListener extends ListenerAdapter {
 
   public static final Logger log = Logger.getLogger("RankyGuildJoinListener.class");
-  public static final String PATH_TO_EMBED_MESSAGE_TXT = "src/main/resources/config/onGuildJoinEmbedMessage.txt";
-  public static final String PATH_TO_NON_RIOT_ENDORSEMENT_MESSAGE_TXT = "src/main/resources/config/nonRiotEndorsementMessage.txt";
 
   @Autowired
   private ConfigLoader config;
@@ -51,12 +49,12 @@ public class RankyGuildJoinListener extends ListenerAdapter {
     Guild guild = event.getGuild();
     Member owner = guild.retrieveOwner().complete();
     String welcomeEmbedMessage = String.format(read(
-            PATH_TO_EMBED_MESSAGE_TXT),
+            config.getPathToEmbedMessage()),
         config.getRankyUserRole(),
         config.getConfigChannel(),
         config.getRankingLimit());
     String nonRiotEndorsementMessage = read(
-        PATH_TO_NON_RIOT_ENDORSEMENT_MESSAGE_TXT);
+        config.getPathToNonRiotEndorsementMessage());
     log.info("JOINED GUILD: " + event.getGuild().getName());
     if (owner != null) {
       log.info(

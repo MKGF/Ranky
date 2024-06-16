@@ -33,6 +33,7 @@ public class WelcomeOwnerServiceTest {
   @BeforeAll
   public void setUp() {
     cut = new WelcomeOwnerService(config);
+    when(config.getPathToOwnerPresentationMessage()).thenReturn("");
   }
 
   @Test

@@ -41,4 +41,19 @@ public class ConfigLoader {
 
   @Value("${account.limit}")
   private int accountLimit;
+
+  @Value("${messages.help}")
+  private String pathToHelpMessage;
+
+  @Value("${messages.non_riot_endorsement}")
+  private String pathToNonRiotEndorsementMessage;
+
+  @Value("${messages.embed}")
+  private String pathToEmbedMessage;
+
+  @Value("${messages.to_guild}")
+  private String pathToGuildPresentationMessage;
+
+  @Value("${messages.to_owner}")
+  private String pathToOwnerPresentationMessage;
 }

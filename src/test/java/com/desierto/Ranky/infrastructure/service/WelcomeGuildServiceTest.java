@@ -37,6 +37,7 @@ public class WelcomeGuildServiceTest {
   @BeforeAll
   public void setUp() {
     cut = new WelcomeGuildService(config);
+    when(config.getPathToGuildPresentationMessage()).thenReturn(PATH_TO_MESSAGE_TO_GUILD_TXT);
   }
 
   @Test

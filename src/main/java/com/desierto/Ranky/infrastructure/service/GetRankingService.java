@@ -19,17 +19,18 @@ import com.desierto.Ranky.infrastructure.utils.DiscordOptionRetriever;
 import com.desierto.Ranky.infrastructure.utils.DiscordProgressBar;
 import com.desierto.Ranky.infrastructure.utils.DiscordRankingFormatter;
 import com.google.gson.Gson;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -57,6 +58,21 @@ public class GetRankingService {
   @Autowired
   private AccountsCache accountsCache;
 
+  @Autowired
+  private PrintRankingService printRankingService;
+
+  @NotNull
+  private static SinglePagePrintingFunction getSinglePagePrintingFunction() {
+    return (genericEvent, formattedRanking) -> {
+      SlashCommandInteractionEvent specificEvent = (SlashCommandInteractionEvent) genericEvent;
+      MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
+      messageBuilder.addContent(formattedRanking);
+      Button button = Button.primary(FINAL_PAGE.getId(), "Make it public");
+      messageBuilder.addActionRow(button);
+      specificEvent.getHook().sendMessage(messageBuilder.build()).queue();
+    };
+  }
+
   public void execute(SlashCommandInteractionEvent event) {
     if (event.isFromGuild()) {
       InteractionHook hook = event.getHook();
@@ -81,9 +97,11 @@ public class GetRankingService {
         List<EntryDTO> rankingEntries = toEntryDtos(rankingAccounts,
             Optional.ofNullable(progressBar));
         if (rankingEntries.size() <= config.getAccountLimit()) {
-          handleSinglePageRanking(hook, rankingName, rankingEntries);
+          printRankingService.printSinglePage(event, rankingName, rankingEntries,
+              getSinglePagePrintingFunction());
         } else {
-          handleMultiPageRanking(hook, rankingName, rankingEntries);
+          printRankingService.printMultiPage(event, rankingName, rankingEntries,
+              getMultiPagePrintingFunction(rankingName));
         }
       } catch (ConfigChannelNotFoundException | RankingNotFoundException e) {
         handleExceptionOnSlashCommandEvent(e, event);
@@ -94,27 +112,28 @@ public class GetRankingService {
     }
   }
 
-  private void handleMultiPageRanking(InteractionHook hook, String rankingName,
-      List<EntryDTO> rankingEntries) {
-    int numberOfEntries = rankingEntries.size();
-    int numberOfFractions = numberOfEntries / config.getAccountLimit() + 1;
-    List<List<EntryDTO>> fractions = new ArrayList<>();
-    for (int i = 0; i < numberOfFractions; i++) {
-      int beginning = config.getAccountLimit() * i;
-      int possibleEnd = (config.getAccountLimit() * (i + 1));
-      int end = Math.min(possibleEnd, numberOfEntries);
-      fractions.add(rankingEntries.subList(beginning, end));
-    }
-    for (int i = 0; i < fractions.size(); i++) {
-      MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
-      String formattedRanking =
-          discordRankingFormatter.title(rankingName, Integer.toString(i + 1))
-              + discordRankingFormatter.formatRankingEntries(fractions.get(i));
-      if (i != fractions.size() - 1) {
+  @NotNull
+  private MultiPagePrintingFunction getMultiPagePrintingFunction(String rankingName) {
+    return new MultiPagePrintingFunction() {
+      @Override
+      public void printBeginning(GenericEvent genericEvent, String formattedRanking) {
+        SlashCommandInteractionEvent specificEvent = (SlashCommandInteractionEvent) genericEvent;
+        MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
         Button pageButton = Button.primary(PAGE.getId(), "Make page public");
         messageBuilder.addActionRow(pageButton);
         messageBuilder.addContent(formattedRanking);
-      } else {
+        specificEvent.getHook().sendMessage(messageBuilder.build()).queue();
+      }
+
+      @Override
+      public void printGeneric(GenericEvent genericEvent, String formattedRanking) {
+        printBeginning(genericEvent, formattedRanking);
+      }
+
+      @Override
+      public void printEnding(GenericEvent genericEvent, String formattedRanking) {
+        SlashCommandInteractionEvent specificEvent = (SlashCommandInteractionEvent) genericEvent;
+        MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
         Button pageButton = Button.primary(FINAL_PAGE.getId(), "Make page public");
         messageBuilder.addActionRow(pageButton);
         String finalMessage = formattedRanking + discordRankingFormatter.footer();
@@ -122,21 +141,9 @@ public class GetRankingService {
         Button rankingButton = Button.primary(rankingName,
             "Make whole ranking public");
         messageBuilder.addActionRow(rankingButton);
+        specificEvent.getHook().sendMessage(messageBuilder.build()).queue();
       }
-      hook.sendMessage(messageBuilder.build()).queue();
-    }
-  }
-
-  private void handleSinglePageRanking(InteractionHook hook, String rankingName,
-      List<EntryDTO> rankingEntries) {
-    String formattedRanking = discordRankingFormatter.formatRankingEntries(rankingEntries);
-    String finalMessage = discordRankingFormatter.title(rankingName, "1") + formattedRanking
-        + discordRankingFormatter.footer();
-    MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
-    messageBuilder.addContent(finalMessage);
-    Button button = Button.primary("public", "Make it public");
-    messageBuilder.addActionRow(button);
-    hook.sendMessage(messageBuilder.build()).queue();
+    };
   }
 
   private List<EntryDTO> toEntryDtos(List<Account> rankingAccounts, Optional<Message> progressBar) {
