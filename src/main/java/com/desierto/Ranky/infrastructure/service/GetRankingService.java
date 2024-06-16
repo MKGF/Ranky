@@ -30,7 +30,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -60,18 +59,6 @@ public class GetRankingService {
 
   @Autowired
   private PrintRankingService printRankingService;
-
-  @NotNull
-  private static SinglePagePrintingFunction getSinglePagePrintingFunction() {
-    return (genericEvent, formattedRanking) -> {
-      SlashCommandInteractionEvent specificEvent = (SlashCommandInteractionEvent) genericEvent;
-      MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
-      messageBuilder.addContent(formattedRanking);
-      Button button = Button.primary(FINAL_PAGE.getId(), "Make it public");
-      messageBuilder.addActionRow(button);
-      specificEvent.getHook().sendMessage(messageBuilder.build()).queue();
-    };
-  }
 
   public void execute(SlashCommandInteractionEvent event) {
     if (event.isFromGuild()) {
@@ -112,7 +99,17 @@ public class GetRankingService {
     }
   }
 
-  @NotNull
+  private static SinglePagePrintingFunction getSinglePagePrintingFunction() {
+    return (genericEvent, formattedRanking) -> {
+      SlashCommandInteractionEvent specificEvent = (SlashCommandInteractionEvent) genericEvent;
+      MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
+      messageBuilder.addContent(formattedRanking);
+      Button button = Button.primary(FINAL_PAGE.getId(), "Make it public");
+      messageBuilder.addActionRow(button);
+      specificEvent.getHook().sendMessage(messageBuilder.build()).queue();
+    };
+  }
+
   private MultiPagePrintingFunction getMultiPagePrintingFunction(String rankingName) {
     return new MultiPagePrintingFunction() {
       @Override
@@ -166,7 +163,6 @@ public class GetRankingService {
                   account.getRank().getWinrate().getPercentage().toString()
               );
             }
-
         )
         .toList();
   }

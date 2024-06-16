@@ -22,6 +22,7 @@ import com.desierto.Ranky.infrastructure.service.admin.ConfigChannelContentRetri
 import com.desierto.Ranky.infrastructure.service.admin.EnrolledUsersRetriever;
 import com.desierto.Ranky.infrastructure.service.admin.GuildRetriever;
 import jakarta.annotation.PostConstruct;
+import java.util.concurrent.ExecutorService;
 import java.util.logging.Logger;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.JDA;
@@ -60,6 +61,9 @@ public class RankySlashCommandListener extends ListenerAdapter {
   private ConfigChannelContentRetriever configChannelContentRetriever;
 
   @Autowired
+  private ExecutorService executorService;
+
+  @Autowired
   private JDA bot;
 
   public static final Logger log = Logger.getLogger("RankySlashCommandListener.class");
@@ -77,44 +81,35 @@ public class RankySlashCommandListener extends ListenerAdapter {
     event.deferReply(true).queue();
     event.getHook().setEphemeral(true);
     if (event.getCommandString().contains("/" + HELP.getCommandId())) {
-      Thread thread = new Thread(() -> helpService.execute(event));
-      thread.start();
+      executorService.execute(() -> helpService.execute(event));
     }
     if (event.getCommandString().contains("/" + RANKING.getCommandId())) {
-      Thread thread = new Thread(() -> getRankingService.execute(event));
-      thread.start();
+      executorService.execute(() -> getRankingService.execute(event));
+
     }
     if (event.getCommandString().contains("/" + CREATE.getCommandId())) {
-      Thread thread = new Thread(() -> createRankingService.execute(event));
-      thread.start();
+      executorService.execute(() -> createRankingService.execute(event));
     }
     if (event.getCommandString().contains("/" + DELETE.getCommandId())) {
-      Thread thread = new Thread(() -> deleteRankingService.execute(event));
-      thread.start();
+      executorService.execute(() -> deleteRankingService.execute(event));
     }
     if (event.getCommandString().contains("/" + ADD_ACCOUNTS.getCommandId())) {
-      Thread thread = new Thread(() -> addAccountsService.execute(event));
-      thread.start();
+      executorService.execute(() -> addAccountsService.execute(event));
     }
     if (event.getCommandString().contains("/" + REMOVE_ACCOUNTS.getCommandId())) {
-      Thread thread = new Thread(() -> removeAccountsService.execute(event));
-      thread.start();
+      executorService.execute(() -> removeAccountsService.execute(event));
     }
     if (event.getCommandString().contains("/" + GET_GUILDS.getCommandId())) {
-      Thread thread = new Thread(() -> guildRetriever.execute(event));
-      thread.start();
+      executorService.execute(() -> guildRetriever.execute(event));
     }
     if (event.getCommandString().contains("/" + GET_ENROLLED_USERS.getCommandId())) {
-      Thread thread = new Thread(() -> enrolledUsersRetriever.execute(event));
-      thread.start();
+      executorService.execute(() -> enrolledUsersRetriever.execute(event));
     }
     if (event.getCommandString().contains("/" + EXISTS_CONFIG_CHANNEL.getCommandId())) {
-      Thread thread = new Thread(() -> configChannelChecker.execute(event));
-      thread.start();
+      executorService.execute(() -> configChannelChecker.execute(event));
     }
     if (event.getCommandString().contains("/" + RETRIEVE_CONFIG_CHANNEL_CONTENT.getCommandId())) {
-      Thread thread = new Thread(() -> configChannelContentRetriever.execute(event));
-      thread.start();
+      executorService.execute(() -> configChannelContentRetriever.execute(event));
     }
   }
 }

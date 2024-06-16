@@ -11,7 +11,6 @@ import com.desierto.Ranky.infrastructure.dto.EntryDTO;
 import com.desierto.Ranky.infrastructure.service.MultiPagePrintingFunction;
 import com.desierto.Ranky.infrastructure.service.PrintRankingService;
 import com.desierto.Ranky.infrastructure.service.SinglePagePrintingFunction;
-import com.desierto.Ranky.infrastructure.utils.DiscordProgressBar;
 import com.desierto.Ranky.infrastructure.utils.DiscordRankingFormatter;
 import jakarta.annotation.PostConstruct;
 import java.util.List;
@@ -22,7 +21,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -84,7 +82,7 @@ public class RankyButtonClickListener extends ListenerAdapter {
       Optional<List<Account>> accounts = accountsCache.find(
           event.getGuild().getId() + ":" + rankingName);
       if (accounts.isPresent()) {
-        List<EntryDTO> rankingEntries = toEntryDtos(accounts.get(), Optional.empty());
+        List<EntryDTO> rankingEntries = toEntryDtos(accounts.get());
         if (rankingEntries.size() <= config.getAccountLimit()) {
           printRankingService.printSinglePage(event, rankingName, rankingEntries,
               getSinglePagePrintingFunction(rankingName));
@@ -149,26 +147,20 @@ public class RankyButtonClickListener extends ListenerAdapter {
     return Objects.equals(event.getButton().getId(), FINAL_PAGE.getId());
   }
 
-  private List<EntryDTO> toEntryDtos(List<Account> rankingAccounts, Optional<Message> progressBar) {
+  private List<EntryDTO> toEntryDtos(List<Account> rankingAccounts) {
     AtomicInteger index = new AtomicInteger(1);
     return rankingAccounts.stream()
         .sorted()
-        .map(account -> {
-              progressBar.ifPresent(message -> message.editMessage(
-                      DiscordProgressBar.getProgress(
-                          50 + (index.get() * 100 / rankingAccounts.size()) / 2))
-                  .complete());
-              return new EntryDTO(
-                  index.getAndIncrement(),
-                  account.getName(),
-                  emojiFromTier(account.getRank().getTier()),
-                  account.getRank().getDivision().toString(),
-                  account.getRank().getLeaguePoints(),
-                  account.getRank().getWinrate().getWins().toString(),
-                  account.getRank().getWinrate().getLosses().toString(),
-                  account.getRank().getWinrate().getPercentage().toString()
-              );
-            }
+        .map(account -> new EntryDTO(
+                index.getAndIncrement(),
+                account.getName(),
+                emojiFromTier(account.getRank().getTier()),
+                account.getRank().getDivision().toString(),
+                account.getRank().getLeaguePoints(),
+                account.getRank().getWinrate().getWins().toString(),
+                account.getRank().getWinrate().getLosses().toString(),
+                account.getRank().getWinrate().getPercentage().toString()
+            )
 
         )
         .toList();
