@@ -50,9 +50,10 @@ jobs:
     - name: Build with Maven
       run: mvn clean package
 
-    - name: Moving JAR to a visible directory for Terraform
+    - name: Moving JAR and classes/config files to a visible directory for Terraform
       run: |
         mv ./target/Ranky.jar ./terraform/Ranky.jar
+        mv ./target/classes/config ./terraform/classes/config
 
     - name: Login to Amazon ECR
       run: |
