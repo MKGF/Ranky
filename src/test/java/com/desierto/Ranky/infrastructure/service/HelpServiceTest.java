@@ -33,6 +33,7 @@ public class HelpServiceTest {
   @BeforeAll
   public void setUp() {
     cut = new HelpService(config);
+    when(config.getPathToHelpMessage()).thenReturn(PATH_TO_HELP_TXT);
   }
 
   @Test

@@ -27,6 +27,12 @@ public class AccountsCache {
     introductionTimes = new HashMap<>();
   }
 
+  public AccountsCache(Map<String, List<Account>> rankingsParam,
+      Map<String, LocalDateTime> introductionTimesParam) {
+    rankings = rankingsParam;
+    introductionTimes = introductionTimesParam;
+  }
+
   public void save(String key, List<Account> accounts) {
     try {
       rankings.remove(key);
@@ -49,7 +55,7 @@ public class AccountsCache {
   }
 
   @Scheduled(fixedRate = 1000 * 60 * CACHE_MINUTES)
-  private void clearCache() {
+  protected void clearCache() {
     List<String> keysToRemoveFromCache = new ArrayList<>();
     introductionTimes.forEach((key, time) -> {
       if (LocalDateTime.now().isAfter(time.plusMinutes(CACHE_MINUTES))) {
