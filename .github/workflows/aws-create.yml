@@ -6,8 +6,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    env:
+      BUCKET_NAME: ranky-s3
 
     steps:
 
@@ -80,5 +80,13 @@ jobs:
           BUCKET_NAME=ranky-s3
           FILE_PATH=./terraform/terraform.tfstate
           aws s3 cp $FILE_PATH s3://$BUCKET_NAME/terraform.tfstate
-        env:
-          BUCKET_NAME: ranky-s3
+
+      - name: Upload SSH Key .pem to S3 bucket
+        run: |
+          FILE_PATH=./terraform/ranky-ec2.pem
+          aws s3 cp $FILE_PATH s3://$BUCKET_NAME/ranky-ec2-ssh.pem
+      
+      - name: Upload Ranky EC2 IP to S3 bucket
+        run: |
+          FILE_PATH=./terraform/ranky-ec2-ip.txt
+          aws s3 cp $FILE_PATH s3://$BUCKET_NAME/ranky-ec2-ip.txt

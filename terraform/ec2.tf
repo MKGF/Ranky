@@ -34,6 +34,14 @@ resource "aws_instance" "ranky-ec2" {
   ]
 }
 
+resource "null_resource" "ranky-ec2-ip-to-file" {
+  depends_on = [aws_instance.ranky-ec2]
+
+  provisioner "local-exec" {
+    command = "echo ${aws_instance.ranky-ec2.public_ip} > ranky-ec2-ip.txt"
+  }
+}
+
 resource "aws_iam_instance_profile" "ranky-ec2-profile" {
   name = "ranky-ec2-ecr-instance-profile"
   role = aws_iam_role.ranky-ec2-role.name
