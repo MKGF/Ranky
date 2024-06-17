@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 import com.desierto.Ranky.infrastructure.service.AddAccountsService;
 import com.desierto.Ranky.infrastructure.service.CreateRankingService;
 import com.desierto.Ranky.infrastructure.service.DeleteRankingService;
+import com.desierto.Ranky.infrastructure.service.DummyService;
 import com.desierto.Ranky.infrastructure.service.GetRankingService;
 import com.desierto.Ranky.infrastructure.service.HelpService;
 import com.desierto.Ranky.infrastructure.service.RemoveAccountsService;
@@ -79,6 +80,9 @@ public class RankySlashCommandListenerTest {
   ConfigChannelContentRetriever configChannelContentRetriever;
 
   @Mock
+  DummyService dummyService;
+
+  @Mock
   ExecutorService executorService;
 
 
@@ -95,6 +99,7 @@ public class RankySlashCommandListenerTest {
         enrolledUsersRetriever,
         configChannelChecker,
         configChannelContentRetriever,
+        dummyService,
         executorService,
         bot
     );

@@ -3,6 +3,7 @@ package com.desierto.Ranky.infrastructure.listeners;
 import static com.desierto.Ranky.infrastructure.commands.Command.ADD_ACCOUNTS;
 import static com.desierto.Ranky.infrastructure.commands.Command.CREATE;
 import static com.desierto.Ranky.infrastructure.commands.Command.DELETE;
+import static com.desierto.Ranky.infrastructure.commands.Command.DUMMY;
 import static com.desierto.Ranky.infrastructure.commands.Command.EXISTS_CONFIG_CHANNEL;
 import static com.desierto.Ranky.infrastructure.commands.Command.GET_ENROLLED_USERS;
 import static com.desierto.Ranky.infrastructure.commands.Command.GET_GUILDS;
@@ -14,6 +15,7 @@ import static com.desierto.Ranky.infrastructure.commands.Command.RETRIEVE_CONFIG
 import com.desierto.Ranky.infrastructure.service.AddAccountsService;
 import com.desierto.Ranky.infrastructure.service.CreateRankingService;
 import com.desierto.Ranky.infrastructure.service.DeleteRankingService;
+import com.desierto.Ranky.infrastructure.service.DummyService;
 import com.desierto.Ranky.infrastructure.service.GetRankingService;
 import com.desierto.Ranky.infrastructure.service.HelpService;
 import com.desierto.Ranky.infrastructure.service.RemoveAccountsService;
@@ -59,6 +61,9 @@ public class RankySlashCommandListener extends ListenerAdapter {
 
   @Autowired
   private ConfigChannelContentRetriever configChannelContentRetriever;
+
+  @Autowired
+  private DummyService dummyService;
 
   @Autowired
   private ExecutorService executorService;
@@ -110,6 +115,9 @@ public class RankySlashCommandListener extends ListenerAdapter {
     }
     if (event.getCommandString().contains("/" + RETRIEVE_CONFIG_CHANNEL_CONTENT.getCommandId())) {
       executorService.execute(() -> configChannelContentRetriever.execute(event));
+    }
+    if (event.getCommandString().contains("/" + DUMMY.getCommandId())) {
+      executorService.execute(() -> dummyService.execute(event));
     }
   }
 }
