@@ -54,7 +54,7 @@ jobs:
       - name: Moving JAR to a visible directory for Terraform
         run: |
           mv ./target/Ranky.jar ./terraform/Ranky.jar
-          mv ./target/classes/config ./terraform/classes/config
+          mv ./target/classes/config ./terraform/config
 
       - name: Login to Amazon ECR
         run: |
