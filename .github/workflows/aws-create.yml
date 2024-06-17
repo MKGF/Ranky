@@ -83,7 +83,7 @@ jobs:
 
       - name: Upload SSH Key .pem to S3 bucket
         run: |
-          FILE_PATH=./terraform/ranky-ec2.pem
+          FILE_PATH=./terraform/ranky-ec2-ssh.pem
           aws s3 cp $FILE_PATH s3://$BUCKET_NAME/ranky-ec2-ssh.pem
       
       - name: Upload Ranky EC2 IP to S3 bucket
