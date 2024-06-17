@@ -30,10 +30,14 @@ public class Command {
 
   public static final Command RETRIEVE_CONFIG_CHANNEL_CONTENT;
 
+  public static final Command DUMMY;
+
 
   static {
     HELP = Command.of("help",
-        "Shows a detailed explanation of the possibilites of Ranky", emptyList());
+        "Shows a detailed explanation of the possibilites of Ranky", List.of(
+            new Parameter("name", "Name of the ranking", true, OptionType.STRING)
+        ));
     RANKING = Command.of(
         "ranking",
         "Shows information of the specified ranking",
@@ -126,6 +130,11 @@ public class Command {
                 OptionType.STRING
             )
         )
+    );
+    DUMMY = Command.of(
+        "dummy",
+        "Dummy description",
+        emptyList()
     );
   }
 

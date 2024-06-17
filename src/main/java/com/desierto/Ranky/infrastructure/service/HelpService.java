@@ -4,6 +4,7 @@ import static com.desierto.Ranky.infrastructure.utils.DiscordMessages.EXECUTE_CO
 
 import com.desierto.Ranky.domain.utils.FileReader;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
+import com.desierto.Ranky.infrastructure.utils.DiscordOptionRetriever;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -18,11 +19,15 @@ public class HelpService {
   @Autowired
   private ConfigLoader config;
 
+  @Autowired
+  private DiscordOptionRetriever discordOptionRetriever;
+
   public void execute(SlashCommandInteractionEvent event) {
     if (event.isFromGuild()) {
       InteractionHook hook = event.getHook();
       EmbedBuilder message = new EmbedBuilder();
-      String formattedMessage = String.format(FileReader.read(config.getPathToHelpMessage()),
+      String formattedMessage = String.format(
+          FileReader.read(discordOptionRetriever.fromEventGetObjectName(event)),
           config.getRankingLimit());
       message.setTitle("Ranky manual");
       message.setDescription(formattedMessage);
