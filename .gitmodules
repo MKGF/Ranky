@@ -1,6 +1,3 @@
-[submodule "mkgf.github.io"]
-	path = mkgf.github.io
-	url = https://github.com/MKGF/mkgf.github.io
 [submodule "rankybot.github.io"]
 	path = rankybot.github.io
 	url = https://github.com/RankyBot/rankybot.github.io
