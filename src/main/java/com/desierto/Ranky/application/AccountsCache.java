@@ -35,19 +35,19 @@ public class AccountsCache {
 
   public void save(String key, List<Account> accounts) {
     try {
-      rankings.remove(key);
+      rankings.remove(key.toLowerCase());
     } catch (NullPointerException ignored) {
     }
-    rankings.put(key, accounts);
-    introductionTimes.put(key, LocalDateTime.now());
-    log.info(String.format("Introduced accounts in cache with id %s", key));
+    rankings.put(key.toLowerCase(), accounts);
+    introductionTimes.put(key.toLowerCase(), LocalDateTime.now());
+    log.info(String.format("Introduced accounts in cache with id %s", key.toLowerCase()));
   }
 
   public Optional<List<Account>> find(String key) {
     Optional<List<Account>> optionalAccounts;
     try {
-      optionalAccounts = Optional.of(rankings.get(key));
-      log.info(String.format("Retrieved accounts from cache for id %s", key));
+      optionalAccounts = Optional.of(rankings.get(key.toLowerCase()));
+      log.info(String.format("Retrieved accounts from cache for id %s", key.toLowerCase()));
     } catch (NullPointerException ignored) {
       optionalAccounts = Optional.empty();
     }
@@ -59,12 +59,12 @@ public class AccountsCache {
     List<String> keysToRemoveFromCache = new ArrayList<>();
     introductionTimes.forEach((key, time) -> {
       if (LocalDateTime.now().isAfter(time.plusMinutes(CACHE_MINUTES))) {
-        keysToRemoveFromCache.add(key);
+        keysToRemoveFromCache.add(key.toLowerCase());
       }
     });
     keysToRemoveFromCache.forEach(key -> {
-      rankings.remove(key);
-      introductionTimes.remove(key);
+      rankings.remove(key.toLowerCase());
+      introductionTimes.remove(key.toLowerCase());
     });
     log.info(String.format("Cleared from cache: %s", keysToRemoveFromCache));
   }
