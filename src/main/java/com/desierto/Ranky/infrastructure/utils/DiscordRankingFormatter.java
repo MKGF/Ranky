@@ -100,7 +100,7 @@ public class DiscordRankingFormatter {
   }
 
   public String footer() {
-    return LINE_BREAK + config.getCreator() /*+ LINE_BREAK + config.getSponsors()*/;
+    return LINE_BREAK /*+ config.getCreator() + LINE_BREAK + config.getSponsors()*/;
   }
 
   public String title(String title, String page) {
