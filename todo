@@ -18,3 +18,5 @@ https://jda.wiki/using-jda/interactions/#select-menus-dropdowns
 -Claimear una cuenta para que te permita imprimir tu pagina y te permita tambien resaltar tu puesto en la clasificacion
 -Cuando se intenta imprimir el ranking y no se ha escrito el comando con el nombre real del ranking (como por ejemplo, todo en caps) no funciona la cache
   + Hacer el comando ranking case insensitive
+-Frontalizar la interfaz de ranky para los usuarios que no esten acostumbrados al uso de comandos
+  + Con esto se puede frontalizar los rankings!!!
