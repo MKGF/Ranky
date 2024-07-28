@@ -20,3 +20,5 @@ https://jda.wiki/using-jda/interactions/#select-menus-dropdowns
   + Hacer el comando ranking case insensitive
 -Frontalizar la interfaz de ranky para los usuarios que no esten acostumbrados al uso de comandos
   + Con esto se puede frontalizar los rankings!!!
+-Comando para repetir el ultimo comando que se hizo
+  + La persistencia debe ir en el config channel
