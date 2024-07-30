@@ -43,6 +43,13 @@ jobs:
         run: |
           echo "$EC2_PEM_KEY" > ec2_key.pem
           chmod 600 ec2_key.pem
+      
+      - name: Add EC2 to known hosts
+        env:
+          EC2_IP_ADDRESS: ${{ secrets.RANKY_EC2_IP_ADDRESS }}
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H $EC2_IP_ADDRESS >> ~/.ssh/known_hosts
 
       - name: Transfer files to EC2
         env:
