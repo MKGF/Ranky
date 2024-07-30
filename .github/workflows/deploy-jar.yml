@@ -47,7 +47,7 @@ jobs:
       - name: Transfer files to EC2
         env:
           EC2_IP_ADDRESS: ${{ secrets.RANKY_EC2_IP_ADDRESS }}
-          HOST: "ec2-user@$EC2_IP_ADDRESS"
+          HOST: "ec2-user@${{ secrets.RANKY_EC2_IP_ADDRESS }}"
         run: |
           scp -i ec2_key.pem ./target/Ranky.jar $HOST:/home/ec2-user/Ranky.jar
           scp -i ec2_key.pem -r ./target/classes/config $HOST:/home/ec2-user/config
@@ -55,7 +55,7 @@ jobs:
       - name: Update Docker container
         env:
           EC2_IP_ADDRESS: ${{ secrets.RANKY_EC2_IP_ADDRESS }}
-          HOST: "ec2-user@$EC2_IP_ADDRESS"
+          HOST: "ec2-user@${{ secrets.RANKY_EC2_IP_ADDRESS }}"
           CONTAINER_NAME: "ranky-app"
           EC2_JAR_PATH: "/home/ec2-user/Ranky.jar"
           EC2_CONFIG_PATH: "/home/ec2-user/config"
