@@ -70,8 +70,8 @@ jobs:
           CONTAINER_CONFIG_PATH: "./app/classes/config"
         run: |
           ssh -i ec2_key.pem $HOST "sudo docker stop $CONTAINER_NAME"
-          ssh -i ec2_key.pem $HOST "sudo docker cp $EC2_JAR_PATH/. $CONTAINER_NAME:$CONTAINER_JAR_PATH"
-          ssh -i ec2_key.pem $HOST "sudo docker cp $EC2_CONFIG_PATH/. $CONTAINER_NAME:$CONTAINER_CONFIG_PATH"
+          ssh -i ec2_key.pem $HOST "sudo docker cp $EC2_JAR_PATH $CONTAINER_NAME:$CONTAINER_JAR_PATH"
+          ssh -i ec2_key.pem $HOST "sudo docker cp $EC2_CONFIG_PATH $CONTAINER_NAME:$CONTAINER_CONFIG_PATH"
           ssh -i ec2_key.pem $HOST "sudo docker start $CONTAINER_NAME"
           ssh -i ec2_key.pem $HOST "rm -rf $EC2_JAR_PATH"
           ssh -i ec2_key.pem $HOST "rm -rf $EC2_CONFIG_PATH"
