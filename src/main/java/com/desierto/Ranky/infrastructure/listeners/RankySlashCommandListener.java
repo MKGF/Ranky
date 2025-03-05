@@ -1,15 +1,6 @@
 package com.desierto.Ranky.infrastructure.listeners;
 
-import static com.desierto.Ranky.infrastructure.commands.Command.ADD_ACCOUNTS;
-import static com.desierto.Ranky.infrastructure.commands.Command.CREATE;
-import static com.desierto.Ranky.infrastructure.commands.Command.DELETE;
-import static com.desierto.Ranky.infrastructure.commands.Command.EXISTS_CONFIG_CHANNEL;
-import static com.desierto.Ranky.infrastructure.commands.Command.GET_ENROLLED_USERS;
-import static com.desierto.Ranky.infrastructure.commands.Command.GET_GUILDS;
-import static com.desierto.Ranky.infrastructure.commands.Command.HELP;
-import static com.desierto.Ranky.infrastructure.commands.Command.RANKING;
-import static com.desierto.Ranky.infrastructure.commands.Command.REMOVE_ACCOUNTS;
-import static com.desierto.Ranky.infrastructure.commands.Command.RETRIEVE_CONFIG_CHANNEL_CONTENT;
+import static com.desierto.Ranky.infrastructure.commands.Command.*;
 
 import com.desierto.Ranky.infrastructure.service.AddAccountsService;
 import com.desierto.Ranky.infrastructure.service.CreateRankingService;
@@ -85,7 +76,6 @@ public class RankySlashCommandListener extends ListenerAdapter {
     }
     if (event.getCommandString().contains("/" + RANKING.getCommandId())) {
       executorService.execute(() -> getRankingService.execute(event));
-
     }
     if (event.getCommandString().contains("/" + CREATE.getCommandId())) {
       executorService.execute(() -> createRankingService.execute(event));

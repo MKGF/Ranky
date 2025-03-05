@@ -38,7 +38,8 @@ public class Command {
         "ranking",
         "Shows information of the specified ranking",
         List.of(
-            new Parameter("name", "Name of the ranking", true, OptionType.STRING)
+            new Parameter("name", "Name of the ranking", true, OptionType.STRING),
+            new Parameter("queuetype", "Can be 'flex' or 'solo' (if empty = solo)", false, OptionType.STRING)
         )
     );
     CREATE = Command.of(

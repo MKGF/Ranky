@@ -1,5 +1,4 @@
 package com.desierto.Ranky.infrastructure.utils;
-
 import com.desierto.Ranky.domain.entity.Account;
 import java.util.Arrays;
 import java.util.List;
@@ -7,6 +6,8 @@ import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.springframework.stereotype.Component;
+
+import static com.desierto.Ranky.infrastructure.utils.Constants.*;
 
 @Component
 public class DiscordOptionRetriever {
@@ -26,6 +27,14 @@ public class DiscordOptionRetriever {
       }
       return new Account(strings[0], strings[1]);
     }).collect(Collectors.toList());
+  }
+
+  public String fromEventQueueType(SlashCommandInteractionEvent event) {
+    List<String> params = fromSlashCommandInteractionEvent(event);
+    if (params.size() > 1) {
+      return params.get(1);
+    }
+    return "solo";
   }
 
   private static List<String> fromSlashCommandInteractionEvent(SlashCommandInteractionEvent event) {
