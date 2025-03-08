@@ -90,3 +90,36 @@ jobs:
         run: |
           FILE_PATH=./terraform/ranky-ec2-ip.txt
           aws s3 cp $FILE_PATH s3://$BUCKET_NAME/ranky-ec2-ip.txt
+      - name: Get repo's public key
+        run: |
+          RESPONSE=$(curl -s -H "Authorization: token ${{ secrets.TOKEN_GITHUB }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/MKGF/Ranky/actions/secrets/public-key)
+            
+          echo "KEY_ID=$(echo $RESPONSE | jq -r '.key_id')" >> $GITHUB_ENV
+          echo "PUBLIC_KEY=$(echo $RESPONSE | jq -r '.key')" >> $GITHUB_ENV
+      - name: Encrypt secrets
+        run: |
+          encrypt_secret() {
+            echo -n "$1" | \
+            openssl rsautl -encrypt -pubin -inkey <(echo "-----BEGIN PUBLIC KEY-----\n${{ env.PUBLIC_KEY }}\n-----END PUBLIC KEY-----") | \
+            base64 -w0
+          }
+
+          echo "::add-mask::$(encrypt_secret '${{ secrets.LOCAL_PEM_KEY }}')"
+          echo "::set-output name=encrypted_pem_key::$(encrypt_secret '${{ secrets.LOCAL_PEM_KEY }}')"
+
+          echo "::add-mask::$(encrypt_secret '${{ secrets.LOCAL_IP_ADDRESS }}')"
+          echo "::set-output name=encrypted_ip::$(encrypt_secret '${{ secrets.LOCAL_IP_ADDRESS }}')"
+
+      - name: Update GitHub Secrets
+        run: |
+          curl -X PUT -H "Authorization: token ${{ secrets.TOKEN_GITHUB }}" \
+               -H "Accept: application/vnd.github.v3+json" \
+               https://api.github.com/repos/MKGF/Ranky/actions/secrets/RANKY_EC2_PEM_KEY \
+               -d "{\"encrypted_value\":\"${{ env.ENCRYPTED_KEY }}\", \"key_id\":\"${{ env.KEY_ID }}\"}"
+
+          curl -X PUT -H "Authorization: token ${{ secrets.TOKEN_GITHUB }}" \
+               -H "Accept: application/vnd.github.v3+json" \
+               https://api.github.com/repos/MKGF/Ranky/actions/secrets/RANKY_EC2_IP_ADDRESS \
+               -d "{\"encrypted_value\":\"${{ env.ENCRYPTED_IP }}\", \"key_id\":\"${{ env.KEY_ID }}\"}"
