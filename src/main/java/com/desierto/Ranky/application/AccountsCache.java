@@ -1,5 +1,6 @@
 package com.desierto.Ranky.application;
 
+import com.desierto.Ranky.infrastructure.utils.*;
 import com.desierto.Ranky.domain.entity.Account;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,6 +22,8 @@ public class AccountsCache {
   private Map<String, List<Account>> rankings;
 
   private Map<String, LocalDateTime> introductionTimes;
+
+  private String cachedQueueType = Constants.SOLO;
 
   public AccountsCache() {
     rankings = new HashMap<>();
@@ -52,6 +55,14 @@ public class AccountsCache {
       optionalAccounts = Optional.empty();
     }
     return optionalAccounts;
+  }
+
+  public void setCacheQueueType(String queueType) {
+    cachedQueueType = queueType;
+  }
+
+  public boolean isSameQueueTypeAsCached (String queueType) {
+    return cachedQueueType.equals(queueType);
   }
 
   @Scheduled(fixedRate = 1000 * 60 * CACHE_MINUTES)

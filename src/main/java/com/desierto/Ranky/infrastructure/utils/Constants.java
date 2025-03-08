@@ -4,6 +4,6 @@ import lombok.Getter;
 
 @Getter
 public class Constants {
-    private final static String FLEX = "flex";
-    private final static String SOLO = "solo";
+    public final static String FLEX = "flex";
+    public final static String SOLO = "solo";
 }

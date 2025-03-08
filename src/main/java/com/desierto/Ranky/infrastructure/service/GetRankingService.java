@@ -78,6 +78,11 @@ public class GetRankingService {
         if (cachedAccounts.isEmpty()) {
           progressBar = hook.sendMessage(DiscordProgressBar.getProgress(0)).complete();
           rankingAccounts = getRankingEntries(ranking, hook, progressBar, queueType);
+          accountsCache.setCacheQueueType(queueType);
+        } else if (!accountsCache.isSameQueueTypeAsCached(queueType)){
+          progressBar = hook.sendMessage(DiscordProgressBar.getProgress(0)).complete();
+          rankingAccounts = getRankingEntries(ranking, hook, progressBar, queueType);
+          accountsCache.setCacheQueueType(queueType);
         } else {
           rankingAccounts = cachedAccounts.get();
         }
