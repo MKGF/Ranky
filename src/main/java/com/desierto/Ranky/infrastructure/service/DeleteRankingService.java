@@ -4,10 +4,10 @@ import static com.desierto.Ranky.infrastructure.utils.DiscordExceptionHandler.ha
 import static com.desierto.Ranky.infrastructure.utils.DiscordMessages.COMMAND_NOT_ALLOWED;
 import static com.desierto.Ranky.infrastructure.utils.DiscordMessages.EXECUTE_COMMAND_FROM_SERVER;
 
-import com.desierto.Ranky.domain.exception.ConfigChannelNotFoundException;
 import com.desierto.Ranky.domain.exception.ranking.RankingCouldNotBeDeletedException;
 import com.desierto.Ranky.domain.exception.ranking.RankingNotFoundException;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
+import com.desierto.Ranky.infrastructure.exceptions.ConfigChannelNotFoundException;
 import com.desierto.Ranky.infrastructure.repository.ConfigChannelRankingRepository;
 import com.google.gson.Gson;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;

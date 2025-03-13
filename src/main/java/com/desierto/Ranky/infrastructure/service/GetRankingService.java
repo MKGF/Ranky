@@ -9,11 +9,11 @@ import static com.desierto.Ranky.infrastructure.utils.DiscordRankingToEmojiMappe
 import com.desierto.Ranky.application.AccountsCache;
 import com.desierto.Ranky.domain.entity.Account;
 import com.desierto.Ranky.domain.entity.Ranking;
-import com.desierto.Ranky.domain.exception.ConfigChannelNotFoundException;
 import com.desierto.Ranky.domain.exception.ranking.RankingNotFoundException;
 import com.desierto.Ranky.domain.repository.RiotAccountRepository;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
 import com.desierto.Ranky.infrastructure.dto.EntryDTO;
+import com.desierto.Ranky.infrastructure.exceptions.ConfigChannelNotFoundException;
 import com.desierto.Ranky.infrastructure.repository.ConfigChannelRankingRepository;
 import com.desierto.Ranky.infrastructure.utils.DiscordOptionRetriever;
 import com.desierto.Ranky.infrastructure.utils.DiscordProgressBar;

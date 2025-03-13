@@ -5,9 +5,9 @@ import static com.desierto.Ranky.infrastructure.utils.DiscordMessages.COMMAND_NO
 import static com.desierto.Ranky.infrastructure.utils.DiscordMessages.EXECUTE_COMMAND_FROM_SERVER;
 
 import com.desierto.Ranky.domain.entity.Ranking;
-import com.desierto.Ranky.domain.exception.ConfigChannelNotFoundException;
 import com.desierto.Ranky.domain.exception.RankingAlreadyExistsException;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
+import com.desierto.Ranky.infrastructure.exceptions.ConfigChannelNotFoundException;
 import com.desierto.Ranky.infrastructure.repository.ConfigChannelRankingRepository;
 import com.desierto.Ranky.infrastructure.utils.DiscordOptionRetriever;
 import com.google.gson.Gson;

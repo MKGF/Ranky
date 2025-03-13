@@ -1,4 +1,4 @@
-package com.desierto.Ranky.domain.exception;
+package com.desierto.Ranky.infrastructure.exceptions;
 
 public class ExcessiveAccountsException extends RuntimeException {
 

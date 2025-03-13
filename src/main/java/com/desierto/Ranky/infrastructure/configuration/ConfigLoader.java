@@ -27,8 +27,6 @@ public class ConfigLoader {
   @Value("${config.channel}")
   private String configChannel;
 
-  @Value("${commands.channel}")
-  private String commandsChannel;
 
   @Value("${message.listener.enabled}")
   private Boolean isMessageListenerEnabled;

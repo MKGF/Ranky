@@ -9,7 +9,6 @@ import static com.desierto.Ranky.infrastructure.commands.Command.GET_GUILDS;
 import static com.desierto.Ranky.infrastructure.commands.Command.HELP;
 import static com.desierto.Ranky.infrastructure.commands.Command.RANKING;
 import static com.desierto.Ranky.infrastructure.commands.Command.REMOVE_ACCOUNTS;
-import static com.desierto.Ranky.infrastructure.commands.Command.REPEAT;
 import static com.desierto.Ranky.infrastructure.commands.Command.RETRIEVE_CONFIG_CHANNEL_CONTENT;
 
 import com.desierto.Ranky.infrastructure.service.AddAccountsService;
@@ -18,7 +17,6 @@ import com.desierto.Ranky.infrastructure.service.DeleteRankingService;
 import com.desierto.Ranky.infrastructure.service.GetRankingService;
 import com.desierto.Ranky.infrastructure.service.HelpService;
 import com.desierto.Ranky.infrastructure.service.RemoveAccountsService;
-import com.desierto.Ranky.infrastructure.service.RepeatCommandService;
 import com.desierto.Ranky.infrastructure.service.admin.ConfigChannelChecker;
 import com.desierto.Ranky.infrastructure.service.admin.ConfigChannelContentRetriever;
 import com.desierto.Ranky.infrastructure.service.admin.EnrolledUsersRetriever;
@@ -64,9 +62,6 @@ public class RankySlashCommandListener extends ListenerAdapter {
 
   @Autowired
   private ExecutorService executorService;
-
-  @Autowired
-  private RepeatCommandService repeatCommandService;
 
   @Autowired
   private JDA bot;
@@ -118,9 +113,6 @@ public class RankySlashCommandListener extends ListenerAdapter {
     }
     if (event.getCommandString().contains("/" + RETRIEVE_CONFIG_CHANNEL_CONTENT.getCommandId())) {
       executorService.execute(() -> configChannelContentRetriever.execute(event));
-    }
-    if (event.getCommandString().contains("/" + REPEAT.getCommandId())) {
-      executorService.execute(() -> repeatCommandService.execute(event));
     }
   }
 }

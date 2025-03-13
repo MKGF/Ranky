@@ -1,9 +1,9 @@
 package com.desierto.Ranky.infrastructure.service;
 
 import com.desierto.Ranky.domain.entity.Ranking;
-import com.desierto.Ranky.domain.exception.ConfigChannelNotFoundException;
 import com.desierto.Ranky.domain.exception.ranking.RankingNotFoundException;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
+import com.desierto.Ranky.infrastructure.exceptions.ConfigChannelNotFoundException;
 import com.desierto.Ranky.infrastructure.repository.ConfigChannelRankingRepository;
 import com.google.gson.Gson;
 import java.util.List;
