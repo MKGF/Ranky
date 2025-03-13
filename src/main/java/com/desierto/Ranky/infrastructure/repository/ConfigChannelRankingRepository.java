@@ -11,6 +11,7 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -87,6 +88,11 @@ public class ConfigChannelRankingRepository implements RankingRepository {
     return fromMessages(messagesOfRanking).toDomain();
   }
 
+  @Override
+  public List<Ranking> findAll() {
+    return retrieveAll().stream().map(RankingDTO::toDomain).collect(Collectors.toList());
+  }
+
   private TextChannel getConfigChannel(Guild guild) {
     return guild.getTextChannels().stream()
         .filter(textChannel -> textChannel.getName().equalsIgnoreCase(config.getConfigChannel()))
@@ -114,6 +120,16 @@ public class ConfigChannelRankingRepository implements RankingRepository {
           removedSuccessfully.set(true);
         });
     return removedSuccessfully.get();
+  }
+
+  private List<RankingDTO> retrieveAll() {
+    List<RankingDTO> rankings = new ArrayList<>();
+    configChannel.getHistory().retrievePast(config.getRankingLimit()).complete()
+        .forEach(message -> {
+          RankingDTO rankingDTO = fromMessages(new ArrayList<>(List.of(message)));
+          rankings.add(rankingDTO);
+        });
+    return rankings;
   }
 
   private List<Message> retrieveMessagesOfRanking(String rankingId) {

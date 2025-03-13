@@ -30,6 +30,8 @@ public class Command {
 
   public static final Command RETRIEVE_CONFIG_CHANNEL_CONTENT;
 
+  public static final Command REPEAT;
+
 
   static {
     HELP = Command.of("help",
@@ -127,6 +129,7 @@ public class Command {
             )
         )
     );
+    REPEAT = Command.of("repeat", "Repeat your last command", List.of());
   }
 
   String commandId;
@@ -154,7 +157,8 @@ public class Command {
         GET_GUILDS.toDiscordCommand(),
         GET_ENROLLED_USERS.toDiscordCommand(),
         EXISTS_CONFIG_CHANNEL.toDiscordCommand(),
-        RETRIEVE_CONFIG_CHANNEL_CONTENT.toDiscordCommand()
+        RETRIEVE_CONFIG_CHANNEL_CONTENT.toDiscordCommand(),
+        REPEAT.toDiscordCommand()
     );
   }
 

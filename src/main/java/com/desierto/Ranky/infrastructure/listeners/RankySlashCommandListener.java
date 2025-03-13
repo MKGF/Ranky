@@ -9,6 +9,7 @@ import static com.desierto.Ranky.infrastructure.commands.Command.GET_GUILDS;
 import static com.desierto.Ranky.infrastructure.commands.Command.HELP;
 import static com.desierto.Ranky.infrastructure.commands.Command.RANKING;
 import static com.desierto.Ranky.infrastructure.commands.Command.REMOVE_ACCOUNTS;
+import static com.desierto.Ranky.infrastructure.commands.Command.REPEAT;
 import static com.desierto.Ranky.infrastructure.commands.Command.RETRIEVE_CONFIG_CHANNEL_CONTENT;
 
 import com.desierto.Ranky.infrastructure.service.AddAccountsService;
@@ -17,6 +18,7 @@ import com.desierto.Ranky.infrastructure.service.DeleteRankingService;
 import com.desierto.Ranky.infrastructure.service.GetRankingService;
 import com.desierto.Ranky.infrastructure.service.HelpService;
 import com.desierto.Ranky.infrastructure.service.RemoveAccountsService;
+import com.desierto.Ranky.infrastructure.service.RepeatCommandService;
 import com.desierto.Ranky.infrastructure.service.admin.ConfigChannelChecker;
 import com.desierto.Ranky.infrastructure.service.admin.ConfigChannelContentRetriever;
 import com.desierto.Ranky.infrastructure.service.admin.EnrolledUsersRetriever;
@@ -64,6 +66,9 @@ public class RankySlashCommandListener extends ListenerAdapter {
   private ExecutorService executorService;
 
   @Autowired
+  private RepeatCommandService repeatCommandService;
+
+  @Autowired
   private JDA bot;
 
   public static final Logger log = Logger.getLogger("RankySlashCommandListener.class");
@@ -80,12 +85,15 @@ public class RankySlashCommandListener extends ListenerAdapter {
     log.info("ENTERED SLASH COMMAND LISTENER");
     event.deferReply(true).queue();
     event.getHook().setEphemeral(true);
+    handleCommand(event);
+  }
+
+  private void handleCommand(SlashCommandInteractionEvent event) {
     if (event.getCommandString().contains("/" + HELP.getCommandId())) {
       executorService.execute(() -> helpService.execute(event));
     }
     if (event.getCommandString().contains("/" + RANKING.getCommandId())) {
       executorService.execute(() -> getRankingService.execute(event));
-
     }
     if (event.getCommandString().contains("/" + CREATE.getCommandId())) {
       executorService.execute(() -> createRankingService.execute(event));
@@ -110,6 +118,9 @@ public class RankySlashCommandListener extends ListenerAdapter {
     }
     if (event.getCommandString().contains("/" + RETRIEVE_CONFIG_CHANNEL_CONTENT.getCommandId())) {
       executorService.execute(() -> configChannelContentRetriever.execute(event));
+    }
+    if (event.getCommandString().contains("/" + REPEAT.getCommandId())) {
+      executorService.execute(() -> repeatCommandService.execute(event));
     }
   }
 }

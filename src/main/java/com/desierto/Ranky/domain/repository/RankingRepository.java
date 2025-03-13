@@ -1,6 +1,7 @@
 package com.desierto.Ranky.domain.repository;
 
 import com.desierto.Ranky.domain.entity.Ranking;
+import java.util.List;
 
 public interface RankingRepository {
 
@@ -11,4 +12,6 @@ public interface RankingRepository {
   boolean delete(String rankingId);
 
   Ranking read(String rankingName);
+
+  List<Ranking> findAll();
 }

@@ -37,7 +37,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class GetRankingService {
 
-  public static final Logger log = Logger.getLogger("RemoveAccountsService.class");
+  public static final Logger log = Logger.getLogger("GetRankingService.class");
 
   @Autowired
   private ConfigLoader config;

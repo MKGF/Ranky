@@ -22,3 +22,4 @@ https://jda.wiki/using-jda/interactions/#select-menus-dropdowns
   + Con esto se puede frontalizar los rankings!!!
 -Comando para repetir el ultimo comando que se hizo
   + La persistencia debe ir en el config channel
+-Revisar si la descripcion del comando es dinamica (puedo meterle el ultimo comando que ha ejecutado dinamicamente en la descripcion?)
