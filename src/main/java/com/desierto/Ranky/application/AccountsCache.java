@@ -7,14 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.logging.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class AccountsCache {
-
-  public static final Logger log = Logger.getLogger("AccountsCache.class");
 
   private final int CACHE_MINUTES = 10;
 
@@ -33,7 +32,8 @@ public class AccountsCache {
     introductionTimes = introductionTimesParam;
   }
 
-  public void save(String key, List<Account> accounts) {
+  public void save(String guildId, String rankingId, List<Account> accounts) {
+    String key = guildId + ":" + rankingId;
     try {
       rankings.remove(key.toLowerCase());
     } catch (NullPointerException ignored) {
@@ -43,7 +43,8 @@ public class AccountsCache {
     log.info(String.format("Introduced accounts in cache with id %s", key.toLowerCase()));
   }
 
-  public Optional<List<Account>> find(String key) {
+  public Optional<List<Account>> find(String guildId, String rankingId) {
+    String key = guildId + ":" + rankingId;
     Optional<List<Account>> optionalAccounts;
     try {
       optionalAccounts = Optional.of(rankings.get(key.toLowerCase()));

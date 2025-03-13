@@ -14,7 +14,7 @@ import static com.desierto.Ranky.infrastructure.commands.Command.RETRIEVE_CONFIG
 import com.desierto.Ranky.infrastructure.service.AddAccountsService;
 import com.desierto.Ranky.infrastructure.service.CreateRankingService;
 import com.desierto.Ranky.infrastructure.service.DeleteRankingService;
-import com.desierto.Ranky.infrastructure.service.GetRankingService;
+import com.desierto.Ranky.infrastructure.service.DiscordRankingService;
 import com.desierto.Ranky.infrastructure.service.HelpService;
 import com.desierto.Ranky.infrastructure.service.RemoveAccountsService;
 import com.desierto.Ranky.infrastructure.service.admin.ConfigChannelChecker;
@@ -23,8 +23,8 @@ import com.desierto.Ranky.infrastructure.service.admin.EnrolledUsersRetriever;
 import com.desierto.Ranky.infrastructure.service.admin.GuildRetriever;
 import jakarta.annotation.PostConstruct;
 import java.util.concurrent.ExecutorService;
-import java.util.logging.Logger;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -33,12 +33,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class RankySlashCommandListener extends ListenerAdapter {
 
   @Autowired
   private HelpService helpService;
   @Autowired
-  private GetRankingService getRankingService;
+  private DiscordRankingService discordRankingService;
   @Autowired
   private CreateRankingService createRankingService;
   @Autowired
@@ -66,8 +67,6 @@ public class RankySlashCommandListener extends ListenerAdapter {
   @Autowired
   private JDA bot;
 
-  public static final Logger log = Logger.getLogger("RankySlashCommandListener.class");
-
 
   @PostConstruct
   private void postConstruct() {
@@ -77,7 +76,7 @@ public class RankySlashCommandListener extends ListenerAdapter {
 
   @Override
   public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-    log.info("ENTERED SLASH COMMAND LISTENER");
+    log.debug("ENTERED SLASH COMMAND LISTENER");
     event.deferReply(true).queue();
     event.getHook().setEphemeral(true);
     handleCommand(event);
@@ -88,7 +87,7 @@ public class RankySlashCommandListener extends ListenerAdapter {
       executorService.execute(() -> helpService.execute(event));
     }
     if (event.getCommandString().contains("/" + RANKING.getCommandId())) {
-      executorService.execute(() -> getRankingService.execute(event));
+      executorService.execute(() -> discordRankingService.execute(event));
     }
     if (event.getCommandString().contains("/" + CREATE.getCommandId())) {
       executorService.execute(() -> createRankingService.execute(event));

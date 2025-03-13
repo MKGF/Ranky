@@ -21,3 +21,4 @@ https://jda.wiki/using-jda/interactions/#select-menus-dropdowns
 -Frontalizar la interfaz de ranky para los usuarios que no esten acostumbrados al uso de comandos
   + Con esto se puede frontalizar los rankings!!!
   + Tambien podemos hacer rankings publicos
+-IMPORTANTE arreglar que desde el endpoint de getAll sea capaz de sacar el ranking entero en vez de fracciones del ranking

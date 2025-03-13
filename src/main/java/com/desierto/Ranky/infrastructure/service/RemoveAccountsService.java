@@ -14,8 +14,8 @@ import com.desierto.Ranky.infrastructure.repository.ConfigChannelRankingReposito
 import com.desierto.Ranky.infrastructure.utils.DiscordOptionRetriever;
 import com.google.gson.Gson;
 import java.util.List;
-import java.util.logging.Logger;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +23,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class RemoveAccountsService {
-
-  public static final Logger log = Logger.getLogger("RemoveAccountsService.class");
 
   @Autowired
   private ConfigLoader config;
@@ -56,7 +55,7 @@ public class RemoveAccountsService {
               .stream()
               .filter(Account::isNotEmpty)
               .map(account -> {
-                log.info("INTO ENRICHMENT WITH ACCOUNT: " + account.getNameAndTagLine());
+                log.debug("INTO ENRICHMENT WITH ACCOUNT: " + account.getNameAndTagLine());
                 return riotAccountRepository.enrichIdentification(account);
               })
               .toList();

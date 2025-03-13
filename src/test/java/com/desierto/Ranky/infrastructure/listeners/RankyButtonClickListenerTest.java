@@ -102,7 +102,7 @@ public class RankyButtonClickListenerTest {
     ButtonInteractionEvent event = getSpecificRankingButtonInteractionEvent();
     Account account = new Account("name", "tagLine");
     account.updateRank(Rank.unranked());
-    when(accountsCache.find(anyString())).thenReturn(Optional.of(List.of(account)));
+    when(accountsCache.find(anyString(), anyString())).thenReturn(Optional.of(List.of(account)));
     EntryDTO entry = new EntryDTO(1, "name", "<:Unranked:1248786000533262419>", "   ", 0, "0", "0",
         "0.00");
 
@@ -120,7 +120,8 @@ public class RankyButtonClickListenerTest {
     Account account2 = new Account("name2", "tagLine2");
     account1.updateRank(Rank.unranked());
     account2.updateRank(Rank.unranked());
-    when(accountsCache.find(anyString())).thenReturn(Optional.of(List.of(account1, account2)));
+    when(accountsCache.find(anyString(), anyString())).thenReturn(
+        Optional.of(List.of(account1, account2)));
     EntryDTO entry1 = new EntryDTO(1, "name1", "<:Unranked:1248786000533262419>", "   ", 0, "0",
         "0",
         "0.00");
@@ -191,6 +192,7 @@ public class RankyButtonClickListenerTest {
     Guild guild = mock(Guild.class);
     String expected = "expected";
     User user = mock(User.class);
+    when(guild.getId()).thenReturn("guildId");
     when(event.getUser()).thenReturn(user);
     when(user.getAsMention()).thenReturn("mention");
     when(event.getChannel()).thenReturn(channel);

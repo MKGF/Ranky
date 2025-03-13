@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 import com.desierto.Ranky.infrastructure.service.AddAccountsService;
 import com.desierto.Ranky.infrastructure.service.CreateRankingService;
 import com.desierto.Ranky.infrastructure.service.DeleteRankingService;
-import com.desierto.Ranky.infrastructure.service.GetRankingService;
+import com.desierto.Ranky.infrastructure.service.DiscordRankingService;
 import com.desierto.Ranky.infrastructure.service.HelpService;
 import com.desierto.Ranky.infrastructure.service.RemoveAccountsService;
 import com.desierto.Ranky.infrastructure.service.admin.ConfigChannelChecker;
@@ -52,7 +52,7 @@ public class RankySlashCommandListenerTest {
   HelpService helpService;
 
   @Mock
-  GetRankingService getRankingService;
+  DiscordRankingService discordRankingService;
 
   @Mock
   CreateRankingService createRankingService;
@@ -86,7 +86,7 @@ public class RankySlashCommandListenerTest {
   public void setUp() {
 
     cut = new RankySlashCommandListener(helpService,
-        getRankingService,
+        discordRankingService,
         createRankingService,
         deleteRankingService,
         addAccountsService,

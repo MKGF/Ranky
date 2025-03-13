@@ -3,18 +3,18 @@ package com.desierto.Ranky.infrastructure.commands;
 import static java.util.Collections.emptyList;
 
 import java.util.List;
-import java.util.logging.Logger;
 import lombok.Getter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 
 @Getter
 @ToString
+@Slf4j
 public class Command {
 
-  public static final Logger log = Logger.getLogger("Command.class");
   public static final Command HELP;
   public static final Command RANKING;
   public static final Command CREATE;

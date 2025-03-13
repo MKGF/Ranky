@@ -10,4 +10,8 @@ public class GameNameDTO {
   String gameName;
 
   String tagLine;
+
+  public String getWholeName() {
+    return gameName + "#" + tagLine;
+  }
 }

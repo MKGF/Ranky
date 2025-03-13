@@ -18,8 +18,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Logger;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -31,9 +31,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class RankyButtonClickListener extends ListenerAdapter {
-
-  public static final Logger log = Logger.getLogger("RankyButtonClickListener.class");
 
   @Autowired
   private JDA bot;
@@ -58,7 +57,7 @@ public class RankyButtonClickListener extends ListenerAdapter {
 
   @Override
   public void onButtonInteraction(ButtonInteractionEvent event) {
-    log.info("ENTERED BUTTON INTERACTION LISTENER");
+    log.debug("ENTERED BUTTON INTERACTION LISTENER");
     if (isPageButton(
         event)) { //Case for a big ranking that needed to be paged, and we just want to show a fraction of the ranking
       event.getChannel()
@@ -83,7 +82,7 @@ public class RankyButtonClickListener extends ListenerAdapter {
     } else { //Case for whole rankings to be made public
       String rankingName = event.getButton().getId();
       Optional<List<Account>> accounts = accountsCache.find(
-          event.getGuild().getId() + ":" + rankingName);
+          event.getGuild().getId(), rankingName);
       if (accounts.isPresent()) {
         List<EntryDTO> rankingEntries = toEntryDtos(accounts.get());
         if (rankingEntries.size() <= config.getAccountLimit()) {
