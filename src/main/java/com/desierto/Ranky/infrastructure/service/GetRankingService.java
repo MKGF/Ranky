@@ -72,20 +72,30 @@ public class GetRankingService {
         Ranking ranking = rankingRepository.read(rankingName);
         Optional<List<Account>> cachedAccounts = accountsCache.find(
             event.getGuild().getId() + ":" + rankingName);
+        Optional<List<Account>> cachedAccountsFlex = accountsCache.findFlex(
+                event.getGuild().getId() + ":" + rankingName);
         List<Account> rankingAccounts;
         Message progressBar = null;
-        String queueType = discordOptionRetriever.fromEventQueueType(event);
-        if (cachedAccounts.isEmpty()) {
-          progressBar = hook.sendMessage(DiscordProgressBar.getProgress(0)).complete();
-          rankingAccounts = getRankingEntries(ranking, hook, progressBar, queueType);
-          accountsCache.setCacheQueueType(queueType);
-        } else if (!accountsCache.isSameQueueTypeAsCached(queueType)){
-          progressBar = hook.sendMessage(DiscordProgressBar.getProgress(0)).complete();
-          rankingAccounts = getRankingEntries(ranking, hook, progressBar, queueType);
-          accountsCache.setCacheQueueType(queueType);
-        } else {
-          rankingAccounts = cachedAccounts.get();
+        String queueType = discordOptionRetriever.fromEventQueueType(event).toLowerCase();
+        switch (queueType) {
+          case "flex":
+            if (cachedAccountsFlex.isEmpty()) {
+              progressBar = hook.sendMessage(DiscordProgressBar.getProgress(0)).complete();
+              rankingAccounts = getRankingEntries(ranking, hook, progressBar, queueType);
+            } else {
+              rankingAccounts = cachedAccountsFlex.get();
+            }
+            break;
+          default:
+            if (cachedAccounts.isEmpty()) {
+              progressBar = hook.sendMessage(DiscordProgressBar.getProgress(0)).complete();
+              rankingAccounts = getRankingEntries(ranking, hook, progressBar, queueType);
+            } else {
+              rankingAccounts = cachedAccounts.get();
+            }
+            break;
         }
+
         List<EntryDTO> rankingEntries = toEntryDtos(rankingAccounts,
             Optional.ofNullable(progressBar));
         if (rankingEntries.size() <= config.getAccountLimit()) {
@@ -183,9 +193,14 @@ public class GetRankingService {
           .complete();
       return riotAccountRepository.enrichWithSoloQStats(account, queueType);
     }).toList();
-
-    accountsCache.save(hook.getInteraction().getGuild().getId() + ":" + ranking.getId(), accounts);
-
+    switch (queueType) {
+      case "flex":
+        accountsCache.saveFlex(hook.getInteraction().getGuild().getId() + ":" + ranking.getId(), accounts);
+        break;
+      default:
+        accountsCache.save(hook.getInteraction().getGuild().getId() + ":" + ranking.getId(), accounts);
+        break;
+    }
     return accounts;
   }
 }
