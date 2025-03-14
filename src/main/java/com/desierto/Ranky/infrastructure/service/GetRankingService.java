@@ -69,33 +69,18 @@ public class GetRankingService {
             event.getGuild(),
             gson
         );
+        String queueType = discordOptionRetriever.fromEventQueueType(event).toLowerCase();
         Ranking ranking = rankingRepository.read(rankingName);
         Optional<List<Account>> cachedAccounts = accountsCache.find(
-            event.getGuild().getId() + ":" + rankingName);
-        Optional<List<Account>> cachedAccountsFlex = accountsCache.findFlex(
-                event.getGuild().getId() + ":" + rankingName);
+            event.getGuild().getId() + ":" + rankingName, queueType);
         List<Account> rankingAccounts;
         Message progressBar = null;
-        String queueType = discordOptionRetriever.fromEventQueueType(event).toLowerCase();
-        switch (queueType) {
-          case "flex":
-            if (cachedAccountsFlex.isEmpty()) {
-              progressBar = hook.sendMessage(DiscordProgressBar.getProgress(0)).complete();
-              rankingAccounts = getRankingEntries(ranking, hook, progressBar, queueType);
-            } else {
-              rankingAccounts = cachedAccountsFlex.get();
-            }
-            break;
-          default:
-            if (cachedAccounts.isEmpty()) {
-              progressBar = hook.sendMessage(DiscordProgressBar.getProgress(0)).complete();
-              rankingAccounts = getRankingEntries(ranking, hook, progressBar, queueType);
-            } else {
-              rankingAccounts = cachedAccounts.get();
-            }
-            break;
+        if (cachedAccounts.isEmpty()) {
+          progressBar = hook.sendMessage(DiscordProgressBar.getProgress(0)).complete();
+          rankingAccounts = getRankingEntries(ranking, hook, progressBar, queueType);
+        } else {
+          rankingAccounts = cachedAccounts.get();
         }
-
         List<EntryDTO> rankingEntries = toEntryDtos(rankingAccounts,
             Optional.ofNullable(progressBar));
         if (rankingEntries.size() <= config.getAccountLimit()) {
@@ -193,14 +178,9 @@ public class GetRankingService {
           .complete();
       return riotAccountRepository.enrichWithSoloQStats(account, queueType);
     }).toList();
-    switch (queueType) {
-      case "flex":
-        accountsCache.saveFlex(hook.getInteraction().getGuild().getId() + ":" + ranking.getId(), accounts);
-        break;
-      default:
-        accountsCache.save(hook.getInteraction().getGuild().getId() + ":" + ranking.getId(), accounts);
-        break;
-    }
+
+    accountsCache.save(hook.getInteraction().getGuild().getId() + ":" + ranking.getId(), accounts, queueType);
+
     return accounts;
   }
 }

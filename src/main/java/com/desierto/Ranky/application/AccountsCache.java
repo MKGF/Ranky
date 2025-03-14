@@ -38,46 +38,49 @@ public class AccountsCache {
     introductionTimes = introductionTimesParam;
   }
 
-  public void save(String key, List<Account> accounts) {
-    try {
-      rankings.remove(key.toLowerCase());
-    } catch (NullPointerException ignored) {
+  public void save(String key, List<Account> accounts, String queueType) {
+    switch (queueType) {
+      case "flex":
+        try {
+          rankingsFlex.remove(key.toLowerCase());
+        } catch (NullPointerException ignored) {
+        }
+        rankingsFlex.put(key.toLowerCase(), accounts);
+        introductionTimes.put(key.toLowerCase(), LocalDateTime.now());
+        log.info(String.format("Introduced accounts in cache with id %s", key.toLowerCase()));
+        break;
+      default:
+        try {
+          rankings.remove(key.toLowerCase());
+        } catch (NullPointerException ignored) {
+        }
+        rankings.put(key.toLowerCase(), accounts);
+        introductionTimes.put(key.toLowerCase(), LocalDateTime.now());
+        log.info(String.format("Introduced accounts in cache with id %s", key.toLowerCase()));
+        break;
     }
-    rankings.put(key.toLowerCase(), accounts);
-    introductionTimes.put(key.toLowerCase(), LocalDateTime.now());
-    log.info(String.format("Introduced accounts in cache with id %s", key.toLowerCase()));
   }
 
-  public void saveFlex(String key, List<Account> accounts) {
-    try {
-      rankingsFlex.remove(key.toLowerCase());
-    } catch (NullPointerException ignored) {
-    }
-    rankingsFlex.put(key.toLowerCase(), accounts);
-    introductionTimes.put(key.toLowerCase(), LocalDateTime.now());
-    log.info(String.format("Introduced accounts in cache with id %s", key.toLowerCase()));
-  }
-
-  public Optional<List<Account>> find(String key) {
+  public Optional<List<Account>> find(String key, String queueType) {
     Optional<List<Account>> optionalAccounts;
-    try {
-      optionalAccounts = Optional.of(rankings.get(key.toLowerCase()));
-      log.info(String.format("Retrieved accounts from cache for id %s", key.toLowerCase()));
-    } catch (NullPointerException ignored) {
-      optionalAccounts = Optional.empty();
+    switch (queueType) {
+      case "flex":
+        try {
+          optionalAccounts = Optional.of(rankingsFlex.get(key.toLowerCase()));
+          log.info(String.format("Retrieved accounts from cache for id %s", key.toLowerCase()));
+        } catch (NullPointerException ignored) {
+          optionalAccounts = Optional.empty();
+        }
+        return optionalAccounts;
+      default:
+        try {
+          optionalAccounts = Optional.of(rankings.get(key.toLowerCase()));
+          log.info(String.format("Retrieved accounts from cache for id %s", key.toLowerCase()));
+        } catch (NullPointerException ignored) {
+          optionalAccounts = Optional.empty();
+        }
+        return optionalAccounts;
     }
-    return optionalAccounts;
-  }
-
-  public Optional<List<Account>> findFlex(String key) {
-    Optional<List<Account>> optionalAccounts;
-    try {
-      optionalAccounts = Optional.of(rankingsFlex.get(key.toLowerCase()));
-      log.info(String.format("Retrieved accounts from cache for id %s", key.toLowerCase()));
-    } catch (NullPointerException ignored) {
-      optionalAccounts = Optional.empty();
-    }
-    return optionalAccounts;
   }
 
   @Scheduled(fixedRate = 1000 * 60 * CACHE_MINUTES)
