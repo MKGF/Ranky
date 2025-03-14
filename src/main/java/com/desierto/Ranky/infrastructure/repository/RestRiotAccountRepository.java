@@ -18,6 +18,7 @@ import com.merakianalytics.orianna.types.core.summoner.Summoner;
 import jakarta.annotation.PostConstruct;
 import java.util.logging.Logger;
 import lombok.AllArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -53,7 +54,7 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
   }
 
   @Override
-  public Account enrichWithSoloQStats(Account account) {
+  public Account enrichWithSoloQStats(Account account, String queueType) {
 
     Summoner summoner = Orianna.summonerWithPuuid(account.getId()).get();
     Builder accountBuilder = Orianna.accountWithPuuid(account.getId());
@@ -62,7 +63,7 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
     //It looks like a bug in Orianna, this is a workaround since parsing it to a string returns the correct name/tagLine coming from Riot
     GameNameDTO gameName = gson.fromJson(accountBuilder.get().toJSON(), GameNameDTO.class);
     try {
-      LeagueEntry leagueEntry = summoner.getLeaguePosition(Queue.RANKED_SOLO);
+      LeagueEntry leagueEntry = summoner.getLeaguePosition(getQueueType(queueType));
       account.updateRank(
           leagueEntry != null ?
               new Rank(
@@ -82,4 +83,7 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
     return account;
   }
 
+  private static Queue getQueueType(String queueType) {
+    return queueType.equalsIgnoreCase("flex") ? Queue.RANKED_FLEX : Queue.RANKED_SOLO;
+  }
 }

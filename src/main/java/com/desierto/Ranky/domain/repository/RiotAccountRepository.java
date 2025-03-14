@@ -6,5 +6,5 @@ public interface RiotAccountRepository {
 
   Account enrichIdentification(Account account);
 
-  Account enrichWithSoloQStats(Account account);
+  Account enrichWithSoloQStats(Account account, String queueType);
 }

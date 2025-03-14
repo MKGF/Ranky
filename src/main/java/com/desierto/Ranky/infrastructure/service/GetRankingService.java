@@ -1,5 +1,4 @@
 package com.desierto.Ranky.infrastructure.service;
-
 import static com.desierto.Ranky.infrastructure.utils.DiscordButtons.FINAL_PAGE;
 import static com.desierto.Ranky.infrastructure.utils.DiscordButtons.PAGE;
 import static com.desierto.Ranky.infrastructure.utils.DiscordExceptionHandler.handleExceptionOnSlashCommandEvent;
@@ -70,14 +69,15 @@ public class GetRankingService {
             event.getGuild(),
             gson
         );
+        String queueType = discordOptionRetriever.fromEventQueueType(event).toLowerCase();
         Ranking ranking = rankingRepository.read(rankingName);
         Optional<List<Account>> cachedAccounts = accountsCache.find(
-            event.getGuild().getId() + ":" + rankingName);
+            event.getGuild().getId() + ":" + rankingName, queueType);
         List<Account> rankingAccounts;
         Message progressBar = null;
         if (cachedAccounts.isEmpty()) {
           progressBar = hook.sendMessage(DiscordProgressBar.getProgress(0)).complete();
-          rankingAccounts = getRankingEntries(ranking, hook, progressBar);
+          rankingAccounts = getRankingEntries(ranking, hook, progressBar, queueType);
         } else {
           rankingAccounts = cachedAccounts.get();
         }
@@ -168,7 +168,7 @@ public class GetRankingService {
   }
 
   private List<Account> getRankingEntries(Ranking ranking, InteractionHook hook,
-      Message progressBar) {
+      Message progressBar, String queueType) {
     AtomicInteger indexForEnrichment = new AtomicInteger(1);
     int numberOfAccounts = ranking.getAccounts().size();
     List<Account> accounts = ranking.getAccounts().stream().map(account -> {
@@ -176,10 +176,10 @@ public class GetRankingService {
               DiscordProgressBar.getProgress(
                   (indexForEnrichment.getAndIncrement() * 100 / numberOfAccounts) / 2))
           .complete();
-      return riotAccountRepository.enrichWithSoloQStats(account);
+      return riotAccountRepository.enrichWithSoloQStats(account, queueType);
     }).toList();
 
-    accountsCache.save(hook.getInteraction().getGuild().getId() + ":" + ranking.getId(), accounts);
+    accountsCache.save(hook.getInteraction().getGuild().getId() + ":" + ranking.getId(), accounts, queueType);
 
     return accounts;
   }

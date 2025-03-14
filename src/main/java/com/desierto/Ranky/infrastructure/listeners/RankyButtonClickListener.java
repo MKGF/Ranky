@@ -11,6 +11,7 @@ import com.desierto.Ranky.infrastructure.dto.EntryDTO;
 import com.desierto.Ranky.infrastructure.service.MultiPagePrintingFunction;
 import com.desierto.Ranky.infrastructure.service.PrintRankingService;
 import com.desierto.Ranky.infrastructure.service.SinglePagePrintingFunction;
+import com.desierto.Ranky.infrastructure.utils.DiscordOptionRetriever;
 import com.desierto.Ranky.infrastructure.utils.DiscordRankingFormatter;
 import jakarta.annotation.PostConstruct;
 import java.util.List;
@@ -83,7 +84,7 @@ public class RankyButtonClickListener extends ListenerAdapter {
     } else { //Case for whole rankings to be made public
       String rankingName = event.getButton().getId();
       Optional<List<Account>> accounts = accountsCache.find(
-          event.getGuild().getId() + ":" + rankingName);
+          event.getGuild().getId() + ":" + rankingName, "");
       if (accounts.isPresent()) {
         List<EntryDTO> rankingEntries = toEntryDtos(accounts.get());
         if (rankingEntries.size() <= config.getAccountLimit()) {

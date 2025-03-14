@@ -1,5 +1,6 @@
 package com.desierto.Ranky.application;
 
+import com.desierto.Ranky.infrastructure.utils.*;
 import com.desierto.Ranky.domain.entity.Account;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,38 +21,66 @@ public class AccountsCache {
 
   private Map<String, List<Account>> rankings;
 
+  private Map<String, List<Account>> rankingsFlex;
+
   private Map<String, LocalDateTime> introductionTimes;
 
   public AccountsCache() {
     rankings = new HashMap<>();
+    rankingsFlex = new HashMap<>();
     introductionTimes = new HashMap<>();
   }
 
   public AccountsCache(Map<String, List<Account>> rankingsParam,
       Map<String, LocalDateTime> introductionTimesParam) {
     rankings = rankingsParam;
+    rankingsFlex = rankingsParam;
     introductionTimes = introductionTimesParam;
   }
 
-  public void save(String key, List<Account> accounts) {
-    try {
-      rankings.remove(key.toLowerCase());
-    } catch (NullPointerException ignored) {
+  public void save(String key, List<Account> accounts, String queueType) {
+    switch (queueType) {
+      case "flex":
+        try {
+          rankingsFlex.remove(key.toLowerCase());
+        } catch (NullPointerException ignored) {
+        }
+        rankingsFlex.put(key.toLowerCase(), accounts);
+        introductionTimes.put(key.toLowerCase(), LocalDateTime.now());
+        log.info(String.format("Introduced accounts in cache with id %s", key.toLowerCase()));
+        break;
+      default:
+        try {
+          rankings.remove(key.toLowerCase());
+        } catch (NullPointerException ignored) {
+        }
+        rankings.put(key.toLowerCase(), accounts);
+        introductionTimes.put(key.toLowerCase(), LocalDateTime.now());
+        log.info(String.format("Introduced accounts in cache with id %s", key.toLowerCase()));
+        break;
     }
-    rankings.put(key.toLowerCase(), accounts);
-    introductionTimes.put(key.toLowerCase(), LocalDateTime.now());
-    log.info(String.format("Introduced accounts in cache with id %s", key.toLowerCase()));
   }
 
-  public Optional<List<Account>> find(String key) {
+  public Optional<List<Account>> find(String key, String queueType) {
     Optional<List<Account>> optionalAccounts;
-    try {
-      optionalAccounts = Optional.of(rankings.get(key.toLowerCase()));
-      log.info(String.format("Retrieved accounts from cache for id %s", key.toLowerCase()));
-    } catch (NullPointerException ignored) {
-      optionalAccounts = Optional.empty();
+    switch (queueType) {
+      case "flex":
+        try {
+          optionalAccounts = Optional.of(rankingsFlex.get(key.toLowerCase()));
+          log.info(String.format("Retrieved accounts from cache for id %s", key.toLowerCase()));
+        } catch (NullPointerException ignored) {
+          optionalAccounts = Optional.empty();
+        }
+        return optionalAccounts;
+      default:
+        try {
+          optionalAccounts = Optional.of(rankings.get(key.toLowerCase()));
+          log.info(String.format("Retrieved accounts from cache for id %s", key.toLowerCase()));
+        } catch (NullPointerException ignored) {
+          optionalAccounts = Optional.empty();
+        }
+        return optionalAccounts;
     }
-    return optionalAccounts;
   }
 
   @Scheduled(fixedRate = 1000 * 60 * CACHE_MINUTES)
@@ -64,6 +93,7 @@ public class AccountsCache {
     });
     keysToRemoveFromCache.forEach(key -> {
       rankings.remove(key.toLowerCase());
+      rankingsFlex.remove(key.toLowerCase());
       introductionTimes.remove(key.toLowerCase());
     });
     log.info(String.format("Cleared from cache: %s", keysToRemoveFromCache));
