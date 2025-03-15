@@ -11,12 +11,12 @@ import static com.desierto.Ranky.infrastructure.commands.Command.RANKING;
 import static com.desierto.Ranky.infrastructure.commands.Command.REMOVE_ACCOUNTS;
 import static com.desierto.Ranky.infrastructure.commands.Command.RETRIEVE_CONFIG_CHANNEL_CONTENT;
 
-import com.desierto.Ranky.infrastructure.service.AddAccountsService;
-import com.desierto.Ranky.infrastructure.service.DeleteRankingService;
+import com.desierto.Ranky.infrastructure.service.DiscordAddAccountsService;
 import com.desierto.Ranky.infrastructure.service.DiscordCreateRankingService;
+import com.desierto.Ranky.infrastructure.service.DiscordDeleteRankingService;
 import com.desierto.Ranky.infrastructure.service.DiscordGetRankingService;
+import com.desierto.Ranky.infrastructure.service.DiscordRemoveAccountsService;
 import com.desierto.Ranky.infrastructure.service.HelpService;
-import com.desierto.Ranky.infrastructure.service.RemoveAccountsService;
 import com.desierto.Ranky.infrastructure.service.admin.ConfigChannelChecker;
 import com.desierto.Ranky.infrastructure.service.admin.ConfigChannelContentRetriever;
 import com.desierto.Ranky.infrastructure.service.admin.EnrolledUsersRetriever;
@@ -43,11 +43,11 @@ public class RankySlashCommandListener extends ListenerAdapter {
   @Autowired
   private DiscordCreateRankingService discordCreateRankingService;
   @Autowired
-  private DeleteRankingService deleteRankingService;
+  private DiscordDeleteRankingService discordDeleteRankingService;
   @Autowired
-  private AddAccountsService addAccountsService;
+  private DiscordAddAccountsService discordAddAccountsService;
   @Autowired
-  private RemoveAccountsService removeAccountsService;
+  private DiscordRemoveAccountsService discordRemoveAccountsService;
 
   @Autowired
   private GuildRetriever guildRetriever;
@@ -93,13 +93,13 @@ public class RankySlashCommandListener extends ListenerAdapter {
       executorService.execute(() -> discordCreateRankingService.execute(event));
     }
     if (event.getCommandString().contains("/" + DELETE.getCommandId())) {
-      executorService.execute(() -> deleteRankingService.execute(event));
+      executorService.execute(() -> discordDeleteRankingService.execute(event));
     }
     if (event.getCommandString().contains("/" + ADD_ACCOUNTS.getCommandId())) {
-      executorService.execute(() -> addAccountsService.execute(event));
+      executorService.execute(() -> discordAddAccountsService.execute(event));
     }
     if (event.getCommandString().contains("/" + REMOVE_ACCOUNTS.getCommandId())) {
-      executorService.execute(() -> removeAccountsService.execute(event));
+      executorService.execute(() -> discordRemoveAccountsService.execute(event));
     }
     if (event.getCommandString().contains("/" + GET_GUILDS.getCommandId())) {
       executorService.execute(() -> guildRetriever.execute(event));

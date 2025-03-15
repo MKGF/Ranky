@@ -15,14 +15,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class DeleteRankingService {
+public class DiscordDeleteRankingService {
 
   private final ConfigLoader config;
 
   private final Gson gson;
 
   @Autowired
-  public DeleteRankingService(ConfigLoader config, Gson gson) {
+  public DiscordDeleteRankingService(ConfigLoader config, Gson gson) {
     this.config = config;
     this.gson = gson;
   }

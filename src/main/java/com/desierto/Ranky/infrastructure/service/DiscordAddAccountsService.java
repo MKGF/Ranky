@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 @Slf4j
-public class RemoveAccountsService {
+public class DiscordAddAccountsService {
 
   @Autowired
   private ConfigLoader config;
@@ -51,18 +51,32 @@ public class RemoveAccountsService {
               gson
           );
           Ranking ranking = rankingRepository.read(rankingName);
-          List<Account> accountsToRemove = discordOptionRetriever.fromEventGetAccountList(event)
+          List<Account> accountsToAdd = discordOptionRetriever.fromEventGetAccountList(event)
               .stream()
               .filter(Account::isNotEmpty)
               .map(account -> {
                 log.debug("INTO ENRICHMENT WITH ACCOUNT: " + account.getNameAndTagLine());
                 return riotAccountRepository.enrichIdentification(account);
               })
+              .filter(account -> {
+                if (account.getId().isEmpty()) {
+                  hook.sendMessage("Couldn't retrieve accountId for the following account: "
+                      + account.getNameAndTagLine()).queue();
+                  return false;
+                }
+                if (ranking.getAccounts().stream().map(Account::getId)
+                    .anyMatch(id -> id.equalsIgnoreCase(account.getId()))) {
+                  hook.sendMessage("Account '" + account.getNameAndTagLine()
+                      + "' is already present in the ranking.").queue();
+                  return false;
+                }
+                return true;
+              })
               .toList();
-          accountsToRemove.forEach(ranking::removeAccount);
+          accountsToAdd.forEach(ranking::addAccount);
           rankingRepository.update(ranking);
-          if (!accountsToRemove.isEmpty()) {
-            hook.sendMessage("Accounts removed successfully!").queue();
+          if (!accountsToAdd.isEmpty()) {
+            hook.sendMessage("Accounts added successfully!").queue();
           }
         } catch (ConfigChannelNotFoundException | RankingNotFoundException e) {
           handleExceptionOnSlashCommandEvent(e, event);

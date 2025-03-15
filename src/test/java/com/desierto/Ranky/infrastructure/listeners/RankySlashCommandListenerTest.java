@@ -17,12 +17,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.desierto.Ranky.infrastructure.service.AddAccountsService;
-import com.desierto.Ranky.infrastructure.service.DeleteRankingService;
+import com.desierto.Ranky.infrastructure.service.DiscordAddAccountsService;
 import com.desierto.Ranky.infrastructure.service.DiscordCreateRankingService;
+import com.desierto.Ranky.infrastructure.service.DiscordDeleteRankingService;
 import com.desierto.Ranky.infrastructure.service.DiscordGetRankingService;
+import com.desierto.Ranky.infrastructure.service.DiscordRemoveAccountsService;
 import com.desierto.Ranky.infrastructure.service.HelpService;
-import com.desierto.Ranky.infrastructure.service.RemoveAccountsService;
 import com.desierto.Ranky.infrastructure.service.admin.ConfigChannelChecker;
 import com.desierto.Ranky.infrastructure.service.admin.ConfigChannelContentRetriever;
 import com.desierto.Ranky.infrastructure.service.admin.EnrolledUsersRetriever;
@@ -58,13 +58,13 @@ public class RankySlashCommandListenerTest {
   DiscordCreateRankingService discordCreateRankingService;
 
   @Mock
-  DeleteRankingService deleteRankingService;
+  DiscordDeleteRankingService discordDeleteRankingService;
 
   @Mock
-  AddAccountsService addAccountsService;
+  DiscordAddAccountsService discordAddAccountsService;
 
   @Mock
-  RemoveAccountsService removeAccountsService;
+  DiscordRemoveAccountsService discordRemoveAccountsService;
 
   @Mock
   GuildRetriever guildRetriever;
@@ -88,9 +88,9 @@ public class RankySlashCommandListenerTest {
     cut = new RankySlashCommandListener(helpService,
         discordGetRankingService,
         discordCreateRankingService,
-        deleteRankingService,
-        addAccountsService,
-        removeAccountsService,
+        discordDeleteRankingService,
+        discordAddAccountsService,
+        discordRemoveAccountsService,
         guildRetriever,
         enrolledUsersRetriever,
         configChannelChecker,

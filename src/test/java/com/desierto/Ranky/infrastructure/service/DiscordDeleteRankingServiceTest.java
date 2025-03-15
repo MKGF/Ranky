@@ -35,11 +35,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @TestInstance(Lifecycle.PER_CLASS)
-public class DeleteRankingServiceTest {
+public class DiscordDeleteRankingServiceTest {
 
   private static final String RANKY_USER = "rankyUser";
 
-  DeleteRankingService cut;
+  DiscordDeleteRankingService cut;
 
   @Mock
   ConfigLoader config;
@@ -49,7 +49,7 @@ public class DeleteRankingServiceTest {
   @BeforeAll
   public void setUp() {
     gson = new Gson();
-    cut = new DeleteRankingService(config, gson);
+    cut = new DiscordDeleteRankingService(config, gson);
     when(config.getRankyUserRole()).thenReturn(RANKY_USER);
   }
 
