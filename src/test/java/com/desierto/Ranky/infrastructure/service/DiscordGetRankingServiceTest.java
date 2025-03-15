@@ -19,7 +19,6 @@ import com.desierto.Ranky.domain.valueobject.Rank;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
 import com.desierto.Ranky.infrastructure.utils.DiscordOptionRetriever;
 import com.desierto.Ranky.infrastructure.utils.DiscordRankingFormatter;
-import com.google.gson.Gson;
 import java.util.Optional;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -46,8 +45,6 @@ public class DiscordGetRankingServiceTest {
   @Mock
   DiscordOptionRetriever discordOptionRetriever;
 
-  Gson gson;
-
   @Mock
   RiotAccountRepository riotAccountRepository;
 
@@ -65,8 +62,7 @@ public class DiscordGetRankingServiceTest {
 
   @BeforeEach
   public void setUp() {
-    gson = new Gson();
-    cut = new DiscordGetRankingService(config, discordOptionRetriever, gson, riotAccountRepository,
+    cut = new DiscordGetRankingService(config, discordOptionRetriever, riotAccountRepository,
         discordRankingFormatter, accountsCache, printRankingService, rankingRepository);
     when(config.getAccountLimit()).thenReturn(1);
   }

@@ -18,7 +18,6 @@ import com.desierto.Ranky.infrastructure.exceptions.ConfigChannelNotFoundExcepti
 import com.desierto.Ranky.infrastructure.utils.DiscordOptionRetriever;
 import com.desierto.Ranky.infrastructure.utils.DiscordProgressBar;
 import com.desierto.Ranky.infrastructure.utils.DiscordRankingFormatter;
-import com.google.gson.Gson;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -43,9 +42,6 @@ public class DiscordGetRankingService {
 
   @Autowired
   private DiscordOptionRetriever discordOptionRetriever;
-
-  @Autowired
-  private Gson gson;
 
   @Autowired
   private RiotAccountRepository riotAccountRepository;

@@ -13,7 +13,6 @@ import com.desierto.Ranky.domain.entity.Ranking;
 import com.desierto.Ranky.domain.service.ICreateRankingService;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
 import com.desierto.Ranky.infrastructure.utils.DiscordOptionRetriever;
-import com.google.gson.Gson;
 import java.util.List;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -38,8 +37,6 @@ public class DiscordCreateRankingServiceTest {
   @Mock
   ConfigLoader config;
 
-  Gson gson;
-
   @Mock
   DiscordOptionRetriever discordOptionRetriever;
 
@@ -48,8 +45,7 @@ public class DiscordCreateRankingServiceTest {
 
   @BeforeEach
   public void setUp() {
-    gson = new Gson();
-    cut = new DiscordCreateRankingService(config, gson, discordOptionRetriever,
+    cut = new DiscordCreateRankingService(config, discordOptionRetriever,
         createRankingService);
     when(config.getRankyUserRole()).thenReturn(RANKY_USER);
   }

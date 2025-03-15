@@ -6,7 +6,6 @@ import static com.desierto.Ranky.infrastructure.utils.DiscordMessages.EXECUTE_CO
 import com.desierto.Ranky.domain.service.ICreateRankingService;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
 import com.desierto.Ranky.infrastructure.utils.DiscordOptionRetriever;
-import com.google.gson.Gson;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,17 +15,14 @@ public class DiscordCreateRankingService {
 
   private final ConfigLoader config;
 
-  private final Gson gson;
-
   private final DiscordOptionRetriever discordOptionRetriever;
 
   private final ICreateRankingService createRankingService;
 
   @Autowired
-  public DiscordCreateRankingService(ConfigLoader config, Gson gson,
+  public DiscordCreateRankingService(ConfigLoader config,
       DiscordOptionRetriever discordOptionRetriever, ICreateRankingService createRankingService) {
     this.config = config;
-    this.gson = gson;
     this.discordOptionRetriever = discordOptionRetriever;
     this.createRankingService = createRankingService;
   }
