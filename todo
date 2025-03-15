@@ -1,24 +1,23 @@
--Crear una homepage desde donde poder incluir el bot en tu servidor y dar una pequeña explicacion sobre el bot y su contexto
--Revisar si merece la pena establecer una encriptacion entre el fichero de config y nuestra aplicacion como por ejemplo, meter la config en una keystore
--CICD independiente del entorno. Esta aplicacion debe de ser facil de ejecutar en cualquier lugar y para ello la complejidad del compilado con su config
+-Crear una homepage desde donde poder incluir el bot en tu servidor y dar una pequeña explicacion sobre el bot y su contexto WIP
+-Revisar si merece la pena establecer una encriptacion entre el fichero de config y nuestra aplicacion como por ejemplo, meter la config en una keystore TODO
+-CICD independiente del entorno. Esta aplicacion debe de ser facil de ejecutar en cualquier lugar y para ello la complejidad del compilado con su config DONE
 es algo que debemos abordar nosotros para que lo unico que tengamos que hacer sea subir el jar y ejecutar "java -jar"
 -Revisar permisos ranky-sg y ajustarlos al mínimo
 -Crear JSON de permisos para la group policy de ranky-terraform en AWS
 -Investigar cómo dejar el fichero en app/data o suplir el contenedor de docker o dockerfile en ECR
--Darle salida del comando al usuario cuando ocurre un error (si no se queda "Ranky está pensando..." eternamente)
--Checkear si es posible ofrecer autocompletado en funcion a los rankings que ya hay en el canal
--Sustituir Orianna por nuestra propia implementacion de comunicacion con Riot
--Sustituir el comando de añadir cuentas con un comando que permita al usuario elegir a que ranking quiere añadir las cuentas en un dropdown menu
+-Darle salida del comando al usuario cuando ocurre un error (si no se queda "Ranky está pensando..." eternamente) DONE
+-Checkear si es posible ofrecer autocompletado en funcion a los rankings que ya hay en el canal TODO
+-Sustituir Orianna por nuestra propia implementacion de comunicacion con Riot TODO
+-Sustituir el comando de añadir cuentas con un comando que permita al usuario elegir a que ranking quiere añadir las cuentas en un dropdown menu TODO
 https://jda.wiki/using-jda/interactions/#select-menus-dropdowns
--Explorar la opcion de abrir una modal para que el usuario meta las cuentas en un espacio mayor
--Añadir una lista de vetos puede ser interesante?
--En los ToS de discord dice que no podemos mandar MDs sin permiso. Revisar si podemos enviar el mensaje de presentacion.
--Montar una liga continua (con un torneo previo para sondear) en el que se premie a la gente que mas elo tenga. Con coste de entrada.
--Graficas que se añadan checkpoints con cada actualizacion de ranking???
--Claimear una cuenta para que te permita imprimir tu pagina y te permita tambien resaltar tu puesto en la clasificacion
--Cuando se intenta imprimir el ranking y no se ha escrito el comando con el nombre real del ranking (como por ejemplo, todo en caps) no funciona la cache
-  + Hacer el comando ranking case insensitive
--Frontalizar la interfaz de ranky para los usuarios que no esten acostumbrados al uso de comandos
-  + Con esto se puede frontalizar los rankings!!!
-  + Tambien podemos hacer rankings publicos
--IMPORTANTE arreglar que desde el endpoint de getAll sea capaz de sacar el ranking entero en vez de fracciones del ranking
+-Explorar la opcion de abrir una modal para que el usuario meta las cuentas en un espacio mayor TODO
+-Añadir una lista de vetos puede ser interesante? TODO
+-En los ToS de discord dice que no podemos mandar MDs sin permiso. Revisar si podemos enviar el mensaje de presentacion. TODO
+-Graficas que se añadan checkpoints con cada actualizacion de ranking??? TODO
+-Claimear una cuenta para que te permita imprimir tu pagina y te permita tambien resaltar tu puesto en la clasificacion TODO
+-Cuando se intenta imprimir el ranking y no se ha escrito el comando con el nombre real del ranking (como por ejemplo, todo en caps) no funciona la cache DONE
+  + Hacer el comando ranking case insensitive DONE
+-Frontalizar la interfaz de ranky para los usuarios que no esten acostumbrados al uso de comandos WIP
+  + Con esto se puede frontalizar los rankings!!! WIP
+  + Tambien podemos hacer rankings publicos TODO
+-IMPORTANTE arreglar que desde el endpoint de getAll sea capaz de sacar el ranking entero en vez de fracciones del ranking DONE
