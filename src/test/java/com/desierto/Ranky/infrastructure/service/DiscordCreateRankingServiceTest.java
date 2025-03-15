@@ -10,8 +10,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.desierto.Ranky.domain.entity.Ranking;
+import com.desierto.Ranky.domain.service.ICreateRankingService;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
-import com.desierto.Ranky.infrastructure.repository.ConfigChannelRankingRepository;
 import com.desierto.Ranky.infrastructure.utils.DiscordOptionRetriever;
 import com.google.gson.Gson;
 import java.util.List;
@@ -27,15 +27,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockedConstruction;
-import org.mockito.Mockito;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-public class CreateRankingServiceTest {
+public class DiscordCreateRankingServiceTest {
 
   private static final String RANKY_USER = "rankyUser";
-  CreateRankingService cut;
+  DiscordCreateRankingService cut;
 
   @Mock
   ConfigLoader config;
@@ -45,10 +43,14 @@ public class CreateRankingServiceTest {
   @Mock
   DiscordOptionRetriever discordOptionRetriever;
 
+  @Mock
+  ICreateRankingService createRankingService;
+
   @BeforeEach
   public void setUp() {
     gson = new Gson();
-    cut = new CreateRankingService(config, gson, discordOptionRetriever);
+    cut = new DiscordCreateRankingService(config, gson, discordOptionRetriever,
+        createRankingService);
     when(config.getRankyUserRole()).thenReturn(RANKY_USER);
   }
 
@@ -93,14 +95,9 @@ public class CreateRankingServiceTest {
     String rankingName = "Test";
     Ranking ranking = new Ranking(rankingName);
     when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingName);
-    try (MockedConstruction<ConfigChannelRankingRepository> repo = Mockito.mockConstruction(
-        ConfigChannelRankingRepository.class, (mock, context) -> {
-          when(mock.create(ranking)).thenReturn(ranking);
-        })) {
-      cut.execute(event);
-      verify(repo.constructed().get(0), times(1)).create(ranking);
-      verify(event.getHook().sendMessage(anyString()), times(1)).queue();
-    }
+    when(createRankingService.execute(rankingName, event.getGuild())).thenReturn(ranking);
+    cut.execute(event);
+    verify(event.getHook().sendMessage(anyString()), times(1)).queue();
   }
 
   private SlashCommandInteractionEvent getMockedEvent() {

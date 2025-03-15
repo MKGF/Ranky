@@ -3,8 +3,8 @@ package com.desierto.Ranky.infrastructure.controller;
 import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.ok;
 
-import com.desierto.Ranky.domain.RankingService;
 import com.desierto.Ranky.domain.entity.Ranking;
+import com.desierto.Ranky.domain.service.IGetRankingService;
 import com.desierto.Ranky.infrastructure.controller.dto.RankingApi;
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +28,7 @@ public class RankingsController {
   private JDA jda;
 
   @Autowired
-  private RankingService rankingService;
+  private IGetRankingService getRankingService;
 
   @GetMapping("/mutualWith/{userId}")
   public ResponseEntity<String> getMutualGuilds(@PathVariable String userId) {
@@ -45,7 +45,7 @@ public class RankingsController {
     Optional<Guild> match = guilds.stream()
         .filter(guild -> guild.getId().equalsIgnoreCase(guildId)).findFirst();
     return match.map(guild -> ok(
-            rankingService.getAll(guild).stream().map(RankingApi::fromDomain)
+            getRankingService.getAll(guild).stream().map(RankingApi::fromDomain)
                 .collect(
                     Collectors.toList())))
         .orElseGet(() -> ResponseEntity.notFound().build());
@@ -58,7 +58,7 @@ public class RankingsController {
     List<Guild> guilds = jda.getMutualGuilds(jda.retrieveUserById(userId).complete());
     Optional<Guild> match = guilds.stream()
         .filter(guild -> guild.getId().equalsIgnoreCase(guildId)).findFirst();
-    return match.map(guild -> ResponseEntity.ok(rankingService.get(ranking, guild)))
+    return match.map(guild -> ResponseEntity.ok(getRankingService.get(ranking, guild)))
         .orElseGet(() -> notFound().build());
   }
 

@@ -12,9 +12,9 @@ import static com.desierto.Ranky.infrastructure.commands.Command.REMOVE_ACCOUNTS
 import static com.desierto.Ranky.infrastructure.commands.Command.RETRIEVE_CONFIG_CHANNEL_CONTENT;
 
 import com.desierto.Ranky.infrastructure.service.AddAccountsService;
-import com.desierto.Ranky.infrastructure.service.CreateRankingService;
 import com.desierto.Ranky.infrastructure.service.DeleteRankingService;
-import com.desierto.Ranky.infrastructure.service.DiscordRankingService;
+import com.desierto.Ranky.infrastructure.service.DiscordCreateRankingService;
+import com.desierto.Ranky.infrastructure.service.DiscordGetRankingService;
 import com.desierto.Ranky.infrastructure.service.HelpService;
 import com.desierto.Ranky.infrastructure.service.RemoveAccountsService;
 import com.desierto.Ranky.infrastructure.service.admin.ConfigChannelChecker;
@@ -39,9 +39,9 @@ public class RankySlashCommandListener extends ListenerAdapter {
   @Autowired
   private HelpService helpService;
   @Autowired
-  private DiscordRankingService discordRankingService;
+  private DiscordGetRankingService discordGetRankingService;
   @Autowired
-  private CreateRankingService createRankingService;
+  private DiscordCreateRankingService discordCreateRankingService;
   @Autowired
   private DeleteRankingService deleteRankingService;
   @Autowired
@@ -87,10 +87,10 @@ public class RankySlashCommandListener extends ListenerAdapter {
       executorService.execute(() -> helpService.execute(event));
     }
     if (event.getCommandString().contains("/" + RANKING.getCommandId())) {
-      executorService.execute(() -> discordRankingService.execute(event));
+      executorService.execute(() -> discordGetRankingService.execute(event));
     }
     if (event.getCommandString().contains("/" + CREATE.getCommandId())) {
-      executorService.execute(() -> createRankingService.execute(event));
+      executorService.execute(() -> discordCreateRankingService.execute(event));
     }
     if (event.getCommandString().contains("/" + DELETE.getCommandId())) {
       executorService.execute(() -> deleteRankingService.execute(event));

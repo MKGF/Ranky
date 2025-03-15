@@ -36,9 +36,9 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-public class DiscordRankingServiceTest {
+public class DiscordGetRankingServiceTest {
 
-  DiscordRankingService cut;
+  DiscordGetRankingService cut;
 
   @Mock
   ConfigLoader config;
@@ -66,7 +66,7 @@ public class DiscordRankingServiceTest {
   @BeforeEach
   public void setUp() {
     gson = new Gson();
-    cut = new DiscordRankingService(config, discordOptionRetriever, gson, riotAccountRepository,
+    cut = new DiscordGetRankingService(config, discordOptionRetriever, gson, riotAccountRepository,
         discordRankingFormatter, accountsCache, printRankingService, rankingRepository);
     when(config.getAccountLimit()).thenReturn(1);
   }

@@ -1,11 +1,11 @@
 package com.desierto.Ranky.application.service;
 
 import com.desierto.Ranky.application.AccountsCache;
-import com.desierto.Ranky.domain.RankingService;
 import com.desierto.Ranky.domain.entity.Account;
 import com.desierto.Ranky.domain.entity.Ranking;
 import com.desierto.Ranky.domain.repository.RankingRepository;
 import com.desierto.Ranky.domain.repository.RiotAccountRepository;
+import com.desierto.Ranky.domain.service.IGetRankingService;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetRankingService implements RankingService {
+public class GetRankingService implements IGetRankingService {
 
   @Autowired
   private RankingRepository rankingRepository;

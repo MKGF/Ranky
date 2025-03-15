@@ -36,7 +36,7 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 @Slf4j
-public class DiscordRankingService {
+public class DiscordGetRankingService {
 
   @Autowired
   private ConfigLoader config;
@@ -64,29 +64,12 @@ public class DiscordRankingService {
 
   public void execute(SlashCommandInteractionEvent event) {
     if (event.isFromGuild()) {
-      InteractionHook hook = event.getHook();
       String rankingName = discordOptionRetriever.fromEventGetObjectName(event);
       try {
         Ranking ranking = rankingRepository.read(rankingName, event.getGuild());
-        Optional<List<Account>> cachedAccounts = accountsCache.find(
-            event.getGuild().getId(), rankingName);
-        List<Account> rankingAccounts;
-        Message progressBar = null;
-        if (cachedAccounts.isEmpty()) {
-          progressBar = hook.sendMessage(DiscordProgressBar.getProgress(0)).complete();
-          rankingAccounts = getRankingEntries(ranking, hook, progressBar);
-        } else {
-          rankingAccounts = cachedAccounts.get();
-        }
-        List<EntryDTO> rankingEntries = toEntryDtos(rankingAccounts,
-            Optional.ofNullable(progressBar));
-        if (rankingEntries.size() <= config.getAccountLimit()) {
-          printRankingService.printSinglePage(event, rankingName, rankingEntries,
-              getSinglePagePrintingFunction());
-        } else {
-          printRankingService.printMultiPage(event, rankingName, rankingEntries,
-              getMultiPagePrintingFunction(rankingName));
-        }
+        List<EntryDTO> rankingEntries = getRankedAccountsWithProgressBarAnimation(event,
+            rankingName, ranking);
+        printRankingAsResponseToUserCommand(event, rankingName, rankingEntries);
       } catch (ConfigChannelNotFoundException | RankingNotFoundException e) {
         handleExceptionOnSlashCommandEvent(e, event);
       }
@@ -94,6 +77,35 @@ public class DiscordRankingService {
     } else {
       event.getHook().sendMessage(EXECUTE_COMMAND_FROM_SERVER.getMessage()).queue();
     }
+  }
+
+  private void printRankingAsResponseToUserCommand(SlashCommandInteractionEvent event,
+      String rankingName,
+      List<EntryDTO> rankingEntries) {
+    if (rankingEntries.size() <= config.getAccountLimit()) {
+      printRankingService.printSinglePage(event, rankingName, rankingEntries,
+          getSinglePagePrintingFunction());
+    } else {
+      printRankingService.printMultiPage(event, rankingName, rankingEntries,
+          getMultiPagePrintingFunction(rankingName));
+    }
+  }
+
+  private List<EntryDTO> getRankedAccountsWithProgressBarAnimation(
+      SlashCommandInteractionEvent event,
+      String rankingName, Ranking ranking) {
+    Optional<List<Account>> cachedAccounts = accountsCache.find(
+        event.getGuild().getId(), rankingName);
+    List<Account> rankingAccounts;
+    Message progressBar = null;
+    if (cachedAccounts.isEmpty()) {
+      progressBar = event.getHook().sendMessage(DiscordProgressBar.getProgress(0)).complete();
+      rankingAccounts = getRankingEntries(ranking, event.getHook(), progressBar);
+    } else {
+      rankingAccounts = cachedAccounts.get();
+    }
+    return toEntryDtos(rankingAccounts,
+        Optional.ofNullable(progressBar));
   }
 
   private static SinglePagePrintingFunction getSinglePagePrintingFunction() {
