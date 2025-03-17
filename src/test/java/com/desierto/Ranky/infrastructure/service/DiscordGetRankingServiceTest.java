@@ -95,9 +95,9 @@ public class DiscordGetRankingServiceTest {
   public void onEvent_withMultiPageRanking_printsMultiPage() {
     SlashCommandInteractionEvent event = getAMockedEvent();
     Ranking ranking = new Ranking("id");
-    Account acc1 = new Account("name1", "tagLine1");
+    Account acc1 = new Account("id1", "name1", "tagLine1");
     acc1.updateRank(Rank.unranked());
-    Account acc2 = new Account("name2", "tagLine2");
+    Account acc2 = new Account("id2", "name2", "tagLine2");
     acc2.updateRank(Rank.unranked());
     ranking.addAccount(acc1);
     ranking.addAccount(acc2);
