@@ -26,18 +26,18 @@ public class AccountsService implements IAccountsService {
   private RiotAccountRepository riotAccountRepository;
 
   @Override
-  public void addAccounts(String rankingId, Guild guild, List<Account> accounts) {
+  public Ranking addAccounts(String rankingId, Guild guild, List<Account> accounts) {
     Ranking ranking = rankingRepository.read(rankingId, guild);
     accounts.stream().map(this::enrich).filter(account -> !account.getId().isEmpty()).forEach(
         ranking::addAccount);
-    rankingRepository.update(ranking, guild);
+    return rankingRepository.update(ranking, guild);
   }
 
   @Override
-  public void removeAccounts(String rankingId, Guild guild, List<Account> accounts) {
+  public Ranking removeAccounts(String rankingId, Guild guild, List<Account> accounts) {
     Ranking ranking = rankingRepository.read(rankingId, guild);
     accounts.stream().map(this::enrich).forEach(ranking::removeAccount);
-    rankingRepository.update(ranking, guild);
+    return rankingRepository.update(ranking, guild);
   }
 
   private Account enrich(Account account) {
