@@ -25,11 +25,14 @@ public class Ranking {
     this.accounts = new ArrayList<>(accounts);
   }
 
-  public boolean addAccount(Account account) {
-    return this.accounts.add(account);
+  public void addAccount(Account account) {
+    if (accounts.stream().map(Account::getId)
+        .noneMatch(id -> id.equalsIgnoreCase(account.getId()))) {
+      this.accounts.add(account);
+    }
   }
 
-  public boolean removeAccount(Account accountToRemove) {
-    return this.accounts.removeIf(account -> account.getId().equals(accountToRemove.getId()));
+  public void removeAccount(Account accountToRemove) {
+    this.accounts.removeIf(account -> account.getId().equals(accountToRemove.getId()));
   }
 }

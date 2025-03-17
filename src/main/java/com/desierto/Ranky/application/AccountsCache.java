@@ -55,6 +55,13 @@ public class AccountsCache {
     return optionalAccounts;
   }
 
+  public void delete(String rankingId, String guildId) {
+    String key = guildId + ":" + rankingId;
+    rankings.remove(key);
+    introductionTimes.remove(key);
+    log.info(String.format("Removed ranking with id = %s from cache", key.toLowerCase()));
+  }
+
   @Scheduled(fixedRate = 1000 * 60 * CACHE_MINUTES)
   protected void clearCache() {
     List<String> keysToRemoveFromCache = new ArrayList<>();
