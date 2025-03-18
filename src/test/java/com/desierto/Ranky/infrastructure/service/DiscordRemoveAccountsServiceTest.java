@@ -2,33 +2,30 @@ package com.desierto.Ranky.infrastructure.service;
 
 import static com.desierto.Ranky.infrastructure.utils.DiscordMessages.COMMAND_NOT_ALLOWED;
 import static com.desierto.Ranky.infrastructure.utils.DiscordMessages.EXECUTE_COMMAND_FROM_SERVER;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.desierto.Ranky.domain.entity.Account;
 import com.desierto.Ranky.domain.entity.Ranking;
-import com.desierto.Ranky.domain.repository.RiotAccountRepository;
+import com.desierto.Ranky.domain.service.IAccountsService;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
-import com.desierto.Ranky.infrastructure.repository.ConfigChannelRankingRepository;
 import com.desierto.Ranky.infrastructure.utils.DiscordOptionRetriever;
-import com.google.gson.Gson;
 import java.util.List;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageCreateAction;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockedConstruction;
-import org.mockito.Mockito;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -41,38 +38,24 @@ public class DiscordRemoveAccountsServiceTest {
   @Mock
   ConfigLoader config;
 
-  Gson gson;
-
-
   @Mock
   DiscordOptionRetriever discordOptionRetriever;
 
   @Mock
-  RiotAccountRepository riotAccountRepository;
-
-  private MockedConstruction<ConfigChannelRankingRepository> repo;
+  IAccountsService accountsService;
 
   @BeforeEach
   public void setUp() {
-    gson = new Gson();
-    cut = new DiscordRemoveAccountsService(config, discordOptionRetriever, gson,
-        riotAccountRepository);
+    cut = new DiscordRemoveAccountsService(config, discordOptionRetriever, accountsService);
     when(config.getRankyUserRole()).thenReturn(RANKY_USER);
-  }
-
-  @AfterEach
-  public void tearDown() {
-    repo.close();
   }
 
   @Test
   public void onExecute_withoutRankyUserRole_doesNothingAndInforms() {
     SlashCommandInteractionEvent event = getAMockedEventWithMemberWithoutRole();
-    String rankingName = "A ranking";
-    Ranking ranking = new Ranking(rankingName);
-    when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingName);
+    String rankingId = "A ranking";
+    when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingId);
     when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of(new Account()));
-    repo = mockDiscordRepo(ranking);
 
     cut.execute(event);
 
@@ -82,11 +65,10 @@ public class DiscordRemoveAccountsServiceTest {
   @Test
   public void onExecute_withEventNotComingFromAGuild_doesNothingAndInforms() {
     SlashCommandInteractionEvent event = getAMockedEventNotFromAGuild();
-    String rankingName = "A ranking";
-    Ranking ranking = new Ranking(rankingName);
-    when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingName);
+    String rankingId = "A ranking";
+    Ranking ranking = new Ranking(rankingId);
+    when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingId);
     when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of(new Account()));
-    repo = mockDiscordRepo(ranking);
 
     cut.execute(event);
 
@@ -96,34 +78,30 @@ public class DiscordRemoveAccountsServiceTest {
   @Test
   public void onExecute_withoutAccountsToRemove_doesNothing() {
     SlashCommandInteractionEvent event = getAMockedEvent();
-    String rankingName = "A ranking";
-    Ranking ranking = new Ranking(rankingName);
-    when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingName);
-    when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of(new Account()));
-    repo = mockDiscordRepo(ranking);
+    String rankingId = "A ranking";
+    when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingId);
+    when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of());
 
     cut.execute(event);
 
-    verify(event.getHook(), times(0)).sendMessage(anyString());
-    verify(repo.constructed().get(0), times(1)).update(ranking);
+    verify(event.getHook(), never()).sendMessage(anyString());
+    verify(accountsService, never()).removeAccounts(anyString(), any(), anyList());
   }
 
   @Test
   public void onExecute_withAccountsToRemove_removesAccountsAndInformsInHook() {
     SlashCommandInteractionEvent event = getAMockedEvent();
-    String rankingName = "A ranking";
+    String rankingId = "A ranking";
     Account BBXhadow = new Account("id", "BBXhadow", "RFF");
-    Ranking ranking = new Ranking(rankingName, List.of(BBXhadow));
-    when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingName);
+    Ranking ranking = new Ranking(rankingId, List.of(BBXhadow));
+    when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingId);
     when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of(BBXhadow));
-    when(riotAccountRepository.enrichIdentification(BBXhadow)).thenReturn(BBXhadow);
-    repo = mockDiscordRepo(ranking);
 
     cut.execute(event);
 
-    assertEquals(ranking.getAccounts().size(), 0);
     verify(event.getHook(), times(1)).sendMessage("Accounts removed successfully!");
-    verify(repo.constructed().get(0), times(1)).update(ranking);
+    verify(accountsService, times(1)).removeAccounts(rankingId, event.getGuild(),
+        List.of(BBXhadow));
   }
 
   private SlashCommandInteractionEvent getAMockedEventWithMemberWithoutRole() {
@@ -166,13 +144,5 @@ public class DiscordRemoveAccountsServiceTest {
     when(role.getName()).thenReturn(RANKY_USER);
     when(hook.sendMessage(anyString())).thenReturn(wmca);
     return event;
-  }
-
-  private MockedConstruction<ConfigChannelRankingRepository> mockDiscordRepo(Ranking ranking) {
-    return Mockito.mockConstruction(
-        ConfigChannelRankingRepository.class, (mock, context) -> {
-          when(mock.update(ranking)).thenReturn(ranking);
-          when(mock.read(ranking.getId())).thenReturn(ranking);
-        });
   }
 }

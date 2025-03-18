@@ -11,9 +11,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.desierto.Ranky.domain.exception.ranking.RankingCouldNotBeDeletedException;
+import com.desierto.Ranky.domain.service.IDeleteRankingService;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
-import com.desierto.Ranky.infrastructure.repository.ConfigChannelRankingRepository;
-import com.google.gson.Gson;
 import java.util.List;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -29,8 +28,6 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockedConstruction;
-import org.mockito.Mockito;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -44,12 +41,12 @@ public class DiscordDeleteRankingServiceTest {
   @Mock
   ConfigLoader config;
 
-  Gson gson;
+  @Mock
+  IDeleteRankingService deleteRankingService;
 
   @BeforeAll
   public void setUp() {
-    gson = new Gson();
-    cut = new DiscordDeleteRankingService(config, gson);
+    cut = new DiscordDeleteRankingService(config, deleteRankingService);
     when(config.getRankyUserRole()).thenReturn(RANKY_USER);
   }
 
@@ -86,29 +83,21 @@ public class DiscordDeleteRankingServiceTest {
   @Test
   public void onEvent_deletesRankingAndInformsInHook() {
     SlashCommandInteractionEvent event = getMockedEvent();
-    String rankingName = "Test";
-    MockedConstruction<ConfigChannelRankingRepository> repo = Mockito.mockConstruction(
-        ConfigChannelRankingRepository.class, (mock, context) -> {
-          when(mock.delete(rankingName)).thenReturn(true);
-        });
+    String rankingId = "Test";
+    when(deleteRankingService.execute(rankingId, event.getGuild())).thenReturn(true);
     cut.execute(event);
-    verify(repo.constructed().get(0), times(1)).delete(rankingName);
+    verify(deleteRankingService, times(1)).execute(rankingId, event.getGuild());
     verify(event.getHook().sendMessage(anyString()), times(1)).queue();
-    repo.close();
   }
 
   @Test
   public void onEvent_whenDeleteWasNotSuccessful_throwsException() {
     SlashCommandInteractionEvent event = getMockedEvent();
-    String rankingName = "Test";
-    MockedConstruction<ConfigChannelRankingRepository> repo = Mockito.mockConstruction(
-        ConfigChannelRankingRepository.class, (mock, context) -> {
-          when(mock.delete(rankingName)).thenReturn(false);
-        });
+    String rankingId = "Test";
+    when(deleteRankingService.execute(rankingId, event.getGuild())).thenReturn(false);
 
     assertThrows(RankingCouldNotBeDeletedException.class, () -> cut.execute(event));
-    verify(repo.constructed().get(0), times(1)).delete(rankingName);
-    repo.close();
+    verify(deleteRankingService, times(1)).execute(rankingId, event.getGuild());
   }
 
   private SlashCommandInteractionEvent getMockedEvent() {
