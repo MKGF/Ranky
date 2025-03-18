@@ -21,3 +21,4 @@ https://jda.wiki/using-jda/interactions/#select-menus-dropdowns
   + Con esto se puede frontalizar los rankings!!! WIP
   + Tambien podemos hacer rankings publicos TODO
 -IMPORTANTE arreglar que desde el endpoint de getAll sea capaz de sacar el ranking entero en vez de fracciones del ranking DONE
+-Testar los controllers con BaseIT y comprobar que todo funciona despues del refactor
