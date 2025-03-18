@@ -5,6 +5,7 @@ import static org.springframework.http.ResponseEntity.ok;
 
 import com.desierto.Ranky.domain.entity.Ranking;
 import com.desierto.Ranky.domain.service.IGetRankingService;
+import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
 import com.desierto.Ranky.infrastructure.controller.dto.RankingApi;
 import java.util.List;
 import java.util.Optional;
@@ -28,38 +29,57 @@ public class RankingsController {
   private JDA jda;
 
   @Autowired
+  private ConfigLoader config;
+
+  @Autowired
   private IGetRankingService getRankingService;
 
-  @GetMapping("/mutualWith/{userId}")
-  public ResponseEntity<String> getMutualGuilds(@PathVariable String userId) {
-    loadGuilds(jda, Long.parseLong(userId));
-    List<Guild> guilds = jda.getMutualGuilds(jda.retrieveUserById(userId).complete());
-    return ok(guilds.toString());
-  }
-
-  @GetMapping("/fromGuild/{guildId}/forUser/{userId}")
-  public ResponseEntity<List<RankingApi>> getRankings(@PathVariable String guildId,
+  @GetMapping("/{adminKey}/mutualWith/{userId}")
+  public ResponseEntity<String> getMutualGuilds(@PathVariable String adminKey,
       @PathVariable String userId) {
-    loadGuilds(jda, Long.parseLong(userId));
-    List<Guild> guilds = jda.getMutualGuilds(jda.retrieveUserById(userId).complete());
-    Optional<Guild> match = guilds.stream()
-        .filter(guild -> guild.getId().equalsIgnoreCase(guildId)).findFirst();
-    return match.map(guild -> ok(
-            getRankingService.getAll(guild).stream().map(RankingApi::fromDomain)
-                .collect(
-                    Collectors.toList())))
-        .orElseGet(() -> ResponseEntity.notFound().build());
+    if (adminKey.equals(config.getControllerAdminKey())) {
+
+      loadGuilds(jda, Long.parseLong(userId));
+      List<Guild> guilds = jda.getMutualGuilds(jda.retrieveUserById(userId).complete());
+      return ok(guilds.toString());
+    } else {
+      return ResponseEntity.notFound().build();
+    }
   }
 
-  @GetMapping("/fromGuild/{guildId}/forUser/{userId}/ranking/{ranking}")
-  public ResponseEntity<Ranking> getRanking(@PathVariable String guildId,
+  @GetMapping("/{adminKey}/fromGuild/{guildId}/forUser/{userId}")
+  public ResponseEntity<List<RankingApi>> getRankings(@PathVariable String adminKey,
+      @PathVariable String guildId,
+      @PathVariable String userId) {
+    if (adminKey.equals(config.getControllerAdminKey())) {
+      loadGuilds(jda, Long.parseLong(userId));
+      List<Guild> guilds = jda.getMutualGuilds(jda.retrieveUserById(userId).complete());
+      Optional<Guild> match = guilds.stream()
+          .filter(guild -> guild.getId().equalsIgnoreCase(guildId)).findFirst();
+      return match.map(guild -> ok(
+              getRankingService.getAll(guild).stream().map(RankingApi::fromDomain)
+                  .collect(
+                      Collectors.toList())))
+          .orElseGet(() -> ResponseEntity.notFound().build());
+    } else {
+      return ResponseEntity.notFound().build();
+    }
+  }
+
+  @GetMapping("/{adminKey}/fromGuild/{guildId}/forUser/{userId}/ranking/{ranking}")
+  public ResponseEntity<Ranking> getRanking(@PathVariable String adminKey,
+      @PathVariable String guildId,
       @PathVariable String userId, @PathVariable String ranking) {
-    loadGuilds(jda, Long.parseLong(userId));
-    List<Guild> guilds = jda.getMutualGuilds(jda.retrieveUserById(userId).complete());
-    Optional<Guild> match = guilds.stream()
-        .filter(guild -> guild.getId().equalsIgnoreCase(guildId)).findFirst();
-    return match.map(guild -> ResponseEntity.ok(getRankingService.get(ranking, guild)))
-        .orElseGet(() -> notFound().build());
+    if (adminKey.equals(config.getControllerAdminKey())) {
+      loadGuilds(jda, Long.parseLong(userId));
+      List<Guild> guilds = jda.getMutualGuilds(jda.retrieveUserById(userId).complete());
+      Optional<Guild> match = guilds.stream()
+          .filter(guild -> guild.getId().equalsIgnoreCase(guildId)).findFirst();
+      return match.map(guild -> ResponseEntity.ok(getRankingService.get(ranking, guild)))
+          .orElseGet(() -> notFound().build());
+    } else {
+      return ResponseEntity.notFound().build();
+    }
   }
 
   private void loadGuilds(JDA bot, long id) {

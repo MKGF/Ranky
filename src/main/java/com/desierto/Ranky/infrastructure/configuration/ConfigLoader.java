@@ -26,7 +26,7 @@ public class ConfigLoader {
 
   @Value("${config.channel}")
   private String configChannel;
-  
+
   @Value("${message.listener.enabled}")
   private Boolean isMessageListenerEnabled;
 
@@ -56,4 +56,7 @@ public class ConfigLoader {
 
   @Value("${messages.to_owner}")
   private String pathToOwnerPresentationMessage;
+
+  @Value("${controller.admin.key}")
+  private String controllerAdminKey;
 }
