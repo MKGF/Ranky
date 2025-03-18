@@ -33,20 +33,20 @@ public class AccountsCacheTest {
   public void whenSave_introducesListOfAccountsAndTime() {
     assertEquals(0, rankings.size());
     assertEquals(0, introductionTimes.size());
-    cut.save("test", List.of());
+    cut.save("guildId", "test", List.of());
     assertEquals(1, rankings.size());
     assertEquals(1, introductionTimes.size());
   }
 
   @Test
   public void whenFind_returnsList() {
-    cut.save("test", List.of());
-    assertTrue(cut.find("test").isPresent());
+    cut.save("guildId", "test", List.of());
+    assertTrue(cut.find("guildId", "test").isPresent());
   }
 
   @Test
   public void whenFind_ifNoValueWasFound_returnsEmpty() {
-    assertTrue(cut.find("test").isEmpty());
+    assertTrue(cut.find("guildId", "test").isEmpty());
   }
 
   @Test

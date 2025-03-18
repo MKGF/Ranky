@@ -2,6 +2,7 @@ package com.desierto.Ranky.infrastructure.service;
 
 import static com.desierto.Ranky.infrastructure.utils.DiscordMessages.COMMAND_NOT_ALLOWED;
 import static com.desierto.Ranky.infrastructure.utils.DiscordMessages.EXECUTE_COMMAND_FROM_SERVER;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -9,11 +10,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.desierto.Ranky.domain.entity.Ranking;
+import com.desierto.Ranky.domain.exception.ranking.RankingCouldNotBeDeletedException;
+import com.desierto.Ranky.domain.service.IDeleteRankingService;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
-import com.desierto.Ranky.infrastructure.repository.ConfigChannelRankingRepository;
-import com.desierto.Ranky.infrastructure.utils.DiscordOptionRetriever;
-import com.google.gson.Gson;
 import java.util.List;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -23,32 +22,31 @@ import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageCreateAction;
 import net.dv8tion.jda.api.utils.data.DataObject;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockedConstruction;
-import org.mockito.Mockito;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-public class CreateRankingServiceTest {
+@TestInstance(Lifecycle.PER_CLASS)
+public class DiscordDeleteRankingServiceTest {
 
   private static final String RANKY_USER = "rankyUser";
-  CreateRankingService cut;
+
+  DiscordDeleteRankingService cut;
 
   @Mock
   ConfigLoader config;
 
-  Gson gson;
-
   @Mock
-  DiscordOptionRetriever discordOptionRetriever;
+  IDeleteRankingService deleteRankingService;
 
-  @BeforeEach
+  @BeforeAll
   public void setUp() {
-    gson = new Gson();
-    cut = new CreateRankingService(config, gson, discordOptionRetriever);
+    cut = new DiscordDeleteRankingService(config, deleteRankingService);
     when(config.getRankyUserRole()).thenReturn(RANKY_USER);
   }
 
@@ -83,31 +81,36 @@ public class CreateRankingServiceTest {
   }
 
   @Test
-  public void onEvent_createsRankingAndInformsInHook() {
+  public void onEvent_deletesRankingAndInformsInHook() {
     SlashCommandInteractionEvent event = getMockedEvent();
-    Member member = mock(Member.class);
-    Role role = mock(Role.class);
-    when(event.getMember()).thenReturn(member);
-    when(member.getRoles()).thenReturn(List.of(role));
-    when(role.getName()).thenReturn(RANKY_USER);
-    String rankingName = "Test";
-    Ranking ranking = new Ranking(rankingName);
-    when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingName);
-    try (MockedConstruction<ConfigChannelRankingRepository> repo = Mockito.mockConstruction(
-        ConfigChannelRankingRepository.class, (mock, context) -> {
-          when(mock.create(ranking)).thenReturn(ranking);
-        })) {
-      cut.execute(event);
-      verify(repo.constructed().get(0), times(1)).create(ranking);
-      verify(event.getHook().sendMessage(anyString()), times(1)).queue();
-    }
+    String rankingId = "Test";
+    when(deleteRankingService.execute(rankingId, event.getGuild())).thenReturn(true);
+    cut.execute(event);
+    verify(deleteRankingService, times(1)).execute(rankingId, event.getGuild());
+    verify(event.getHook().sendMessage(anyString()), times(1)).queue();
+  }
+
+  @Test
+  public void onEvent_whenDeleteWasNotSuccessful_throwsException() {
+    SlashCommandInteractionEvent event = getMockedEvent();
+    String rankingId = "Test";
+    when(deleteRankingService.execute(rankingId, event.getGuild())).thenReturn(false);
+
+    assertThrows(RankingCouldNotBeDeletedException.class, () -> cut.execute(event));
+    verify(deleteRankingService, times(1)).execute(rankingId, event.getGuild());
   }
 
   private SlashCommandInteractionEvent getMockedEvent() {
     SlashCommandInteractionEvent event = mock(SlashCommandInteractionEvent.class);
     Guild guild = mock(Guild.class);
     InteractionHook hook = mock(InteractionHook.class);
+    Member member = mock(Member.class);
+    Role role = mock(Role.class);
     WebhookMessageCreateAction wmca = mock(WebhookMessageCreateAction.class);
+    when(event.getHook()).thenReturn(hook);
+    when(event.getMember()).thenReturn(member);
+    when(member.getRoles()).thenReturn(List.of(role));
+    when(role.getName()).thenReturn(RANKY_USER);
     when(event.isFromGuild()).thenReturn(true);
     when(event.getGuild()).thenReturn(guild);
     when(event.getOptions()).thenReturn(

@@ -4,47 +4,37 @@ import static com.desierto.Ranky.infrastructure.utils.DiscordExceptionHandler.ha
 import static com.desierto.Ranky.infrastructure.utils.DiscordMessages.COMMAND_NOT_ALLOWED;
 import static com.desierto.Ranky.infrastructure.utils.DiscordMessages.EXECUTE_COMMAND_FROM_SERVER;
 
-import com.desierto.Ranky.domain.exception.ConfigChannelNotFoundException;
 import com.desierto.Ranky.domain.exception.ranking.RankingCouldNotBeDeletedException;
-import com.desierto.Ranky.domain.exception.ranking.RankingNotFoundException;
+import com.desierto.Ranky.domain.service.IDeleteRankingService;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
-import com.desierto.Ranky.infrastructure.repository.ConfigChannelRankingRepository;
-import com.google.gson.Gson;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class DeleteRankingService {
+public class DiscordDeleteRankingService {
 
   private final ConfigLoader config;
 
-  private final Gson gson;
+  private final IDeleteRankingService deleteRankingService;
 
   @Autowired
-  public DeleteRankingService(ConfigLoader config, Gson gson) {
+  public DiscordDeleteRankingService(ConfigLoader config,
+      IDeleteRankingService deleteRankingService) {
     this.config = config;
-    this.gson = gson;
+    this.deleteRankingService = deleteRankingService;
   }
 
   public void execute(SlashCommandInteractionEvent event) {
     if (event.getMember().getRoles().stream()
         .anyMatch(role -> role.getName().equalsIgnoreCase(config.getRankyUserRole()))) {
       if (event.isFromGuild()) {
-        try {
-          ConfigChannelRankingRepository rankingRepository = new ConfigChannelRankingRepository(
-              config,
-              event.getGuild(),
-              gson
-          );
-          String rankingName = event.getOptions().stream().findFirst().get().getAsString();
-          if (rankingRepository.delete(rankingName)) {
-            event.getHook().sendMessage("Ranking deleted successfully!").queue();
-          } else {
-            handleExceptionOnSlashCommandEvent(new RankingCouldNotBeDeletedException(), event);
-          }
-        } catch (ConfigChannelNotFoundException | RankingNotFoundException e) {
-          handleExceptionOnSlashCommandEvent(e, event);
+
+        String rankingId = event.getOptions().stream().findFirst().get().getAsString();
+        if (deleteRankingService.execute(rankingId, event.getGuild())) {
+          event.getHook().sendMessage("Ranking deleted successfully!").queue();
+        } else {
+          handleExceptionOnSlashCommandEvent(new RankingCouldNotBeDeletedException(), event);
         }
       } else {
         event.getHook().sendMessage(EXECUTE_COMMAND_FROM_SERVER.getMessage()).queue();

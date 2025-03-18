@@ -25,4 +25,8 @@ public class RankingDTO {
     return new Ranking(id, accounts.stream().map(AccountDTO::toDomain).collect(
         Collectors.toList()));
   }
+
+  public void addAccounts(List<AccountDTO> accounts) {
+    this.accounts.addAll(accounts);
+  }
 }

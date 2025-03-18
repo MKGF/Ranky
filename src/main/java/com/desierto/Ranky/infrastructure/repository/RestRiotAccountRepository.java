@@ -16,15 +16,14 @@ import com.merakianalytics.orianna.types.core.account.Account.Builder;
 import com.merakianalytics.orianna.types.core.league.LeagueEntry;
 import com.merakianalytics.orianna.types.core.summoner.Summoner;
 import jakarta.annotation.PostConstruct;
-import java.util.logging.Logger;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
+@Slf4j
 public class RestRiotAccountRepository implements RiotAccountRepository {
-
-  public static final Logger log = Logger.getLogger("RestRiotAccountRepository.class");
 
   private final ConfigLoader configLoader;
 
@@ -63,6 +62,7 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
     GameNameDTO gameName = gson.fromJson(accountBuilder.get().toJSON(), GameNameDTO.class);
     try {
       LeagueEntry leagueEntry = summoner.getLeaguePosition(Queue.RANKED_SOLO);
+      log.debug("Got ranked stats for account: " + gameName.getWholeName());
       account.updateRank(
           leagueEntry != null ?
               new Rank(

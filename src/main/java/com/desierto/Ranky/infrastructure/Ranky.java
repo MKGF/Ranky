@@ -6,7 +6,7 @@ import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
 import com.desierto.Ranky.infrastructure.service.BotStatusUpdaterService;
 import com.desierto.Ranky.infrastructure.service.WelcomeGuildService;
 import com.desierto.Ranky.infrastructure.service.WelcomeOwnerService;
-import java.util.logging.Logger;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -19,11 +19,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
+@Slf4j
 public class Ranky extends SpringBootServletInitializer {
 
   public static String prefix = "/";
-  public static final Logger log = Logger.getLogger("Ranky.class");
-
   public static final String PATH_TO_EMBED_MESSAGE_TXT = "src/main/resources/config/onGuildJoinEmbedMessage.txt";
   public static final String PATH_TO_NON_RIOT_ENDORSEMENT_MESSAGE_TXT = "src/main/resources/config/nonRiotEndorsementMessage.txt";
 

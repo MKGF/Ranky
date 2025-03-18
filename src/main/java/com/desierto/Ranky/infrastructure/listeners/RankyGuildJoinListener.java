@@ -7,8 +7,8 @@ import com.desierto.Ranky.infrastructure.service.BotStatusUpdaterService;
 import com.desierto.Ranky.infrastructure.service.WelcomeGuildService;
 import com.desierto.Ranky.infrastructure.service.WelcomeOwnerService;
 import jakarta.annotation.PostConstruct;
-import java.util.logging.Logger;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -19,9 +19,8 @@ import org.springframework.stereotype.Service;
 
 @AllArgsConstructor
 @Service
+@Slf4j
 public class RankyGuildJoinListener extends ListenerAdapter {
-
-  public static final Logger log = Logger.getLogger("RankyGuildJoinListener.class");
 
   @Autowired
   private ConfigLoader config;
@@ -57,11 +56,11 @@ public class RankyGuildJoinListener extends ListenerAdapter {
         config.getPathToNonRiotEndorsementMessage());
     log.info("JOINED GUILD: " + event.getGuild().getName());
     if (owner != null) {
-      log.info(
+      log.warn(
           "OWNER OF THE GUILD: " + owner.getUser().getName() + "/" + owner.getUser()
               .getId());
     } else {
-      log.info("GUILD HAS NO OWNER.");
+      log.warn("GUILD HAS NO OWNER.");
     }
 
     botStatusUpdaterService.execute();

@@ -13,13 +13,12 @@ import static org.mockito.Mockito.when;
 import com.desierto.Ranky.application.AccountsCache;
 import com.desierto.Ranky.domain.entity.Account;
 import com.desierto.Ranky.domain.entity.Ranking;
+import com.desierto.Ranky.domain.repository.RankingRepository;
 import com.desierto.Ranky.domain.repository.RiotAccountRepository;
 import com.desierto.Ranky.domain.valueobject.Rank;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
-import com.desierto.Ranky.infrastructure.repository.ConfigChannelRankingRepository;
 import com.desierto.Ranky.infrastructure.utils.DiscordOptionRetriever;
 import com.desierto.Ranky.infrastructure.utils.DiscordRankingFormatter;
-import com.google.gson.Gson;
 import java.util.Optional;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -29,27 +28,22 @@ import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageCreateAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockedConstruction;
-import org.mockito.Mockito;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-public class GetRankingServiceTest {
+public class DiscordGetRankingServiceTest {
 
-  GetRankingService cut;
+  DiscordGetRankingService cut;
 
   @Mock
   ConfigLoader config;
 
   @Mock
   DiscordOptionRetriever discordOptionRetriever;
-
-  Gson gson;
 
   @Mock
   RiotAccountRepository riotAccountRepository;
@@ -63,26 +57,21 @@ public class GetRankingServiceTest {
   @Mock
   PrintRankingService printRankingService;
 
-  private MockedConstruction<ConfigChannelRankingRepository> repo;
+  @Mock
+  RankingRepository rankingRepository;
 
   @BeforeEach
   public void setUp() {
-    gson = new Gson();
-    cut = new GetRankingService(config, discordOptionRetriever, gson, riotAccountRepository,
-        discordRankingFormatter, accountsCache, printRankingService);
+    cut = new DiscordGetRankingService(config, discordOptionRetriever, riotAccountRepository,
+        discordRankingFormatter, accountsCache, printRankingService, rankingRepository);
     when(config.getAccountLimit()).thenReturn(1);
-  }
-
-  @AfterEach
-  public void tearDown() {
-    repo.close();
   }
 
   @Test
   public void onEvent_whenNotFromGuild_doesNothingAndInforms() {
     SlashCommandInteractionEvent event = getAMockedEventNotFromAGuild();
     Ranking ranking = new Ranking("");
-    repo = mockDiscordRepo(ranking);
+    mockDiscordRepo(ranking, event.getGuild());
     cut.execute(event);
 
     verify(event.getHook(), times(1)).sendMessage(EXECUTE_COMMAND_FROM_SERVER.getMessage());
@@ -92,7 +81,7 @@ public class GetRankingServiceTest {
   public void onEvent_withSinglePageRanking_printsSinglePage() {
     SlashCommandInteractionEvent event = getAMockedEvent();
     Ranking ranking = new Ranking("id");
-    repo = mockDiscordRepo(ranking);
+    mockDiscordRepo(ranking, event.getGuild());
     when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn("id");
     when(discordRankingFormatter.formatRankingEntries(any())).thenReturn("formattedRanking");
 
@@ -106,14 +95,15 @@ public class GetRankingServiceTest {
   public void onEvent_withMultiPageRanking_printsMultiPage() {
     SlashCommandInteractionEvent event = getAMockedEvent();
     Ranking ranking = new Ranking("id");
-    Account acc1 = new Account("name1", "tagLine1");
+    Account acc1 = new Account("id1", "name1", "tagLine1");
     acc1.updateRank(Rank.unranked());
-    Account acc2 = new Account("name2", "tagLine2");
+    Account acc2 = new Account("id2", "name2", "tagLine2");
     acc2.updateRank(Rank.unranked());
     ranking.addAccount(acc1);
     ranking.addAccount(acc2);
-    repo = mockDiscordRepo(ranking);
-    when(accountsCache.find(anyString())).thenReturn(Optional.of(ranking.getAccounts()));
+    mockDiscordRepo(ranking, event.getGuild());
+    when(accountsCache.find(anyString(), anyString())).thenReturn(
+        Optional.of(ranking.getAccounts()));
     when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn("id");
     when(discordRankingFormatter.formatRankingEntries(any())).thenReturn("formattedRanking");
 
@@ -156,11 +146,8 @@ public class GetRankingServiceTest {
     return event;
   }
 
-  private MockedConstruction<ConfigChannelRankingRepository> mockDiscordRepo(Ranking ranking) {
-    return Mockito.mockConstruction(
-        ConfigChannelRankingRepository.class, (mock, context) -> {
-          when(mock.update(ranking)).thenReturn(ranking);
-          when(mock.read(ranking.getId())).thenReturn(ranking);
-        });
+  private void mockDiscordRepo(Ranking ranking, Guild guild) {
+    when(rankingRepository.update(ranking, guild)).thenReturn(ranking);
+    when(rankingRepository.read(ranking.getId(), guild)).thenReturn(ranking);
   }
 }

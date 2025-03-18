@@ -56,4 +56,7 @@ public class ConfigLoader {
 
   @Value("${messages.to_owner}")
   private String pathToOwnerPresentationMessage;
+
+  @Value("${controller.admin.key}")
+  private String controllerAdminKey;
 }

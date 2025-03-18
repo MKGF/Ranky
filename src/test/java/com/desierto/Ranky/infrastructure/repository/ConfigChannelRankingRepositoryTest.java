@@ -11,11 +11,11 @@ import static org.mockito.Mockito.when;
 
 import com.desierto.Ranky.domain.entity.Account;
 import com.desierto.Ranky.domain.entity.Ranking;
-import com.desierto.Ranky.domain.exception.ConfigChannelNotFoundException;
 import com.desierto.Ranky.domain.exception.RankingAlreadyExistsException;
 import com.desierto.Ranky.domain.exception.ranking.RankingNotFoundException;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
 import com.desierto.Ranky.infrastructure.dto.RankingDTO;
+import com.desierto.Ranky.infrastructure.exceptions.ConfigChannelNotFoundException;
 import com.google.gson.Gson;
 import java.util.List;
 import net.dv8tion.jda.api.entities.Guild;

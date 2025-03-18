@@ -11,20 +11,20 @@ import static com.desierto.Ranky.infrastructure.commands.Command.RANKING;
 import static com.desierto.Ranky.infrastructure.commands.Command.REMOVE_ACCOUNTS;
 import static com.desierto.Ranky.infrastructure.commands.Command.RETRIEVE_CONFIG_CHANNEL_CONTENT;
 
-import com.desierto.Ranky.infrastructure.service.AddAccountsService;
-import com.desierto.Ranky.infrastructure.service.CreateRankingService;
-import com.desierto.Ranky.infrastructure.service.DeleteRankingService;
-import com.desierto.Ranky.infrastructure.service.GetRankingService;
+import com.desierto.Ranky.infrastructure.service.DiscordAddAccountsService;
+import com.desierto.Ranky.infrastructure.service.DiscordCreateRankingService;
+import com.desierto.Ranky.infrastructure.service.DiscordDeleteRankingService;
+import com.desierto.Ranky.infrastructure.service.DiscordGetRankingService;
+import com.desierto.Ranky.infrastructure.service.DiscordRemoveAccountsService;
 import com.desierto.Ranky.infrastructure.service.HelpService;
-import com.desierto.Ranky.infrastructure.service.RemoveAccountsService;
 import com.desierto.Ranky.infrastructure.service.admin.ConfigChannelChecker;
 import com.desierto.Ranky.infrastructure.service.admin.ConfigChannelContentRetriever;
 import com.desierto.Ranky.infrastructure.service.admin.EnrolledUsersRetriever;
 import com.desierto.Ranky.infrastructure.service.admin.GuildRetriever;
 import jakarta.annotation.PostConstruct;
 import java.util.concurrent.ExecutorService;
-import java.util.logging.Logger;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -33,20 +33,21 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class RankySlashCommandListener extends ListenerAdapter {
 
   @Autowired
   private HelpService helpService;
   @Autowired
-  private GetRankingService getRankingService;
+  private DiscordGetRankingService discordGetRankingService;
   @Autowired
-  private CreateRankingService createRankingService;
+  private DiscordCreateRankingService discordCreateRankingService;
   @Autowired
-  private DeleteRankingService deleteRankingService;
+  private DiscordDeleteRankingService discordDeleteRankingService;
   @Autowired
-  private AddAccountsService addAccountsService;
+  private DiscordAddAccountsService discordAddAccountsService;
   @Autowired
-  private RemoveAccountsService removeAccountsService;
+  private DiscordRemoveAccountsService discordRemoveAccountsService;
 
   @Autowired
   private GuildRetriever guildRetriever;
@@ -66,8 +67,6 @@ public class RankySlashCommandListener extends ListenerAdapter {
   @Autowired
   private JDA bot;
 
-  public static final Logger log = Logger.getLogger("RankySlashCommandListener.class");
-
 
   @PostConstruct
   private void postConstruct() {
@@ -77,27 +76,30 @@ public class RankySlashCommandListener extends ListenerAdapter {
 
   @Override
   public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-    log.info("ENTERED SLASH COMMAND LISTENER");
+    log.debug("ENTERED SLASH COMMAND LISTENER");
     event.deferReply(true).queue();
     event.getHook().setEphemeral(true);
+    handleCommand(event);
+  }
+
+  private void handleCommand(SlashCommandInteractionEvent event) {
     if (event.getCommandString().contains("/" + HELP.getCommandId())) {
       executorService.execute(() -> helpService.execute(event));
     }
     if (event.getCommandString().contains("/" + RANKING.getCommandId())) {
-      executorService.execute(() -> getRankingService.execute(event));
-
+      executorService.execute(() -> discordGetRankingService.execute(event));
     }
     if (event.getCommandString().contains("/" + CREATE.getCommandId())) {
-      executorService.execute(() -> createRankingService.execute(event));
+      executorService.execute(() -> discordCreateRankingService.execute(event));
     }
     if (event.getCommandString().contains("/" + DELETE.getCommandId())) {
-      executorService.execute(() -> deleteRankingService.execute(event));
+      executorService.execute(() -> discordDeleteRankingService.execute(event));
     }
     if (event.getCommandString().contains("/" + ADD_ACCOUNTS.getCommandId())) {
-      executorService.execute(() -> addAccountsService.execute(event));
+      executorService.execute(() -> discordAddAccountsService.execute(event));
     }
     if (event.getCommandString().contains("/" + REMOVE_ACCOUNTS.getCommandId())) {
-      executorService.execute(() -> removeAccountsService.execute(event));
+      executorService.execute(() -> discordRemoveAccountsService.execute(event));
     }
     if (event.getCommandString().contains("/" + GET_GUILDS.getCommandId())) {
       executorService.execute(() -> guildRetriever.execute(event));

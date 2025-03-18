@@ -9,21 +9,20 @@ import static com.desierto.Ranky.infrastructure.utils.DiscordRankingToEmojiMappe
 import com.desierto.Ranky.application.AccountsCache;
 import com.desierto.Ranky.domain.entity.Account;
 import com.desierto.Ranky.domain.entity.Ranking;
-import com.desierto.Ranky.domain.exception.ConfigChannelNotFoundException;
 import com.desierto.Ranky.domain.exception.ranking.RankingNotFoundException;
+import com.desierto.Ranky.domain.repository.RankingRepository;
 import com.desierto.Ranky.domain.repository.RiotAccountRepository;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
 import com.desierto.Ranky.infrastructure.dto.EntryDTO;
-import com.desierto.Ranky.infrastructure.repository.ConfigChannelRankingRepository;
+import com.desierto.Ranky.infrastructure.exceptions.ConfigChannelNotFoundException;
 import com.desierto.Ranky.infrastructure.utils.DiscordOptionRetriever;
 import com.desierto.Ranky.infrastructure.utils.DiscordProgressBar;
 import com.desierto.Ranky.infrastructure.utils.DiscordRankingFormatter;
-import com.google.gson.Gson;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Logger;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -35,18 +34,14 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class GetRankingService {
-
-  public static final Logger log = Logger.getLogger("RemoveAccountsService.class");
+@Slf4j
+public class DiscordGetRankingService {
 
   @Autowired
   private ConfigLoader config;
 
   @Autowired
   private DiscordOptionRetriever discordOptionRetriever;
-
-  @Autowired
-  private Gson gson;
 
   @Autowired
   private RiotAccountRepository riotAccountRepository;
@@ -60,36 +55,17 @@ public class GetRankingService {
   @Autowired
   private PrintRankingService printRankingService;
 
+  @Autowired
+  private RankingRepository rankingRepository;
+
   public void execute(SlashCommandInteractionEvent event) {
     if (event.isFromGuild()) {
-      InteractionHook hook = event.getHook();
       String rankingName = discordOptionRetriever.fromEventGetObjectName(event);
       try {
-        ConfigChannelRankingRepository rankingRepository = new ConfigChannelRankingRepository(
-            config,
-            event.getGuild(),
-            gson
-        );
-        Ranking ranking = rankingRepository.read(rankingName);
-        Optional<List<Account>> cachedAccounts = accountsCache.find(
-            event.getGuild().getId() + ":" + rankingName);
-        List<Account> rankingAccounts;
-        Message progressBar = null;
-        if (cachedAccounts.isEmpty()) {
-          progressBar = hook.sendMessage(DiscordProgressBar.getProgress(0)).complete();
-          rankingAccounts = getRankingEntries(ranking, hook, progressBar);
-        } else {
-          rankingAccounts = cachedAccounts.get();
-        }
-        List<EntryDTO> rankingEntries = toEntryDtos(rankingAccounts,
-            Optional.ofNullable(progressBar));
-        if (rankingEntries.size() <= config.getAccountLimit()) {
-          printRankingService.printSinglePage(event, rankingName, rankingEntries,
-              getSinglePagePrintingFunction());
-        } else {
-          printRankingService.printMultiPage(event, rankingName, rankingEntries,
-              getMultiPagePrintingFunction(rankingName));
-        }
+        Ranking ranking = rankingRepository.read(rankingName, event.getGuild());
+        List<EntryDTO> rankingEntries = getRankedAccountsWithProgressBarAnimation(event,
+            rankingName, ranking);
+        printRankingAsResponseToUserCommand(event, rankingName, rankingEntries);
       } catch (ConfigChannelNotFoundException | RankingNotFoundException e) {
         handleExceptionOnSlashCommandEvent(e, event);
       }
@@ -97,6 +73,35 @@ public class GetRankingService {
     } else {
       event.getHook().sendMessage(EXECUTE_COMMAND_FROM_SERVER.getMessage()).queue();
     }
+  }
+
+  private void printRankingAsResponseToUserCommand(SlashCommandInteractionEvent event,
+      String rankingName,
+      List<EntryDTO> rankingEntries) {
+    if (rankingEntries.size() <= config.getAccountLimit()) {
+      printRankingService.printSinglePage(event, rankingName, rankingEntries,
+          getSinglePagePrintingFunction());
+    } else {
+      printRankingService.printMultiPage(event, rankingName, rankingEntries,
+          getMultiPagePrintingFunction(rankingName));
+    }
+  }
+
+  private List<EntryDTO> getRankedAccountsWithProgressBarAnimation(
+      SlashCommandInteractionEvent event,
+      String rankingName, Ranking ranking) {
+    Optional<List<Account>> cachedAccounts = accountsCache.find(
+        event.getGuild().getId(), rankingName);
+    List<Account> rankingAccounts;
+    Message progressBar = null;
+    if (cachedAccounts.isEmpty()) {
+      progressBar = event.getHook().sendMessage(DiscordProgressBar.getProgress(0)).complete();
+      rankingAccounts = getRankingEntries(ranking, event.getHook(), progressBar);
+    } else {
+      rankingAccounts = cachedAccounts.get();
+    }
+    return toEntryDtos(rankingAccounts,
+        Optional.ofNullable(progressBar));
   }
 
   private static SinglePagePrintingFunction getSinglePagePrintingFunction() {
@@ -179,7 +184,7 @@ public class GetRankingService {
       return riotAccountRepository.enrichWithSoloQStats(account);
     }).toList();
 
-    accountsCache.save(hook.getInteraction().getGuild().getId() + ":" + ranking.getId(), accounts);
+    accountsCache.save(hook.getInteraction().getGuild().getId(), ranking.getId(), accounts);
 
     return accounts;
   }

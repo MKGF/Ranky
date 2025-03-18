@@ -1,21 +1,22 @@
 package com.desierto.Ranky.infrastructure.repository;
 
 import com.desierto.Ranky.domain.entity.Ranking;
-import com.desierto.Ranky.domain.exception.ConfigChannelNotFoundException;
 import com.desierto.Ranky.domain.exception.RankingAlreadyExistsException;
 import com.desierto.Ranky.domain.exception.ranking.RankingNotFoundException;
-import com.desierto.Ranky.domain.repository.RankingRepository;
 import com.desierto.Ranky.infrastructure.configuration.ConfigLoader;
 import com.desierto.Ranky.infrastructure.dto.RankingDTO;
+import com.desierto.Ranky.infrastructure.exceptions.ConfigChannelNotFoundException;
 import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
-public class ConfigChannelRankingRepository implements RankingRepository {
+public class ConfigChannelRankingRepository {
 
   private final TextChannel configChannel;
 
@@ -33,7 +34,6 @@ public class ConfigChannelRankingRepository implements RankingRepository {
     this.gson = gson;
   }
 
-  @Override
   public Ranking create(Ranking ranking) throws RankingAlreadyExistsException {
     if (rankingWithIdExists(ranking.getId())) {
       throw new RankingAlreadyExistsException();
@@ -42,7 +42,6 @@ public class ConfigChannelRankingRepository implements RankingRepository {
     return ranking;
   }
 
-  @Override
   public Ranking update(Ranking ranking) throws RankingNotFoundException {
     List<Message> rankingMessages = retrieveMessagesOfRanking(ranking.getId());
     if (rankingMessages.isEmpty()) {
@@ -70,7 +69,6 @@ public class ConfigChannelRankingRepository implements RankingRepository {
     }
   }
 
-  @Override
   public boolean delete(String rankingId) {
     if (!rankingWithIdExists(rankingId)) {
       throw new RankingNotFoundException(rankingId);
@@ -78,13 +76,16 @@ public class ConfigChannelRankingRepository implements RankingRepository {
     return removeMessageOfRanking(rankingId);
   }
 
-  @Override
   public Ranking read(String rankingId) {
     List<Message> messagesOfRanking = new ArrayList<>(retrieveMessagesOfRanking(rankingId));
     if (messagesOfRanking.isEmpty()) {
       throw new RankingNotFoundException(rankingId);
     }
     return fromMessages(messagesOfRanking).toDomain();
+  }
+
+  public List<Ranking> findAll() {
+    return retrieveAll().stream().map(RankingDTO::toDomain).collect(Collectors.toList());
   }
 
   private TextChannel getConfigChannel(Guild guild) {
@@ -114,6 +115,22 @@ public class ConfigChannelRankingRepository implements RankingRepository {
           removedSuccessfully.set(true);
         });
     return removedSuccessfully.get();
+  }
+
+  private List<RankingDTO> retrieveAll() {
+    List<RankingDTO> rankings = new ArrayList<>();
+    configChannel.getHistory().retrievePast(config.getRankingLimit()).complete()
+        .forEach(message -> {
+          RankingDTO rankingDTO = fromMessages(new ArrayList<>(List.of(message)));
+          Optional<RankingDTO> multiPageRanking = rankings.stream()
+              .filter(dto -> dto.getId().equalsIgnoreCase(rankingDTO.getId())).findFirst();
+          if (multiPageRanking.isPresent()) {
+            multiPageRanking.get().addAccounts(rankingDTO.getAccounts());
+          } else {
+            rankings.add(rankingDTO);
+          }
+        });
+    return rankings;
   }
 
   private List<Message> retrieveMessagesOfRanking(String rankingId) {
