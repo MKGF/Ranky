@@ -1,5 +1,5 @@
 locals {
-  region = "eu-west-3"
+  region = "eu-west-2"
 }
 
 variable "AWS_ACCOUNT_ID" {
