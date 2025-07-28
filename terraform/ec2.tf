@@ -1,5 +1,5 @@
 resource "aws_instance" "ranky-ec2" {
-  ami           = "ami-0288d9523e7053c23"
+  ami           = "ami-0175d4f2509d1d9e8"
   instance_type = "t2.micro"
   subnet_id = aws_subnet.ranky-subnet.id
   vpc_security_group_ids = [aws_security_group.ranky-sg-ec2.id]
