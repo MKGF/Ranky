@@ -25,11 +25,11 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: eu-west-3
+        aws-region: eu-west-2
 
     - name: Download terraform.tfstate from S3 if it exists
       run: |
-        BUCKET_NAME=ranky-s3
+        BUCKET_NAME=ranky-bot-s3
         FILE_PATH=terraform.tfstate
         aws s3 cp "s3://$BUCKET_NAME/$FILE_PATH" "./terraform/$FILE_PATH"
 
@@ -44,9 +44,9 @@ jobs:
     
     - name: Empty and delete S3 bucket
       run: |
-        BUCKET_NAME=ranky-s3
+        BUCKET_NAME=ranky-bot-s3
         FILE_PATH=./terraform/terraform.tfstate
         aws s3 rm s3://$BUCKET_NAME --recursive || echo "Bucket is already empty or does not exist"
-        aws s3api delete-bucket --bucket $BUCKET_NAME --region eu-west-3 || echo "Bucket does not exist or could not be deleted"
+        aws s3api delete-bucket --bucket $BUCKET_NAME --region eu-west-2 || echo "Bucket does not exist or could not be deleted"
       env:
-        BUCKET_NAME: ranky-s3
+        BUCKET_NAME: ranky-bot-s3
