@@ -7,7 +7,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      BUCKET_NAME: ranky-s3
+      BUCKET_NAME: ranky-bot-s3
 
     steps:
 
@@ -63,7 +63,7 @@ jobs:
 
       - name: Create S3 bucket for terraform.tfstate
         run: |
-          BUCKET_NAME=ranky-s3
+          BUCKET_NAME=ranky-bot-s3
           FILE_PATH=terraform/terraform.tfstate
           aws s3api create-bucket --bucket $BUCKET_NAME --region eu-west-2 --create-bucket-configuration LocationConstraint=eu-west-2
 
@@ -78,7 +78,7 @@ jobs:
       - name: Upload file changes to S3 bucket
         if: always()
         run: |
-          BUCKET_NAME=ranky-s3
+          BUCKET_NAME=ranky-bot-s3
           FILE_PATH=./terraform/terraform.tfstate
           aws s3 cp $FILE_PATH s3://$BUCKET_NAME/terraform.tfstate
 
