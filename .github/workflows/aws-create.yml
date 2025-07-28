@@ -25,7 +25,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-west-3
+          aws-region: eu-west-2
 
       - name: Create Secrets
         uses: 1arp/create-a-file-action@0.4.5
@@ -59,13 +59,13 @@ jobs:
 
       - name: Login to Amazon ECR
         run: |
-          aws ecr get-login-password --region eu-west-3 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-west-3.amazonaws.com
+          aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-west-2.amazonaws.com
 
       - name: Create S3 bucket for terraform.tfstate
         run: |
           BUCKET_NAME=ranky-s3
           FILE_PATH=terraform/terraform.tfstate
-          aws s3api create-bucket --bucket $BUCKET_NAME --region eu-west-3 --create-bucket-configuration LocationConstraint=eu-west-3
+          aws s3api create-bucket --bucket $BUCKET_NAME --region eu-west-2 --create-bucket-configuration LocationConstraint=eu-west-2
 
       - name: Terraform Init
         run: terraform init
