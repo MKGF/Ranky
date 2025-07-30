@@ -98,11 +98,6 @@
       <version>2.2.6</version>
     </dependency>
     <dependency>
-      <groupId>com.merakianalytics.orianna</groupId>
-      <artifactId>orianna</artifactId>
-      <version>4.0.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
       <groupId>net.dv8tion</groupId>
       <artifactId>JDA</artifactId>
       <version>5.0.0-beta.24</version>
