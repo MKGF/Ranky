@@ -1,5 +1,6 @@
 package com.desierto.ranky.application.service;
 
+import static com.desierto.ranky.domain.valueobject.RankedMode.RANKED_SOLO_5X5;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -55,7 +56,7 @@ public class GetRankingServiceTest {
         Optional.of(List.of(account)));
     assertEquals(cut.get(rankingId, guild).getAccounts().get(0), account);
     verify(accountsCache, never()).save(anyString(), anyString(), anyList());
-    verify(riotAccountRepository, never()).enrichWithSoloQStats(any());
+    verify(riotAccountRepository, never()).enrichWithRankedStats(any(), RANKED_SOLO_5X5);
   }
 
   @Test
@@ -67,12 +68,12 @@ public class GetRankingServiceTest {
     Ranking ranking = new Ranking(rankingId);
     ranking.addAccount(account);
     when(rankingRepository.read(rankingId, guild)).thenReturn(ranking);
-    when(riotAccountRepository.enrichWithSoloQStats(account)).thenReturn(account);
+    when(riotAccountRepository.enrichWithRankedStats(account, RANKED_SOLO_5X5)).thenReturn(account);
     when(accountsCache.find(guild.getId(), rankingId)).thenReturn(
         Optional.empty());
     assertEquals(cut.get(rankingId, guild).getAccounts().get(0), account);
     verify(accountsCache, times(1)).save(anyString(), anyString(), anyList());
-    verify(riotAccountRepository, times(1)).enrichWithSoloQStats(any());
+    verify(riotAccountRepository, times(1)).enrichWithRankedStats(any(), RANKED_SOLO_5X5);
   }
 
 }

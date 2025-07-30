@@ -1,5 +1,7 @@
 package com.desierto.ranky.application.service;
 
+import static com.desierto.ranky.domain.valueobject.RankedMode.RANKED_SOLO_5X5;
+
 import com.desierto.ranky.application.AccountsCache;
 import com.desierto.ranky.domain.entity.Account;
 import com.desierto.ranky.domain.entity.Ranking;
@@ -41,7 +43,8 @@ public class GetRankingService implements IGetRankingService {
         guild.getId(), rankingId);
     if (cachedAccounts.isEmpty()) {
       List<Account> enrichedAccounts = ranking.getAccounts().stream()
-          .map(account -> riotAccountRepository.enrichWithSoloQStats(account)).collect(
+          .map(account -> riotAccountRepository.enrichWithRankedStats(account, RANKED_SOLO_5X5))
+          .collect(
               Collectors.toList());
       ranking.setAccounts(enrichedAccounts);
       accountsCache.save(guild.getId(), rankingId, enrichedAccounts);

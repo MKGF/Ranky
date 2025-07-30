@@ -1,5 +1,6 @@
 package com.desierto.ranky.infrastructure.service;
 
+import static com.desierto.ranky.domain.valueobject.RankedMode.RANKED_SOLO_5X5;
 import static com.desierto.ranky.infrastructure.utils.DiscordButtons.FINAL_PAGE;
 import static com.desierto.ranky.infrastructure.utils.DiscordButtons.PAGE;
 import static com.desierto.ranky.infrastructure.utils.DiscordExceptionHandler.handleExceptionOnSlashCommandEvent;
@@ -181,7 +182,7 @@ public class DiscordGetRankingService {
               DiscordProgressBar.getProgress(
                   (indexForEnrichment.getAndIncrement() * 100 / numberOfAccounts) / 2))
           .complete();
-      return riotAccountRepository.enrichWithSoloQStats(account);
+      return riotAccountRepository.enrichWithRankedStats(account, RANKED_SOLO_5X5);
     }).toList();
 
     accountsCache.save(hook.getInteraction().getGuild().getId(), ranking.getId(), accounts);
