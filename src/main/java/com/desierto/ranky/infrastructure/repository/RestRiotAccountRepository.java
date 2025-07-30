@@ -25,14 +25,12 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
 
   private final RiotLeagueClient riotLeagueClient;
 
-  private RiotAccount getRiotAccount(String name, String tag) {
-    return riotAccountClient.getAccountDto(name, tag);
-  }
 
   @Override
   public Account enrichIdentification(Account account) {
     try {
-      RiotAccount riotAccount = getRiotAccount(account.getName(), account.getTagLine());
+      RiotAccount riotAccount = riotAccountClient.getAccountDto(account.getName(),
+          account.getTagLine());
       String puuid = riotAccount.puuid();
       if (puuid == null) {
         return new Account(account.getName(), account.getTagLine());
@@ -45,6 +43,8 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
 
   @Override
   public Account enrichWithRankedStats(Account account, RankedMode rankedMode) {
+    RiotAccount riotAccount = riotAccountClient.getAccountDto(account.getId());
+    account.updateGameName(riotAccount.gameName(), riotAccount.tagLine());
     List<League> leagues = riotLeagueClient.getLeaguesOfAccount(account.getId());
     try {
       League leagueEntry = leagues.stream()
@@ -62,12 +62,11 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
       );
     } catch (NullPointerException e) {
       log.info(
-          String.format("Couldn't retrieve SoloQ rank of account %s", account.getNameAndTagLine())
+          String.format("Couldn't retrieve %s rank of account %s", rankedMode.getRankedMode(),
+              account.getNameAndTagLine())
       );
       account.updateRank(Rank.unranked());
     }
-    RiotAccount riotAccount = getRiotAccount(account.getName(), account.getTagLine());
-    account.updateGameName(riotAccount.gameName(), riotAccount.tagLine());
     return account;
   }
 
