@@ -148,7 +148,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <configuration>
-          <mainClass>com.desierto.Ranky.infrastructure.Ranky</mainClass>
+          <mainClass>com.desierto.ranky.infrastructure.Ranky</mainClass>
           <finalName>Ranky</finalName>
         </configuration>
       </plugin>
