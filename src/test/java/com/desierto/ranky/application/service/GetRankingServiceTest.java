@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -56,7 +57,7 @@ public class GetRankingServiceTest {
         Optional.of(List.of(account)));
     assertEquals(cut.get(rankingId, guild).getAccounts().get(0), account);
     verify(accountsCache, never()).save(anyString(), anyString(), anyList());
-    verify(riotAccountRepository, never()).enrichWithRankedStats(any(), RANKED_SOLO_5x5);
+    verify(riotAccountRepository, never()).enrichWithRankedStats(any(), eq(RANKED_SOLO_5x5));
   }
 
   @Test
@@ -73,7 +74,7 @@ public class GetRankingServiceTest {
         Optional.empty());
     assertEquals(cut.get(rankingId, guild).getAccounts().get(0), account);
     verify(accountsCache, times(1)).save(anyString(), anyString(), anyList());
-    verify(riotAccountRepository, times(1)).enrichWithRankedStats(any(), RANKED_SOLO_5x5);
+    verify(riotAccountRepository, times(1)).enrichWithRankedStats(any(), eq(RANKED_SOLO_5x5));
   }
 
 }
