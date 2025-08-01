@@ -77,11 +77,14 @@ public class RankingsController {
       @PathVariable String userId, @PathVariable String ranking) {
     log.info("Entered getRanking");
     if (adminKey.equals(config.getControllerAdminKey())) {
-      log.info("Entered getRankings adminKey check");
+      log.info("Entered getRanking adminKey check");
       loadGuilds(jda, Long.parseLong(userId));
+      log.info("Loaded guilds");
       List<Guild> guilds = jda.getMutualGuilds(jda.retrieveUserById(userId).complete());
+      log.info("Got full list of guilds");
       Optional<Guild> match = guilds.stream()
           .filter(guild -> guild.getId().equalsIgnoreCase(guildId)).findFirst();
+      log.info("Did we find the guild? " + match.isPresent());
       return match.map(guild -> ResponseEntity.ok(getRankingService.get(ranking, guild)))
           .orElseGet(() -> notFound().build());
     } else {
