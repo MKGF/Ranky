@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/rankings")
 @AllArgsConstructor
+@Slf4j
 public class RankingsController {
 
   @Autowired
@@ -37,7 +39,9 @@ public class RankingsController {
   @GetMapping("/{adminKey}/mutualWith/{userId}")
   public ResponseEntity<String> getMutualGuilds(@PathVariable String adminKey,
       @PathVariable String userId) {
+    log.info("Entered getMutualGuilds");
     if (adminKey.equals(config.getControllerAdminKey())) {
+      log.info("Entered getMutualGuilds adminKey check");
       loadGuilds(jda, Long.parseLong(userId));
       List<Guild> guilds = jda.getMutualGuilds(jda.retrieveUserById(userId).complete());
       return ok(guilds.toString());
@@ -50,7 +54,9 @@ public class RankingsController {
   public ResponseEntity<List<RankingApi>> getRankings(@PathVariable String adminKey,
       @PathVariable String guildId,
       @PathVariable String userId) {
+    log.info("Entered getRankings");
     if (adminKey.equals(config.getControllerAdminKey())) {
+      log.info("Entered getRankings adminKey check");
       loadGuilds(jda, Long.parseLong(userId));
       List<Guild> guilds = jda.getMutualGuilds(jda.retrieveUserById(userId).complete());
       Optional<Guild> match = guilds.stream()
@@ -69,7 +75,9 @@ public class RankingsController {
   public ResponseEntity<Ranking> getRanking(@PathVariable String adminKey,
       @PathVariable String guildId,
       @PathVariable String userId, @PathVariable String ranking) {
+    log.info("Entered getRanking");
     if (adminKey.equals(config.getControllerAdminKey())) {
+      log.info("Entered getRankings adminKey check");
       loadGuilds(jda, Long.parseLong(userId));
       List<Guild> guilds = jda.getMutualGuilds(jda.retrieveUserById(userId).complete());
       Optional<Guild> match = guilds.stream()
