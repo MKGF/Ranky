@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,7 +43,7 @@ public class RankingsController {
     log.info("Entered getMutualGuilds");
     if (adminKey.equals(config.getControllerAdminKey())) {
       log.info("Entered getMutualGuilds adminKey check");
-      loadGuilds(jda, Long.parseLong(userId));
+      loadGuilds(jda, userId);
       List<Guild> guilds = jda.getMutualGuilds(jda.retrieveUserById(userId).complete());
       return ok(guilds.toString());
     } else {
@@ -57,7 +58,7 @@ public class RankingsController {
     log.info("Entered getRankings");
     if (adminKey.equals(config.getControllerAdminKey())) {
       log.info("Entered getRankings adminKey check");
-      loadGuilds(jda, Long.parseLong(userId));
+      loadGuilds(jda, userId);
       List<Guild> guilds = jda.getMutualGuilds(jda.retrieveUserById(userId).complete());
       Optional<Guild> match = guilds.stream()
           .filter(guild -> guild.getId().equalsIgnoreCase(guildId)).findFirst();
@@ -79,7 +80,7 @@ public class RankingsController {
     if (adminKey.equals(config.getControllerAdminKey())) {
       try {
         log.info("Entered getRanking adminKey check");
-        loadGuilds(jda, Long.parseLong(userId));
+        loadGuilds(jda, userId);
         log.info("Loaded guilds");
         List<Guild> guilds = jda.getMutualGuilds(jda.retrieveUserById(userId).complete());
         log.info("Got full list of guilds");
@@ -97,7 +98,13 @@ public class RankingsController {
     }
   }
 
-  private void loadGuilds(JDA bot, long id) {
-    bot.getGuilds().forEach(guild -> guild.retrieveMemberById(id).complete());
+  private void loadGuilds(JDA bot, String id) {
+    bot.getGuilds().forEach(guild -> {
+      try {
+        guild.retrieveMemberById(id).complete();
+      } catch (ErrorResponseException e) {
+        log.info("Not member of corresponding guild: " + guild.getName());
+      }
+    });
   }
 }
