@@ -20,7 +20,7 @@ resource "aws_instance" "ranky-ec2" {
               sudo docker pull ${var.AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/ranky-repo:latest
 
               # Ejecutar la imagen
-              sudo docker run -d --name ranky-app ${var.AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/ranky-repo:latest
+              sudo docker run -d -p 8080:8080 --name ranky-app ${var.AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/ranky-repo:latest
               EOF
 
   iam_instance_profile = aws_iam_instance_profile.ranky-ec2-profile.name
