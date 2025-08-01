@@ -15,7 +15,7 @@ import com.desierto.ranky.application.AccountsCache;
 import com.desierto.ranky.domain.entity.Account;
 import com.desierto.ranky.domain.valueobject.Rank;
 import com.desierto.ranky.infrastructure.configuration.ConfigLoader;
-import com.desierto.ranky.infrastructure.dto.EntryDTO;
+import com.desierto.ranky.infrastructure.dto.EntryDto;
 import com.desierto.ranky.infrastructure.service.PrintRankingService;
 import com.desierto.ranky.infrastructure.utils.DiscordRankingFormatter;
 import java.util.List;
@@ -103,7 +103,7 @@ public class RankyButtonClickListenerTest {
     Account account = new Account("name", "tagLine");
     account.updateRank(Rank.unranked());
     when(accountsCache.find(anyString(), anyString())).thenReturn(Optional.of(List.of(account)));
-    EntryDTO entry = new EntryDTO(1, "name", "<:Unranked:1248786000533262419>", "   ", 0, "0", "0",
+    EntryDto entry = new EntryDto(1, "name", "<:Unranked:1248786000533262419>", "   ", 0, "0", "0",
         "0.00");
 
     cut.onButtonInteraction(event);
@@ -122,10 +122,10 @@ public class RankyButtonClickListenerTest {
     account2.updateRank(Rank.unranked());
     when(accountsCache.find(anyString(), anyString())).thenReturn(
         Optional.of(List.of(account1, account2)));
-    EntryDTO entry1 = new EntryDTO(1, "name1", "<:Unranked:1248786000533262419>", "   ", 0, "0",
+    EntryDto entry1 = new EntryDto(1, "name1", "<:Unranked:1248786000533262419>", "   ", 0, "0",
         "0",
         "0.00");
-    EntryDTO entry2 = new EntryDTO(2, "name2", "<:Unranked:1248786000533262419>", "   ", 0, "0",
+    EntryDto entry2 = new EntryDto(2, "name2", "<:Unranked:1248786000533262419>", "   ", 0, "0",
         "0",
         "0.00");
 

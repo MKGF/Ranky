@@ -14,7 +14,7 @@ import com.desierto.ranky.domain.exception.ranking.RankingNotFoundException;
 import com.desierto.ranky.domain.repository.RankingRepository;
 import com.desierto.ranky.domain.repository.RiotAccountRepository;
 import com.desierto.ranky.infrastructure.configuration.ConfigLoader;
-import com.desierto.ranky.infrastructure.dto.EntryDTO;
+import com.desierto.ranky.infrastructure.dto.EntryDto;
 import com.desierto.ranky.infrastructure.exceptions.ConfigChannelNotFoundException;
 import com.desierto.ranky.infrastructure.utils.DiscordOptionRetriever;
 import com.desierto.ranky.infrastructure.utils.DiscordProgressBar;
@@ -64,7 +64,7 @@ public class DiscordGetRankingService {
       String rankingName = discordOptionRetriever.fromEventGetObjectName(event);
       try {
         Ranking ranking = rankingRepository.read(rankingName, event.getGuild());
-        List<EntryDTO> rankingEntries = getRankedAccountsWithProgressBarAnimation(event,
+        List<EntryDto> rankingEntries = getRankedAccountsWithProgressBarAnimation(event,
             rankingName, ranking);
         printRankingAsResponseToUserCommand(event, rankingName, rankingEntries);
       } catch (ConfigChannelNotFoundException | RankingNotFoundException e) {
@@ -78,7 +78,7 @@ public class DiscordGetRankingService {
 
   private void printRankingAsResponseToUserCommand(SlashCommandInteractionEvent event,
       String rankingName,
-      List<EntryDTO> rankingEntries) {
+      List<EntryDto> rankingEntries) {
     if (rankingEntries.size() <= config.getAccountLimit()) {
       printRankingService.printSinglePage(event, rankingName, rankingEntries,
           getSinglePagePrintingFunction());
@@ -88,7 +88,7 @@ public class DiscordGetRankingService {
     }
   }
 
-  private List<EntryDTO> getRankedAccountsWithProgressBarAnimation(
+  private List<EntryDto> getRankedAccountsWithProgressBarAnimation(
       SlashCommandInteractionEvent event,
       String rankingName, Ranking ranking) {
     Optional<List<Account>> cachedAccounts = accountsCache.find(
@@ -149,7 +149,7 @@ public class DiscordGetRankingService {
     };
   }
 
-  private List<EntryDTO> toEntryDtos(List<Account> rankingAccounts, Optional<Message> progressBar) {
+  private List<EntryDto> toEntryDtos(List<Account> rankingAccounts, Optional<Message> progressBar) {
     AtomicInteger index = new AtomicInteger(1);
     return rankingAccounts.stream()
         .sorted()
@@ -158,7 +158,7 @@ public class DiscordGetRankingService {
                       DiscordProgressBar.getProgress(
                           50 + (index.get() * 100 / rankingAccounts.size()) / 2))
                   .complete());
-              return new EntryDTO(
+              return new EntryDto(
                   index.getAndIncrement(),
                   account.getName(),
                   emojiFromTier(account.getRank().getTier()),

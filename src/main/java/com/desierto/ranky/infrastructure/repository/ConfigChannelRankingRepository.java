@@ -4,7 +4,7 @@ import com.desierto.ranky.domain.entity.Ranking;
 import com.desierto.ranky.domain.exception.RankingAlreadyExistsException;
 import com.desierto.ranky.domain.exception.ranking.RankingNotFoundException;
 import com.desierto.ranky.infrastructure.configuration.ConfigLoader;
-import com.desierto.ranky.infrastructure.dto.RankingDTO;
+import com.desierto.ranky.infrastructure.dto.RankingDto;
 import com.desierto.ranky.infrastructure.exceptions.ConfigChannelNotFoundException;
 import com.google.gson.Gson;
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public class ConfigChannelRankingRepository {
     if (rankingWithIdExists(ranking.getId())) {
       throw new RankingAlreadyExistsException();
     }
-    configChannel.sendMessage(gson.toJson(RankingDTO.fromDomain(ranking))).complete();
+    configChannel.sendMessage(gson.toJson(RankingDto.fromDomain(ranking))).complete();
     return ranking;
   }
 
@@ -48,7 +48,7 @@ public class ConfigChannelRankingRepository {
       throw new RankingNotFoundException(ranking.getId());
     } else {
       if (ranking.getAccounts().isEmpty()) {
-        configChannel.sendMessage(gson.toJson(RankingDTO.fromDomain(ranking))).complete();
+        configChannel.sendMessage(gson.toJson(RankingDto.fromDomain(ranking))).complete();
       } else {
         int numberOfAccounts = ranking.getAccounts().size();
         int numberOfFractions = numberOfAccounts / config.getAccountLimit() + 1;
@@ -61,7 +61,7 @@ public class ConfigChannelRankingRepository {
               new Ranking(ranking.getId(), ranking.getAccounts().subList(beginning, end)));
         }
         fractions.forEach(
-            fraction -> configChannel.sendMessage(gson.toJson(RankingDTO.fromDomain(fraction)))
+            fraction -> configChannel.sendMessage(gson.toJson(RankingDto.fromDomain(fraction)))
                 .complete());
       }
       rankingMessages.forEach(message -> message.delete().complete());
@@ -85,7 +85,7 @@ public class ConfigChannelRankingRepository {
   }
 
   public List<Ranking> findAll() {
-    return retrieveAll().stream().map(RankingDTO::toDomain).collect(Collectors.toList());
+    return retrieveAll().stream().map(RankingDto::toDomain).collect(Collectors.toList());
   }
 
   private TextChannel getConfigChannel(Guild guild) {
@@ -98,7 +98,7 @@ public class ConfigChannelRankingRepository {
   private boolean rankingWithIdExists(String rankingId) {
     return configChannel.getHistory().retrievePast(config.getRankingLimit()).complete().stream()
         .anyMatch(message -> {
-          RankingDTO rankingDTO = fromMessages(new ArrayList<>(List.of(message)));
+          RankingDto rankingDTO = fromMessages(new ArrayList<>(List.of(message)));
           return rankingDTO.getId().equalsIgnoreCase(rankingId);
         });
   }
@@ -107,7 +107,7 @@ public class ConfigChannelRankingRepository {
     AtomicReference<Boolean> removedSuccessfully = new AtomicReference<>(false);
     configChannel.getHistory().retrievePast(config.getRankingLimit()).complete().stream()
         .filter(message -> {
-          RankingDTO rankingDTO = fromMessages(new ArrayList<>(List.of(message)));
+          RankingDto rankingDTO = fromMessages(new ArrayList<>(List.of(message)));
           return rankingDTO.getId().equalsIgnoreCase(rankingId);
         })
         .forEach(message -> {
@@ -117,12 +117,12 @@ public class ConfigChannelRankingRepository {
     return removedSuccessfully.get();
   }
 
-  private List<RankingDTO> retrieveAll() {
-    List<RankingDTO> rankings = new ArrayList<>();
+  private List<RankingDto> retrieveAll() {
+    List<RankingDto> rankings = new ArrayList<>();
     configChannel.getHistory().retrievePast(config.getRankingLimit()).complete()
         .forEach(message -> {
-          RankingDTO rankingDTO = fromMessages(new ArrayList<>(List.of(message)));
-          Optional<RankingDTO> multiPageRanking = rankings.stream()
+          RankingDto rankingDTO = fromMessages(new ArrayList<>(List.of(message)));
+          Optional<RankingDto> multiPageRanking = rankings.stream()
               .filter(dto -> dto.getId().equalsIgnoreCase(rankingDTO.getId())).findFirst();
           if (multiPageRanking.isPresent()) {
             multiPageRanking.get().addAccounts(rankingDTO.getAccounts());
@@ -136,16 +136,16 @@ public class ConfigChannelRankingRepository {
   private List<Message> retrieveMessagesOfRanking(String rankingId) {
     return configChannel.getHistory().retrievePast(config.getRankingLimit()).complete().stream()
         .filter(message -> {
-          RankingDTO rankingDTO = fromMessages(new ArrayList<>(List.of(message)));
+          RankingDto rankingDTO = fromMessages(new ArrayList<>(List.of(message)));
           return rankingDTO.getId().equalsIgnoreCase(rankingId);
         }).toList();
   }
 
-  private RankingDTO fromMessages(List<Message> messages) {
-    RankingDTO grouped = gson.fromJson(messages.get(0).getContentRaw(), RankingDTO.class);
+  private RankingDto fromMessages(List<Message> messages) {
+    RankingDto grouped = gson.fromJson(messages.get(0).getContentRaw(), RankingDto.class);
     messages.remove(0);
     messages.forEach(message -> grouped.getAccounts()
-        .addAll(gson.fromJson(message.getContentRaw(), RankingDTO.class).getAccounts()));
+        .addAll(gson.fromJson(message.getContentRaw(), RankingDto.class).getAccounts()));
     return grouped;
   }
 }

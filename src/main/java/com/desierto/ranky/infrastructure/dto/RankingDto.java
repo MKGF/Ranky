@@ -10,23 +10,23 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class RankingDTO {
+public class RankingDto {
 
   String id;
-  List<AccountDTO> accounts;
+  List<AccountDto> accounts;
 
-  public static RankingDTO fromDomain(Ranking ranking) {
-    return new RankingDTO(ranking.getId(),
-        ranking.getAccounts().stream().map(AccountDTO::fromDomain).collect(
+  public static RankingDto fromDomain(Ranking ranking) {
+    return new RankingDto(ranking.getId(),
+        ranking.getAccounts().stream().map(AccountDto::fromDomain).collect(
             Collectors.toList()));
   }
 
   public Ranking toDomain() {
-    return new Ranking(id, accounts.stream().map(AccountDTO::toDomain).collect(
+    return new Ranking(id, accounts.stream().map(AccountDto::toDomain).collect(
         Collectors.toList()));
   }
 
-  public void addAccounts(List<AccountDTO> accounts) {
+  public void addAccounts(List<AccountDto> accounts) {
     this.accounts.addAll(accounts);
   }
 }

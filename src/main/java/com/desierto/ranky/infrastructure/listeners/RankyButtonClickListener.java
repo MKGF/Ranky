@@ -7,7 +7,7 @@ import static com.desierto.ranky.infrastructure.utils.DiscordRankingToEmojiMappe
 import com.desierto.ranky.application.AccountsCache;
 import com.desierto.ranky.domain.entity.Account;
 import com.desierto.ranky.infrastructure.configuration.ConfigLoader;
-import com.desierto.ranky.infrastructure.dto.EntryDTO;
+import com.desierto.ranky.infrastructure.dto.EntryDto;
 import com.desierto.ranky.infrastructure.service.MultiPagePrintingFunction;
 import com.desierto.ranky.infrastructure.service.PrintRankingService;
 import com.desierto.ranky.infrastructure.service.SinglePagePrintingFunction;
@@ -84,7 +84,7 @@ public class RankyButtonClickListener extends ListenerAdapter {
       Optional<List<Account>> accounts = accountsCache.find(
           event.getGuild().getId(), rankingName);
       if (accounts.isPresent()) {
-        List<EntryDTO> rankingEntries = toEntryDtos(accounts.get());
+        List<EntryDto> rankingEntries = toEntryDtos(accounts.get());
         if (rankingEntries.size() <= config.getAccountLimit()) {
           printRankingService.printSinglePage(event, rankingName, rankingEntries,
               getSinglePagePrintingFunction(rankingName));
@@ -154,11 +154,11 @@ public class RankyButtonClickListener extends ListenerAdapter {
     return Objects.equals(event.getButton().getId(), FINAL_PAGE.getId());
   }
 
-  private List<EntryDTO> toEntryDtos(List<Account> rankingAccounts) {
+  private List<EntryDto> toEntryDtos(List<Account> rankingAccounts) {
     AtomicInteger index = new AtomicInteger(1);
     return rankingAccounts.stream()
         .sorted()
-        .map(account -> new EntryDTO(
+        .map(account -> new EntryDto(
                 index.getAndIncrement(),
                 account.getName(),
                 emojiFromTier(account.getRank().getTier()),

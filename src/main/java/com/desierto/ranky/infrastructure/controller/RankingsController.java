@@ -38,7 +38,6 @@ public class RankingsController {
   public ResponseEntity<String> getMutualGuilds(@PathVariable String adminKey,
       @PathVariable String userId) {
     if (adminKey.equals(config.getControllerAdminKey())) {
-
       loadGuilds(jda, Long.parseLong(userId));
       List<Guild> guilds = jda.getMutualGuilds(jda.retrieveUserById(userId).complete());
       return ok(guilds.toString());

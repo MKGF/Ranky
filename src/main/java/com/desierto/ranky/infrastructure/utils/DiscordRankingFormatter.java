@@ -1,7 +1,7 @@
 package com.desierto.ranky.infrastructure.utils;
 
 import com.desierto.ranky.infrastructure.configuration.ConfigLoader;
-import com.desierto.ranky.infrastructure.dto.EntryDTO;
+import com.desierto.ranky.infrastructure.dto.EntryDto;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.AllArgsConstructor;
@@ -30,7 +30,7 @@ public class DiscordRankingFormatter {
   @Autowired
   private ConfigLoader config;
 
-  public String formatRankingEntries(List<EntryDTO> entries) {
+  public String formatRankingEntries(List<EntryDto> entries) {
     StringBuilder sb = new StringBuilder();
     entries.forEach(entry -> {
       sb.append(CODE_LINE);

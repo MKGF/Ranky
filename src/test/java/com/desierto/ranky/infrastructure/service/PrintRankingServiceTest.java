@@ -8,7 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.desierto.ranky.infrastructure.configuration.ConfigLoader;
-import com.desierto.ranky.infrastructure.dto.EntryDTO;
+import com.desierto.ranky.infrastructure.dto.EntryDto;
 import com.desierto.ranky.infrastructure.utils.DiscordRankingFormatter;
 import java.util.List;
 import net.dv8tion.jda.api.events.GenericEvent;
@@ -52,10 +52,10 @@ public class PrintRankingServiceTest {
   @Test
   public void whenMultiPageIsCalled_usesAllPrintingMethodsFromFunction() {
     GenericEvent event = mock(GenericEvent.class);
-    EntryDTO entry1 = mock(EntryDTO.class);
-    EntryDTO entry2 = mock(EntryDTO.class);
-    EntryDTO entry3 = mock(EntryDTO.class);
-    EntryDTO entry4 = mock(EntryDTO.class);
+    EntryDto entry1 = mock(EntryDto.class);
+    EntryDto entry2 = mock(EntryDto.class);
+    EntryDto entry3 = mock(EntryDto.class);
+    EntryDto entry4 = mock(EntryDto.class);
     when(discordRankingFormatter.formatRankingEntries(anyList())).thenReturn("formatted");
     MultiPagePrintingFunction function = mock(MultiPagePrintingFunction.class);
 

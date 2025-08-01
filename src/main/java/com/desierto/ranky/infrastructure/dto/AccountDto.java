@@ -8,12 +8,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class AccountDTO {
+public class AccountDto {
 
   String id;
 
-  public static AccountDTO fromDomain(Account account) {
-    return new AccountDTO(account.getId());
+  public static AccountDto fromDomain(Account account) {
+    return new AccountDto(account.getId());
   }
 
   public Account toDomain() {

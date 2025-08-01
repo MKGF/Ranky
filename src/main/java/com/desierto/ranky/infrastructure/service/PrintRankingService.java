@@ -1,7 +1,7 @@
 package com.desierto.ranky.infrastructure.service;
 
 import com.desierto.ranky.infrastructure.configuration.ConfigLoader;
-import com.desierto.ranky.infrastructure.dto.EntryDTO;
+import com.desierto.ranky.infrastructure.dto.EntryDto;
 import com.desierto.ranky.infrastructure.utils.DiscordRankingFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ public class PrintRankingService {
   private DiscordRankingFormatter discordRankingFormatter;
 
   public void printSinglePage(GenericEvent event, String rankingName,
-      List<EntryDTO> rankingEntries, SinglePagePrintingFunction function) {
+      List<EntryDto> rankingEntries, SinglePagePrintingFunction function) {
     String formattedRanking = discordRankingFormatter.formatRankingEntries(rankingEntries);
     String finalMessage = discordRankingFormatter.title(rankingName) + formattedRanking
         + discordRankingFormatter.footer();
@@ -29,12 +29,12 @@ public class PrintRankingService {
   }
 
   public void printMultiPage(GenericEvent event, String title,
-      List<EntryDTO> rankingEntries,
+      List<EntryDto> rankingEntries,
       MultiPagePrintingFunction function) {
     int numberOfEntries = rankingEntries.size();
     int numberOfFractions = numberOfEntries / config.getAccountLimit() + 1;
 
-    List<List<EntryDTO>> fractions = new ArrayList<>();
+    List<List<EntryDto>> fractions = new ArrayList<>();
     for (int i = 0; i < numberOfFractions; i++) {
       int beginning = config.getAccountLimit() * i;
       int possibleEnd = (config.getAccountLimit() * (i + 1));
