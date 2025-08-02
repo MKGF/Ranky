@@ -38,11 +38,11 @@ public class GetRankingServiceTest {
   @Mock
   AccountsCache accountsCache;
 
-  GetRankingService cut;
+  RankingsService cut;
 
   @BeforeEach
   public void setUp() {
-    cut = new GetRankingService(rankingRepository, riotAccountRepository, accountsCache);
+    cut = new RankingsService(rankingRepository, riotAccountRepository, accountsCache);
   }
 
   @Test

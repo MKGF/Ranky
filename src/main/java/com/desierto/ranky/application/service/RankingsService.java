@@ -7,29 +7,30 @@ import com.desierto.ranky.domain.entity.Account;
 import com.desierto.ranky.domain.entity.Ranking;
 import com.desierto.ranky.domain.repository.RankingRepository;
 import com.desierto.ranky.domain.repository.RiotAccountRepository;
-import com.desierto.ranky.domain.service.IGetRankingService;
+import com.desierto.ranky.domain.service.IRankingsService;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import net.dv8tion.jda.api.entities.Guild;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
-@NoArgsConstructor
-public class GetRankingService implements IGetRankingService {
+public class RankingsService implements IRankingsService {
+
+  private final RankingRepository rankingRepository;
+
+  private final RiotAccountRepository riotAccountRepository;
+
+  private final AccountsCache accountsCache;
 
   @Autowired
-  private RankingRepository rankingRepository;
-
-  @Autowired
-  private RiotAccountRepository riotAccountRepository;
-
-  @Autowired
-  private AccountsCache accountsCache;
+  public RankingsService(RankingRepository rankingRepository,
+      RiotAccountRepository riotAccountRepository, AccountsCache accountsCache) {
+    this.rankingRepository = rankingRepository;
+    this.riotAccountRepository = riotAccountRepository;
+    this.accountsCache = accountsCache;
+  }
 
   @Override
   public List<Ranking> getAll(Guild guild) {
