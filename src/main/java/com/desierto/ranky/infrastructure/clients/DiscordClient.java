@@ -21,7 +21,6 @@ public interface DiscordClient {
   @Headers("Content-Type: application/x-www-form-urlencoded")
   Map<String, Object> getToken(
       @RequestParam("grant_type") String grantType,
-      @RequestParam("scope") String scope,
       @RequestParam("code") String code,
       @RequestParam("redirect_uri") String redirectUri
   );
