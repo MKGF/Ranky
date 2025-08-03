@@ -74,6 +74,6 @@ public class AccountsCache {
       rankings.remove(key.toLowerCase());
       introductionTimes.remove(key.toLowerCase());
     });
-    log.info(String.format("Cleared from cache: %s", keysToRemoveFromCache));
+    log.info(String.format("Cleared from accounts cache: %s", keysToRemoveFromCache));
   }
 }

@@ -1,6 +1,7 @@
 package com.desierto.ranky.infrastructure.controller;
 
 import com.desierto.ranky.infrastructure.configuration.ConfigLoader;
+import com.desierto.ranky.infrastructure.service.auth.AuthenticationService;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -20,9 +21,13 @@ public class AuthenticationController {
 
   private final ConfigLoader config;
 
+  private final AuthenticationService authenticationService;
+
   @Autowired
-  public AuthenticationController(ConfigLoader config) {
+  public AuthenticationController(ConfigLoader config,
+      AuthenticationService authenticationService) {
     this.config = config;
+    this.authenticationService = authenticationService;
   }
 
   @GetMapping
@@ -39,13 +44,8 @@ public class AuthenticationController {
     response.sendRedirect(discordUrl);
   }
 
-  //TODO
   @GetMapping("/callback")
   public ResponseEntity<?> handleCallback(@RequestParam String code) {
-    // Aquí puedes hacer la petición POST para obtener el access_token
-    // y luego usarlo para pedir /users/@me
-
-    // Para este ejemplo lo dejamos como un placeholder:
-    return ResponseEntity.ok("Código recibido: " + code);
+    return authenticationService.authenticate(code);
   }
 }
