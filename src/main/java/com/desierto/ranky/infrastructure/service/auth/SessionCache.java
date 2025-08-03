@@ -31,7 +31,7 @@ public class SessionCache {
   public void remove(String sessionId) {
     sessions.remove(sessionId);
     introductionTimes.remove(sessionId);
-    log.info(String.format("Removed cookie %s", sessionId));
+    log.info(String.format("Removed session %s", sessionId));
   }
 
   @Scheduled(fixedRate = 1000 * 60 * CACHE_MINUTES)

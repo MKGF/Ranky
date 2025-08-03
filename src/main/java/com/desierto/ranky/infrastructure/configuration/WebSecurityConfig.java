@@ -1,46 +1,35 @@
 package com.desierto.ranky.infrastructure.configuration;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
+import com.desierto.ranky.infrastructure.service.auth.SessionAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
 
+  private final SessionAuthenticationFilter sessionAuthenticationFilter;
+
+  @Autowired
+  public WebSecurityConfig(SessionAuthenticationFilter sessionAuthenticationFilter) {
+    this.sessionAuthenticationFilter = sessionAuthenticationFilter;
+  }
+
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
-        .authorizeHttpRequests(requests -> requests
+    return http
+        .csrf(AbstractHttpConfigurer::disable)
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/auth/**").permitAll()
             .anyRequest().authenticated()
         )
-        .httpBasic(withDefaults())
-        .csrf(AbstractHttpConfigurer::disable);
-
-    return http.build();
-  }
-
-  @Bean
-  public InMemoryUserDetailsManager userDetailsService() {
-    UserDetails user = User.withUsername("user")
-        .password(encoder().encode("password"))
-        .roles("USER")
+        .addFilterBefore(sessionAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         .build();
-    return new InMemoryUserDetailsManager(user);
-  }
-
-  @Bean
-  public PasswordEncoder encoder() {
-    return new BCryptPasswordEncoder();
   }
 }

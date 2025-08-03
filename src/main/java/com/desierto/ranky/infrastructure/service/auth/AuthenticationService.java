@@ -33,14 +33,26 @@ public class AuthenticationService {
   public ResponseEntity<?> authenticate(String code) {
     // Get the token for this code
     String redirectUri = String.format("%sauth/callback", config.getRankyHomeUrl());
-    Map<String, Object> response = discordClient.getToken(config.getClientId(),
-        config.getDiscApiKey(), "authorization_code",
-        code, redirectUri);
+    Map<String, Object> response;
+    try {
+      response = discordClient.getToken(config.getClientId(),
+          config.getDiscApiKey(), "authorization_code",
+          code, redirectUri);
+    } catch (Exception e) {
+      log.info(String.format("Couldn't retrieve token from given code %s", code));
+      return ResponseEntity.unprocessableEntity().build();
+    }
     log.info("RECEIVED TOKEN RESPONSE");
     response.forEach((key, value) -> log.info(key + ":" + value.toString()));
     String token = (String) response.get("access_token");
     // Get the user details
-    Map<String, Object> userDetails = discordClient.getUserInfo(token);
+    Map<String, Object> userDetails;
+    try {
+      userDetails = discordClient.getUserInfo(token);
+    } catch (Exception e) {
+      log.info(String.format("Couldn't retrieve userDetails from given token %s", token));
+      return ResponseEntity.unprocessableEntity().build();
+    }
     log.info("RECEIVED USER DETAILS");
     userDetails.forEach((key, value) -> log.info(key + ":" + value.toString()));
     String sessionId = UUID.randomUUID().toString();
