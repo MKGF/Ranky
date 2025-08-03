@@ -35,8 +35,7 @@ public class AuthenticationService {
     String redirectUri = String.format("%sauth/callback", config.getRankyHomeUrl());
     Map<String, Object> response;
     try {
-      response = discordClient.getToken(config.getClientId(),
-          config.getClientSecret(), "authorization_code", "identify",
+      response = discordClient.getToken("authorization_code", "identify",
           code, redirectUri);
     } catch (Exception e) {
       log.info(String.format("Couldn't retrieve token from given code %s", code));
