@@ -63,6 +63,9 @@ public class ConfigLoader {
   @Value("${discord.client.id}")
   private String clientId;
 
+  @Value("${discord.client.secret}")
+  private String clientSecret;
+
   @Value("${ranky.home.url}")
   private String rankyHomeUrl;
 }
