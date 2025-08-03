@@ -2,13 +2,16 @@ package com.desierto.ranky.infrastructure.configuration;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
+import feign.codec.Encoder;
+import feign.form.FormEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-@Component
+@Configuration
 @Slf4j
 public class DiscordClientConfig implements RequestInterceptor {
 
@@ -27,5 +30,10 @@ public class DiscordClientConfig implements RequestInterceptor {
         .encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
     template.header("Authorization", "Basic " + encoded);
     log.info("Request intercepted to add following credentials: " + credentials);
+  }
+
+  @Bean
+  public Encoder feignFormEncoder() {
+    return new FormEncoder();
   }
 }
