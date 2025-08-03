@@ -59,4 +59,10 @@ public class ConfigLoader {
 
   @Value("${controller.admin.key}")
   private String controllerAdminKey;
+
+  @Value("${discord.client.id}")
+  private String clientId;
+
+  @Value("${ranky.home.url}")
+  private String rankyHomeUrl;
 }
