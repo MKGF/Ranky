@@ -40,8 +40,8 @@ public class GuildsService implements IGuildsService {
     bot.getGuilds().forEach(guild -> {
       try {
         guild.retrieveMemberById(id).complete();
-      } catch (ErrorResponseException e) {
-        log.info("Not member of corresponding guild: " + guild.getName());
+      } catch (ErrorResponseException ignored) {
+        log.debug("Not member of corresponding guild: " + guild.getName());
       }
     });
   }

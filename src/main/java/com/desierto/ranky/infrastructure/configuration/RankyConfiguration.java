@@ -1,13 +1,8 @@
 package com.desierto.ranky.infrastructure.configuration;
 
-import com.desierto.ranky.infrastructure.commands.Command;
 import com.google.gson.Gson;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.requests.GatewayIntent;
-import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -19,19 +14,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @ComponentScan(basePackages = "com.desierto.ranky.infrastructure")
 @ComponentScan(basePackages = "com.desierto.ranky.application")
 @EntityScan(basePackages = "com.desierto.ranky.domain.entity")
-public class Configuration implements WebMvcConfigurer {
-
-  @Bean
-  public JDA jda(ConfigLoader config) {
-    JDA bot = JDABuilder.createDefault(config.getDiscApiKey())
-        .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.DIRECT_MESSAGES,
-            GatewayIntent.GUILD_MODERATION, GatewayIntent.MESSAGE_CONTENT)
-        .setMemberCachePolicy(MemberCachePolicy.ALL)
-        .build();
-
-    bot.updateCommands().addCommands(Command.getDiscordCommands()).queue();
-    return bot;
-  }
+public class RankyConfiguration implements WebMvcConfigurer {
 
   @Bean
   public Gson gson() {
