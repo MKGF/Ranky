@@ -21,6 +21,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Slf4j
 public class SessionAuthenticationFilter extends OncePerRequestFilter {
 
+  public static final String SESSION_ID = "SESSION_ID";
+  public static final String USER_SESSION = "userSession";
+  public static final String ROLE_USER = "ROLE_USER";
   private final SessionCache sessionStore;
 
   @Autowired
@@ -39,7 +42,7 @@ public class SessionAuthenticationFilter extends OncePerRequestFilter {
 
       if (cookies != null) {
         Arrays.stream(cookies)
-            .filter(cookie -> "SESSION_ID".equals(cookie.getName()))
+            .filter(cookie -> SESSION_ID.equals(cookie.getName()))
             .findFirst()
             .ifPresent(cookie -> {
               String sessionId = cookie.getValue();
@@ -48,16 +51,16 @@ public class SessionAuthenticationFilter extends OncePerRequestFilter {
               if (session != null) {
                 log.info("Authenticated session for user: {}", session.userId());
 
-                request.setAttribute("userSession", session);
+                request.setAttribute(USER_SESSION, session);
 
                 Authentication auth = new UsernamePasswordAuthenticationToken(
                     session,
                     null,
-                    List.of(new SimpleGrantedAuthority("ROLE_USER"))
+                    List.of(new SimpleGrantedAuthority(ROLE_USER))
                 );
                 SecurityContextHolder.getContext().setAuthentication(auth);
               } else {
-                log.info("Session ID not found in session store: {}", sessionId);
+                log.info("Session ID not found in cache: {}", sessionId);
               }
             });
       }

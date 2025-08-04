@@ -1,11 +1,13 @@
 package com.desierto.ranky.infrastructure.service.auth;
 
 import com.desierto.ranky.infrastructure.configuration.ConfigLoader;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.Map;
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -24,6 +26,11 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 public class AuthenticationService {
 
+  public static final String DISCORD_URL = "https://discord.com/oauth2/authorize?response_type=code&client_id=%s&scope=%s&redirect_uri=%s";
+  public static final String CALLBACK_ENDPOINT = "%sauth/callback";
+  public static final String SCOPE = "identify email";
+  public static final String SESSION_ID = "SESSION_ID";
+
   private final RestTemplate restTemplate;
 
   private final ConfigLoader config;
@@ -38,53 +45,62 @@ public class AuthenticationService {
     this.sessionCache = sessionCache;
   }
 
-  public ResponseEntity<?> authenticate(String code) {
-    // Get the token for this code
-    Map<String, Object> response;
-    try {
-      response = getToken(code);
-    } catch (Exception e) {
-      log.info(e.getMessage());
-      log.info(String.format("Couldn't retrieve token from given code %s", code));
-      return ResponseEntity.unprocessableEntity().build();
-    }
-    log.info("RECEIVED TOKEN RESPONSE");
-    response.forEach((key, value) -> log.info(key + ":" + value.toString()));
-    String token = (String) response.get("access_token");
-    // Get the user details
-    Map<String, Object> userDetails;
-    try {
-      userDetails = getUserInfo(token);
-    } catch (Exception e) {
-      log.info(e.getMessage());
-      log.info(String.format("Couldn't retrieve userDetails from given token %s", token));
-      return ResponseEntity.unprocessableEntity().build();
-    }
-    log.info("RECEIVED USER DETAILS");
-    userDetails.forEach((key, value) -> log.info(key + ":" + value));
-    String sessionId = UUID.randomUUID().toString();
-    // Store them in the cache
-    sessionCache.store(sessionId, new UserSession(token, (String) userDetails.get("username"),
-        (String) userDetails.get("id")));
+  public void redirect(HttpServletResponse response) throws IOException {
+    String redirectUri = URLEncoder.encode(
+        String.format(CALLBACK_ENDPOINT, config.getRankyHomeUrl()),
+        StandardCharsets.UTF_8);
+    String scope = URLEncoder.encode(SCOPE, StandardCharsets.UTF_8);
 
-    ResponseCookie cookie = ResponseCookie.from("SESSION_ID", sessionId)
-        .httpOnly(true)
-        .path("/")
-        .maxAge(Duration.ofHours(2))
-        .build();
+    String discordUrl = String.format(
+        DISCORD_URL,
+        config.getClientId(), scope, redirectUri);
 
-    return ResponseEntity.ok()
-        .header(HttpHeaders.SET_COOKIE, cookie.toString())
-        .body(Map.of("status", "ok"));
+    response.sendRedirect(discordUrl);
   }
 
-  private Map<String, Object> getToken(String code) {
+  public ResponseEntity<?> authenticate(String code) {
+    try {
+      String token = getToken(code);
+      String sessionId = createSession(token);
+
+      ResponseCookie cookie = ResponseCookie.from(SESSION_ID, sessionId)
+          .httpOnly(true)
+          .path("/")
+          .maxAge(Duration.ofHours(2))
+          .build();
+
+      return ResponseEntity.ok()
+          .header(HttpHeaders.SET_COOKIE, cookie.toString())
+          .body(Map.of("status", "ok"));
+    } catch (Exception e) {
+      return ResponseEntity.unprocessableEntity().build();
+    }
+  }
+
+  private String getToken(String code) {
+    try {
+      return (String) askForToken(code).get("access_token");
+    } catch (Exception e) {
+      log.error(String.format("Couldn't retrieve token from given code %s", code));
+      log.error(e.getMessage());
+      throw e;
+    }
+  }
+
+  private Map<String, Object> askForToken(String code) {
     String url = "https://discord.com/api/oauth2/token";
 
+    HttpEntity<MultiValueMap<String, String>> request = createTokenRequest(code);
+
+    ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
+    return response.getBody();
+  }
+
+  private HttpEntity<MultiValueMap<String, String>> createTokenRequest(String code) {
     MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
     body.add("grant_type", "authorization_code");
     body.add("code", code);
-    body.add("redirect_uri", "https://api.ranky.top/auth/callback");
+    body.add("redirect_uri", String.format(CALLBACK_ENDPOINT, config.getRankyHomeUrl()));
 
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -93,11 +109,20 @@ public class AuthenticationService {
     String encoded = Base64.getEncoder()
         .encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
     headers.set("Authorization", "Basic " + encoded);
+    return new HttpEntity<>(body, headers);
+  }
 
-    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
-
-    ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
-    return response.getBody();
+  private String createSession(String token) {
+    try {
+      Map<String, Object> userDetails = getUserInfo(token);
+      String sessionId = sessionCache.generate();
+      sessionCache.store(sessionId, UserSession.fromUserDetails(token, userDetails));
+      return sessionId;
+    } catch (Exception e) {
+      log.error(String.format("Couldn't retrieve userDetails from given token %s", token));
+      log.error(e.getMessage());
+      throw e;
+    }
   }
 
   private Map<String, Object> getUserInfo(String token) {

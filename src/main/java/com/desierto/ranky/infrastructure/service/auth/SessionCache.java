@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,6 +18,14 @@ public class SessionCache {
   private final Map<String, UserSession> sessions = new ConcurrentHashMap<>();
 
   private final Map<String, LocalDateTime> introductionTimes = new ConcurrentHashMap<>();
+
+  public String generate() {
+    String id;
+    do {
+      id = UUID.randomUUID().toString();
+    } while (sessions.containsKey(id));
+    return id;
+  }
 
   public void store(String sessionId, UserSession session) {
     sessions.put(sessionId, session);

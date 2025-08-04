@@ -5,7 +5,6 @@ import com.desierto.ranky.domain.exception.NotFoundException;
 import com.desierto.ranky.domain.exception.ranking.RankingNotFoundException;
 import com.desierto.ranky.domain.service.IGuildsService;
 import com.desierto.ranky.domain.service.IRankingsService;
-import com.desierto.ranky.infrastructure.configuration.ConfigLoader;
 import com.desierto.ranky.infrastructure.controller.dto.RankingApi;
 import com.desierto.ranky.infrastructure.mappers.RankingsMapper;
 import com.desierto.ranky.infrastructure.service.auth.UserSession;
@@ -24,8 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class RankingsController {
 
-  private ConfigLoader config;
-
   private IRankingsService rankingsService;
 
   private IGuildsService guildsService;
@@ -33,9 +30,8 @@ public class RankingsController {
   private RankingsMapper mapper;
 
   @Autowired
-  public RankingsController(ConfigLoader config, IRankingsService rankingsService,
+  public RankingsController(IRankingsService rankingsService,
       IGuildsService guildsService, RankingsMapper mapper) {
-    this.config = config;
     this.rankingsService = rankingsService;
     this.guildsService = guildsService;
     this.mapper = mapper;
@@ -48,34 +44,27 @@ public class RankingsController {
     return mapper.mapGuilds(guildsService.getAll(session.userId()));
   }
 
-  @GetMapping("/{adminKey}/fromGuild/{guildId}/forUser/{userId}")
-  public ResponseEntity<List<RankingApi>> getRankings(@PathVariable String adminKey,
-      @PathVariable String guildId,
-      @PathVariable String userId) {
-    if (adminKey.equals(config.getControllerAdminKey())) {
-      try {
-        log.info("Entered getRankings");
-        return mapper.mapRankings(rankingsService.getAll(
-            guildsService.get(guildId, userId).orElseThrow(
-                () -> new NotFoundException(String.format("Guild %s was not found.", guildId)))));
-      } catch (NotFoundException e) {
-        return ResponseEntity.notFound().build();
-      }
-    } else {
+  @GetMapping("/fromGuild/{guildId}")
+  public ResponseEntity<List<RankingApi>> getRankings(@CurrentUser UserSession session,
+      @PathVariable String guildId) {
+    try {
+      log.info("Entered getRankings");
+      log.info("Session: {}", session.toString());
+      return mapper.mapRankings(rankingsService.getAll(
+          guildsService.get(guildId, session.userId()).orElseThrow(
+              () -> new NotFoundException(String.format("Guild %s was not found.", guildId)))));
+    } catch (NotFoundException e) {
       return ResponseEntity.notFound().build();
     }
   }
 
-  @GetMapping("/{adminKey}/fromGuild/{guildId}/forUser/{userId}/ranking/{ranking}")
-  public ResponseEntity<Ranking> getRanking(@PathVariable String adminKey,
-      @PathVariable String guildId,
-      @PathVariable String userId, @PathVariable String ranking) {
-    if (adminKey.equals(config.getControllerAdminKey())) {
-      log.info("Entered getRanking");
-      return mapper.mapSingle(rankingsService.get(ranking, guildsService.get(guildId, userId)
-          .orElseThrow(() -> new RankingNotFoundException(ranking))));
-    } else {
-      return ResponseEntity.notFound().build();
-    }
+  @GetMapping("/fromGuild/{guildId}/ranking/{ranking}")
+  public ResponseEntity<Ranking> getRanking(@CurrentUser UserSession session,
+      @PathVariable String guildId, @PathVariable String ranking) {
+    log.info("Entered getRanking");
+    log.info("Session: {}", session.toString());
+    return mapper.mapSingle(
+        rankingsService.get(ranking, guildsService.get(guildId, session.userId())
+            .orElseThrow(() -> new RankingNotFoundException(ranking))));
   }
 }

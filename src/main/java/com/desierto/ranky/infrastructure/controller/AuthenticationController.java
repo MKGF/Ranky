@@ -4,8 +4,6 @@ import com.desierto.ranky.infrastructure.configuration.ConfigLoader;
 import com.desierto.ranky.infrastructure.service.auth.AuthenticationService;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -32,16 +30,7 @@ public class AuthenticationController {
 
   @GetMapping
   public void redirectToDiscord(HttpServletResponse response) throws IOException {
-    String redirectUri = URLEncoder.encode(
-        String.format("%sauth/callback", config.getRankyHomeUrl()),
-        StandardCharsets.UTF_8);
-    String scope = URLEncoder.encode("identify email", StandardCharsets.UTF_8);
-
-    String discordUrl = String.format(
-        "https://discord.com/oauth2/authorize?response_type=code&client_id=%s&scope=%s&redirect_uri=%s",
-        config.getClientId(), scope, redirectUri);
-
-    response.sendRedirect(discordUrl);
+    authenticationService.redirect(response);
   }
 
   @GetMapping("/callback")
