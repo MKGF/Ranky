@@ -44,6 +44,7 @@ public class AuthenticationService {
     try {
       response = getToken(code);
     } catch (Exception e) {
+      log.info(e.getMessage());
       log.info(String.format("Couldn't retrieve token from given code %s", code));
       return ResponseEntity.unprocessableEntity().build();
     }
@@ -55,11 +56,12 @@ public class AuthenticationService {
     try {
       userDetails = getUserInfo(token);
     } catch (Exception e) {
+      log.info(e.getMessage());
       log.info(String.format("Couldn't retrieve userDetails from given token %s", token));
       return ResponseEntity.unprocessableEntity().build();
     }
     log.info("RECEIVED USER DETAILS");
-    userDetails.forEach((key, value) -> log.info(key + ":" + value.toString()));
+    userDetails.forEach((key, value) -> log.info(key + ":" + value));
     String sessionId = UUID.randomUUID().toString();
     // Store them in the cache
     sessionCache.store(sessionId, new UserSession(token, (String) userDetails.get("username"),
