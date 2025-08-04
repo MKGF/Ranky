@@ -65,7 +65,7 @@ public class AuthenticationService {
     String sessionId = UUID.randomUUID().toString();
     // Store them in the cache
     sessionCache.store(sessionId, new UserSession(token, (String) userDetails.get("username"),
-        (String) userDetails.get("userId")));
+        (String) userDetails.get("id")));
 
     ResponseCookie cookie = ResponseCookie.from("SESSION_ID", sessionId)
         .httpOnly(true)
