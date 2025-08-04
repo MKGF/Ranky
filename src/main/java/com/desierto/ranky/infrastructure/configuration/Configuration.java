@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -40,5 +41,10 @@ public class Configuration implements WebMvcConfigurer {
   @Bean
   public ExecutorService executorService() {
     return Executors.newFixedThreadPool(20);
+  }
+
+  @Bean
+  public RestTemplateBuilder restTemplateBuilder() {
+    return new RestTemplateBuilder();
   }
 }
