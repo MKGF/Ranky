@@ -8,6 +8,8 @@ import com.desierto.ranky.domain.service.IRankingsService;
 import com.desierto.ranky.infrastructure.configuration.ConfigLoader;
 import com.desierto.ranky.infrastructure.controller.dto.RankingApi;
 import com.desierto.ranky.infrastructure.mappers.RankingsMapper;
+import com.desierto.ranky.infrastructure.service.auth.UserSession;
+import com.desierto.ranky.infrastructure.web.annotation.CurrentUser;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,15 +41,11 @@ public class RankingsController {
     this.mapper = mapper;
   }
 
-  @GetMapping("/{adminKey}/mutualWith/{userId}")
-  public ResponseEntity<String> getMutualGuilds(@PathVariable String adminKey,
-      @PathVariable String userId) {
-    if (adminKey.equals(config.getControllerAdminKey())) {
-      log.info("Entered getMutualGuilds");
-      return mapper.mapGuilds(guildsService.getAll(userId));
-    } else {
-      return ResponseEntity.notFound().build();
-    }
+  @GetMapping("/mutual")
+  public ResponseEntity<String> getMutualGuilds(@CurrentUser UserSession session) {
+    log.info("Entered getMutualGuilds");
+    log.info("Session: {}", session.toString());
+    return mapper.mapGuilds(guildsService.getAll(session.userId()));
   }
 
   @GetMapping("/{adminKey}/fromGuild/{guildId}/forUser/{userId}")
