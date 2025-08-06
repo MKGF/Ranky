@@ -68,4 +68,7 @@ public class ConfigLoader {
 
   @Value("${ranky.home.url}")
   private String rankyHomeUrl;
+
+  @Value("${ranky.homepage}")
+  private String rankyHomepage;
 }

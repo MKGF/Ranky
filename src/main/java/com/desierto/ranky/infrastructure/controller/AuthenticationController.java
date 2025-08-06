@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class AuthenticationController {
 
+  public static final String SESSION_ID = "SESSION_ID";
   private final ConfigLoader config;
 
   private final AuthenticationService authenticationService;
@@ -36,6 +37,13 @@ public class AuthenticationController {
   public void handleCallback(HttpServletResponse response, @RequestParam String code)
       throws IOException {
     response.addCookie(authenticationService.authenticate(code));
-    response.sendRedirect("https://ranky.top");
+    response.sendRedirect(config.getRankyHomepage());
+  }
+
+  @GetMapping("/logout")
+  public void logout(HttpServletResponse response)
+      throws IOException {
+    authenticationService.remove(response.getHeader(SESSION_ID));
+    response.sendRedirect(config.getRankyHomepage());
   }
 }

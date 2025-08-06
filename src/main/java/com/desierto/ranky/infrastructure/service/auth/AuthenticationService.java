@@ -136,4 +136,10 @@ public class AuthenticationService {
 
     return response.getBody();
   }
+
+  public void remove(String sessionId) {
+    if (sessionId != null) {
+      sessionCache.remove(sessionId);
+    }
+  }
 }
