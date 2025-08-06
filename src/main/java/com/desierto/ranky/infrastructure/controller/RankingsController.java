@@ -6,6 +6,7 @@ import com.desierto.ranky.domain.exception.ranking.RankingNotFoundException;
 import com.desierto.ranky.domain.service.IGuildsService;
 import com.desierto.ranky.domain.service.IRankingsService;
 import com.desierto.ranky.infrastructure.controller.dto.RankingApi;
+import com.desierto.ranky.infrastructure.dto.GuildDto;
 import com.desierto.ranky.infrastructure.mappers.RankingsMapper;
 import com.desierto.ranky.infrastructure.service.auth.UserSession;
 import com.desierto.ranky.infrastructure.web.annotation.CurrentUser;
@@ -38,7 +39,7 @@ public class RankingsController {
   }
 
   @GetMapping("/mutual")
-  public ResponseEntity<String> getMutualGuilds(@CurrentUser UserSession session) {
+  public ResponseEntity<List<GuildDto>> getMutualGuilds(@CurrentUser UserSession session) {
     log.info("Entered getMutualGuilds");
     log.info("Session: {}", session.toString());
     return mapper.mapGuilds(guildsService.getAll(session.userId()));
