@@ -36,6 +36,6 @@ public class AuthenticationController {
   public void handleCallback(HttpServletResponse response, @RequestParam String code)
       throws IOException {
     response.addCookie(authenticationService.authenticate(code));
-    response.sendRedirect("https://ranky.top/#/servers");
+    response.sendRedirect("https://ranky.top");
   }
 }
