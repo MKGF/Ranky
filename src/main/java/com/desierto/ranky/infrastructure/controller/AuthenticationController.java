@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,7 +33,9 @@ public class AuthenticationController {
   }
 
   @GetMapping("/callback")
-  public ResponseEntity<?> handleCallback(@RequestParam String code) {
-    return authenticationService.authenticate(code);
+  public void handleCallback(HttpServletResponse response, @RequestParam String code)
+      throws IOException {
+    response.addCookie(authenticationService.authenticate(code));
+    response.sendRedirect("https://ranky.top/servers");
   }
 }

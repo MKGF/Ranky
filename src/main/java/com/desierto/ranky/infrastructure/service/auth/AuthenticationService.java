@@ -1,11 +1,11 @@
 package com.desierto.ranky.infrastructure.service.auth;
 
 import com.desierto.ranky.infrastructure.configuration.ConfigLoader;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.Base64;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -58,23 +57,18 @@ public class AuthenticationService {
     response.sendRedirect(discordUrl);
   }
 
-  public ResponseEntity<?> authenticate(String code) {
-    try {
-      String token = getToken(code);
-      String sessionId = createSession(token);
+  public Cookie authenticate(String code) {
 
-      ResponseCookie cookie = ResponseCookie.from(SESSION_ID, sessionId)
-          .httpOnly(true)
-          .path("/")
-          .maxAge(Duration.ofHours(2))
-          .build();
+    String token = getToken(code);
+    String sessionId = createSession(token);
 
-      return ResponseEntity.ok()
-          .header(HttpHeaders.SET_COOKIE, cookie.toString())
-          .body(Map.of("status", "ok"));
-    } catch (Exception e) {
-      return ResponseEntity.unprocessableEntity().build();
-    }
+    Cookie cookie = new Cookie(SESSION_ID, sessionId);
+    cookie.setHttpOnly(true);
+    cookie.setPath("/");
+    cookie.setMaxAge(2 * 60 * 60);
+    cookie.setSecure(true);
+
+    return cookie;
   }
 
   private String getToken(String code) {
