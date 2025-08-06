@@ -2,6 +2,8 @@ package com.desierto.ranky.infrastructure.controller;
 
 import com.desierto.ranky.infrastructure.configuration.ConfigLoader;
 import com.desierto.ranky.infrastructure.service.auth.AuthenticationService;
+import com.desierto.ranky.infrastructure.service.auth.UserSession;
+import com.desierto.ranky.infrastructure.web.annotation.CurrentUser;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
@@ -41,9 +43,10 @@ public class AuthenticationController {
   }
 
   @GetMapping("/logout")
-  public void logout(HttpServletResponse response)
+  public void logout(HttpServletResponse response, @CurrentUser UserSession userSession)
       throws IOException {
-    authenticationService.remove(response.getHeader(SESSION_ID));
+    log.info("Logging out {}", userSession);
+    authenticationService.remove(userSession);
     response.sendRedirect(config.getRankyHomepage());
   }
 }

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +42,14 @@ public class SessionCache {
     sessions.remove(sessionId);
     introductionTimes.remove(sessionId);
     log.info(String.format("Removed session %s", sessionId));
+  }
+
+  public void remove(UserSession userSession) {
+    List<String> keysToRemove = sessions.entrySet().stream()
+        .filter(entry -> entry.getValue().equals(userSession)).map(Entry::getKey).toList();
+    keysToRemove.forEach(sessions::remove);
+    keysToRemove.forEach(introductionTimes::remove);
+    log.info(String.format("Removed sessions %s", keysToRemove));
   }
 
   @Scheduled(fixedRate = 1000 * 60 * CACHE_MINUTES)
