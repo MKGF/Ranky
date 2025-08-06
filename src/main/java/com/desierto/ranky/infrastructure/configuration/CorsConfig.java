@@ -14,9 +14,9 @@ public class CorsConfig {
       @Override
       public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-            .allowedOrigins("https://ranky.top") // Tu dominio frontend
+            .allowedOrigins("https://ranky.top")
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-            .allowCredentials(true) // MUY IMPORTANTE para cookies
+            .allowCredentials(true)
             .allowedHeaders("*");
       }
     };
