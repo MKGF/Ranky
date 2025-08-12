@@ -1,8 +1,8 @@
 package com.desierto.ranky.application.service;
 
+import com.desierto.ranky.domain.exception.guild.GuildNotFoundException;
 import com.desierto.ranky.domain.service.IGuildsService;
 import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
@@ -23,11 +23,12 @@ public class GuildsService implements IGuildsService {
 
 
   @Override
-  public Optional<Guild> get(String guildId, String userId) {
+  public Guild get(String guildId, String userId) {
     loadGuilds(jda, userId);
     List<Guild> guilds = jda.getMutualGuilds(jda.retrieveUserById(userId).complete());
     return guilds.stream()
-        .filter(guild -> guild.getId().equalsIgnoreCase(guildId)).findFirst();
+        .filter(guild -> guild.getId().equalsIgnoreCase(guildId)).findFirst()
+        .orElseThrow(() -> new GuildNotFoundException(guildId));
   }
 
   @Override
