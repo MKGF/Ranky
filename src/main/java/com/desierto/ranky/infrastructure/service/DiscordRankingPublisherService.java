@@ -35,8 +35,8 @@ public class DiscordRankingPublisherService {
       if (event.isFromGuild()) {
         String rankingName = discordOptionRetriever.fromEventGetObjectName(event);
         rankingPublisherService.publish(rankingName, event.getGuild());
-        String url = String.format("%s/rankings/fromGuild/%s/ranking/%s", config.getRankyHomeUrl(),
-            event.getGuild().getId(), rankingName);
+        String url = String.format("%srankings/fromGuild/%s/ranking/%s", config.getRankyHomeUrl(),
+            event.getGuild().getId(), rankingName.replace(" ", "%20"));
         event.getHook().sendMessage(
             String.format("Ranking published successfully! You can access it in %s", url)).queue();
       } else {
