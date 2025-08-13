@@ -15,14 +15,24 @@ public class Ranking {
 
   private List<Account> accounts;
 
+  private Boolean isPublic;
+
   public Ranking(String id) {
     this.id = id;
     this.accounts = new ArrayList<>();
+    this.isPublic = false;
   }
 
   public Ranking(String id, List<Account> accounts) {
     this.id = id;
     this.accounts = new ArrayList<>(accounts);
+    this.isPublic = false;
+  }
+
+  public Ranking(String id, List<Account> accounts, Boolean isPublic) {
+    this.id = id;
+    this.accounts = new ArrayList<>(accounts);
+    this.isPublic = isPublic;
   }
 
   public void addAccount(Account account) {
@@ -34,5 +44,9 @@ public class Ranking {
 
   public void removeAccount(Account accountToRemove) {
     this.accounts.removeIf(account -> account.getId().equals(accountToRemove.getId()));
+  }
+
+  public void makePublic() {
+    this.isPublic = true;
   }
 }

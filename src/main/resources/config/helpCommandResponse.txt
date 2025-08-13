@@ -5,3 +5,4 @@ This channel is referred to as #config-channel and only uses the last %d message
 - /add_accounts :RANKINGNAME: ACCOUNTS... Adds the given accounts to the ranking (being separated by a comma (','). (format: summonerName#tagLine,summonerName#tagLine...) (Role protected command)
 - /remove_accounts :RANKINGNAME: ACCOUNTS... Removes the given accounts from the ranking (being separated by a comma (','). (format: summonerName#tagLine,summonerName#tagLine...) (Role protected command)
 - /ranking :RANKINGNAME: gives the soloQ information of the accounts in the ranking ordered by rank
+- /make_public :RANKINGNAME: makes the ranking public so it can be accessed without authentication through the website

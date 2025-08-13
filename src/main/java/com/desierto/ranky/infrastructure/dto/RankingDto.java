@@ -15,15 +15,18 @@ public class RankingDto {
   String id;
   List<AccountDto> accounts;
 
+  Boolean isPublic;
+
   public static RankingDto fromDomain(Ranking ranking) {
     return new RankingDto(ranking.getId(),
         ranking.getAccounts().stream().map(AccountDto::fromDomain).collect(
-            Collectors.toList()));
+            Collectors.toList()),
+        ranking.getIsPublic());
   }
 
   public Ranking toDomain() {
     return new Ranking(id, accounts.stream().map(AccountDto::toDomain).collect(
-        Collectors.toList()));
+        Collectors.toList()), isPublic);
   }
 
   public void addAccounts(List<AccountDto> accounts) {

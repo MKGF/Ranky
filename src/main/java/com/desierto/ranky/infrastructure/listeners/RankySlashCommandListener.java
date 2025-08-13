@@ -7,6 +7,7 @@ import static com.desierto.ranky.infrastructure.commands.Command.EXISTS_CONFIG_C
 import static com.desierto.ranky.infrastructure.commands.Command.GET_ENROLLED_USERS;
 import static com.desierto.ranky.infrastructure.commands.Command.GET_GUILDS;
 import static com.desierto.ranky.infrastructure.commands.Command.HELP;
+import static com.desierto.ranky.infrastructure.commands.Command.MAKE_PUBLIC;
 import static com.desierto.ranky.infrastructure.commands.Command.RANKING;
 import static com.desierto.ranky.infrastructure.commands.Command.REMOVE_ACCOUNTS;
 import static com.desierto.ranky.infrastructure.commands.Command.RETRIEVE_CONFIG_CHANNEL_CONTENT;
@@ -15,6 +16,7 @@ import com.desierto.ranky.infrastructure.service.DiscordAddAccountsService;
 import com.desierto.ranky.infrastructure.service.DiscordCreateRankingService;
 import com.desierto.ranky.infrastructure.service.DiscordDeleteRankingService;
 import com.desierto.ranky.infrastructure.service.DiscordGetRankingService;
+import com.desierto.ranky.infrastructure.service.DiscordRankingPublisherService;
 import com.desierto.ranky.infrastructure.service.DiscordRemoveAccountsService;
 import com.desierto.ranky.infrastructure.service.HelpService;
 import com.desierto.ranky.infrastructure.service.admin.ConfigChannelChecker;
@@ -60,6 +62,9 @@ public class RankySlashCommandListener extends ListenerAdapter {
 
   @Autowired
   private ConfigChannelContentRetriever configChannelContentRetriever;
+
+  @Autowired
+  private DiscordRankingPublisherService discordRankingPublisherService;
 
   @Autowired
   private ExecutorService executorService;
@@ -112,6 +117,9 @@ public class RankySlashCommandListener extends ListenerAdapter {
     }
     if (event.getCommandString().contains("/" + RETRIEVE_CONFIG_CHANNEL_CONTENT.getCommandId())) {
       executorService.execute(() -> configChannelContentRetriever.execute(event));
+    }
+    if (event.getCommandString().contains("/" + MAKE_PUBLIC.getCommandId())) {
+      executorService.execute(() -> discordRankingPublisherService.execute(event));
     }
   }
 }

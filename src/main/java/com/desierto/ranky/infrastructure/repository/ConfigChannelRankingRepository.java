@@ -58,7 +58,8 @@ public class ConfigChannelRankingRepository {
           int possibleEnd = (config.getAccountLimit() * (i + 1));
           int end = Math.min(possibleEnd, numberOfAccounts);
           fractions.add(
-              new Ranking(ranking.getId(), ranking.getAccounts().subList(beginning, end)));
+              new Ranking(ranking.getId(), ranking.getAccounts().subList(beginning, end),
+                  ranking.getIsPublic()));
         }
         fractions.forEach(
             fraction -> configChannel.sendMessage(gson.toJson(RankingDto.fromDomain(fraction)))

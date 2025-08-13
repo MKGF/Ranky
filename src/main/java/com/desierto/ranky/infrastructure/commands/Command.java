@@ -30,6 +30,8 @@ public class Command {
 
   public static final Command RETRIEVE_CONFIG_CHANNEL_CONTENT;
 
+  public static final Command MAKE_PUBLIC;
+
 
   static {
     HELP = Command.of("help",
@@ -127,6 +129,13 @@ public class Command {
             )
         )
     );
+    MAKE_PUBLIC = Command.of(
+        "make_public",
+        "Makes the ranking of public access",
+        List.of(
+            new Parameter("name", "Name of the ranking", true, OptionType.STRING)
+        )
+    );
   }
 
   String commandId;
@@ -154,7 +163,8 @@ public class Command {
         GET_GUILDS.toDiscordCommand(),
         GET_ENROLLED_USERS.toDiscordCommand(),
         EXISTS_CONFIG_CHANNEL.toDiscordCommand(),
-        RETRIEVE_CONFIG_CHANNEL_CONTENT.toDiscordCommand()
+        RETRIEVE_CONFIG_CHANNEL_CONTENT.toDiscordCommand(),
+        MAKE_PUBLIC.toDiscordCommand()
     );
   }
 
