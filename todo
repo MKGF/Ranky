@@ -7,7 +7,7 @@ es algo que debemos abordar nosotros para que lo unico que tengamos que hacer se
 -Investigar cómo dejar el fichero en app/data o suplir el contenedor de docker o dockerfile en ECR
 -Darle salida del comando al usuario cuando ocurre un error (si no se queda "Ranky está pensando..." eternamente) DONE
 -Checkear si es posible ofrecer autocompletado en funcion a los rankings que ya hay en el canal TODO
--Sustituir Orianna por nuestra propia implementacion de comunicacion con Riot TODO
+-Sustituir Orianna por nuestra propia implementacion de comunicacion con Riot DONE
 -Sustituir el comando de añadir cuentas con un comando que permita al usuario elegir a que ranking quiere añadir las cuentas en un dropdown menu TODO
 https://jda.wiki/using-jda/interactions/#select-menus-dropdowns
 -Explorar la opcion de abrir una modal para que el usuario meta las cuentas en un espacio mayor TODO
@@ -17,8 +17,9 @@ https://jda.wiki/using-jda/interactions/#select-menus-dropdowns
 -Claimear una cuenta para que te permita imprimir tu pagina y te permita tambien resaltar tu puesto en la clasificacion TODO
 -Cuando se intenta imprimir el ranking y no se ha escrito el comando con el nombre real del ranking (como por ejemplo, todo en caps) no funciona la cache DONE
   + Hacer el comando ranking case insensitive DONE
--Frontalizar la interfaz de ranky para los usuarios que no esten acostumbrados al uso de comandos WIP
-  + Con esto se puede frontalizar los rankings!!! WIP
-  + Tambien podemos hacer rankings publicos TODO
+-Frontalizar la interfaz de ranky para los usuarios que no esten acostumbrados al uso de comandos DONE
+  + Con esto se puede frontalizar los rankings!!! DONE
+  + Tambien podemos hacer rankings publicos WIP
 -IMPORTANTE arreglar que desde el endpoint de getAll sea capaz de sacar el ranking entero en vez de fracciones del ranking DONE
 -Testar los controllers con BaseIT y comprobar que todo funciona despues del refactor
+-Explorar hacer rankings multiregion (o por lo menos permitir customizar la region del ranking)
