@@ -180,7 +180,7 @@ public class ConfigChannelRankingRepositoryTest {
     MessageHistory history = mock(MessageHistory.class);
     RestAction restAction = mock(RestAction.class);
     Message message = mock(Message.class);
-    Ranking expected = new Ranking("Test", List.of(new Account("id")));
+    Ranking expected = new Ranking("Test", List.of(new Account("id")), null);
     when(configChannel.getName()).thenReturn(CONFIG_CHANNEL);
     when(guild.getTextChannels()).thenReturn(List.of(configChannel));
     when(configChannel.getHistory()).thenReturn(history);
