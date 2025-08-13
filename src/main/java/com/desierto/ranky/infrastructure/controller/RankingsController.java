@@ -79,11 +79,25 @@ public class RankingsController {
 
   @GetMapping("/fromGuild/{guildId}/ranking/{ranking}")
   public ResponseEntity<Ranking> getRanking(@CurrentUser UserSession session,
-      @PathVariable String guildId, @PathVariable String ranking) {
+      @PathVariable String guildId, @PathVariable("ranking") String rankingId) {
     log.info("Entered getRanking");
-    log.info("Session: {}", session.toString());
-    return mapper.mapSingle(
-        rankingsService.get(ranking, guildsService.get(guildId, session.userId())));
+    log.info("Session: {}", session);
+    if (session != null) {
+      return mapper.mapSingle(
+          rankingsService.get(rankingId, guildsService.get(guildId, session.userId())));
+    } else {
+      try {
+        Guild guild = guildsService.getGuild(guildId);
+        Ranking ranking = rankingsService.get(rankingId, guild);
+        if (ranking.getIsPublic()) {
+          return mapper.mapSingle(ranking);
+        } else {
+          return ResponseEntity.status(403).build();
+        }
+      } catch (NumberFormatException ignored) {
+        return ResponseEntity.notFound().build();
+      }
+    }
   }
 
   @PostMapping("/forGuild/{guildId}/name/{name}")

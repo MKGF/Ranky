@@ -8,4 +8,6 @@ public interface IGuildsService {
   Guild get(String guildId, String userId);
 
   List<Guild> getAll(String userId);
+
+  Guild getGuild(String guildId);
 }

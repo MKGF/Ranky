@@ -37,6 +37,15 @@ public class GuildsService implements IGuildsService {
     return jda.getMutualGuilds(jda.retrieveUserById(userId).complete());
   }
 
+  @Override
+  public Guild getGuild(String guildId) {
+    Guild guild = jda.getGuildById(guildId);
+    if (guild == null) {
+      throw new GuildNotFoundException(guildId);
+    }
+    return guild;
+  }
+
   private void loadGuilds(JDA bot, String id) {
     bot.getGuilds().forEach(guild -> {
       try {
