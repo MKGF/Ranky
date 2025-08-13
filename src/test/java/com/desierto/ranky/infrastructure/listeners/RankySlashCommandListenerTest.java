@@ -7,6 +7,7 @@ import static com.desierto.ranky.infrastructure.commands.Command.EXISTS_CONFIG_C
 import static com.desierto.ranky.infrastructure.commands.Command.GET_ENROLLED_USERS;
 import static com.desierto.ranky.infrastructure.commands.Command.GET_GUILDS;
 import static com.desierto.ranky.infrastructure.commands.Command.HELP;
+import static com.desierto.ranky.infrastructure.commands.Command.MAKE_PUBLIC;
 import static com.desierto.ranky.infrastructure.commands.Command.RANKING;
 import static com.desierto.ranky.infrastructure.commands.Command.REMOVE_ACCOUNTS;
 import static com.desierto.ranky.infrastructure.commands.Command.RETRIEVE_CONFIG_CHANNEL_CONTENT;
@@ -21,6 +22,7 @@ import com.desierto.ranky.infrastructure.service.DiscordAddAccountsService;
 import com.desierto.ranky.infrastructure.service.DiscordCreateRankingService;
 import com.desierto.ranky.infrastructure.service.DiscordDeleteRankingService;
 import com.desierto.ranky.infrastructure.service.DiscordGetRankingService;
+import com.desierto.ranky.infrastructure.service.DiscordRankingPublisherService;
 import com.desierto.ranky.infrastructure.service.DiscordRemoveAccountsService;
 import com.desierto.ranky.infrastructure.service.HelpService;
 import com.desierto.ranky.infrastructure.service.admin.ConfigChannelChecker;
@@ -41,7 +43,7 @@ import org.mockito.Mockito;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-public class RankySlashCommandListenerTest {
+class RankySlashCommandListenerTest {
 
   RankySlashCommandListener cut;
 
@@ -79,11 +81,14 @@ public class RankySlashCommandListenerTest {
   ConfigChannelContentRetriever configChannelContentRetriever;
 
   @Mock
+  DiscordRankingPublisherService discordRankingPublisherService;
+
+  @Mock
   ExecutorService executorService;
 
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
 
     cut = new RankySlashCommandListener(helpService,
         discordGetRankingService,
@@ -95,6 +100,7 @@ public class RankySlashCommandListenerTest {
         enrolledUsersRetriever,
         configChannelChecker,
         configChannelContentRetriever,
+        discordRankingPublisherService,
         executorService,
         bot
     );
@@ -112,7 +118,7 @@ public class RankySlashCommandListenerTest {
   }
 
   @Test
-  public void onHelpCommand_opensThread() {
+  void onHelpCommand_opensThread() {
     SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
     when(event.getCommandString()).thenReturn("/" + HELP.getCommandId());
 
@@ -122,7 +128,7 @@ public class RankySlashCommandListenerTest {
   }
 
   @Test
-  public void onRankingCommand_opensThread() {
+  void onRankingCommand_opensThread() {
     SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
     when(event.getCommandString()).thenReturn("/" + RANKING.getCommandId());
 
@@ -132,7 +138,7 @@ public class RankySlashCommandListenerTest {
   }
 
   @Test
-  public void onCreateCommand_opensThread() {
+  void onCreateCommand_opensThread() {
     SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
     when(event.getCommandString()).thenReturn("/" + CREATE.getCommandId());
 
@@ -142,7 +148,7 @@ public class RankySlashCommandListenerTest {
   }
 
   @Test
-  public void onDeleteCommand_opensThread() {
+  void onDeleteCommand_opensThread() {
     SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
     when(event.getCommandString()).thenReturn("/" + DELETE.getCommandId());
 
@@ -152,7 +158,7 @@ public class RankySlashCommandListenerTest {
   }
 
   @Test
-  public void onAddAccountsCommand_opensThread() {
+  void onAddAccountsCommand_opensThread() {
     SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
     when(event.getCommandString()).thenReturn("/" + ADD_ACCOUNTS.getCommandId());
 
@@ -162,7 +168,7 @@ public class RankySlashCommandListenerTest {
   }
 
   @Test
-  public void onRemoveAccountsCommand_opensThread() {
+  void onRemoveAccountsCommand_opensThread() {
     SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
     when(event.getCommandString()).thenReturn("/" + REMOVE_ACCOUNTS.getCommandId());
 
@@ -172,7 +178,7 @@ public class RankySlashCommandListenerTest {
   }
 
   @Test
-  public void onGetGuildsCommand_opensThread() {
+  void onGetGuildsCommand_opensThread() {
     SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
     when(event.getCommandString()).thenReturn("/" + GET_GUILDS.getCommandId());
 
@@ -182,7 +188,7 @@ public class RankySlashCommandListenerTest {
   }
 
   @Test
-  public void onGetEnrolledUsersCommand_opensThread() {
+  void onGetEnrolledUsersCommand_opensThread() {
     SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
     when(event.getCommandString()).thenReturn("/" + GET_ENROLLED_USERS.getCommandId());
 
@@ -192,7 +198,7 @@ public class RankySlashCommandListenerTest {
   }
 
   @Test
-  public void onExistsConfigChannelCommand_opensThread() {
+  void onExistsConfigChannelCommand_opensThread() {
     SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
     when(event.getCommandString()).thenReturn("/" + EXISTS_CONFIG_CHANNEL.getCommandId());
 
@@ -202,7 +208,7 @@ public class RankySlashCommandListenerTest {
   }
 
   @Test
-  public void onRetrieveConfigChannelContentCommand_opensThread() {
+  void onRetrieveConfigChannelContentCommand_opensThread() {
     SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
     when(event.getCommandString()).thenReturn("/" + RETRIEVE_CONFIG_CHANNEL_CONTENT.getCommandId());
 
@@ -212,7 +218,17 @@ public class RankySlashCommandListenerTest {
   }
 
   @Test
-  public void onUnknownCommand_opensNoThreads() {
+  void onMakePublicCommand_opensThread() {
+    SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
+    when(event.getCommandString()).thenReturn("/" + MAKE_PUBLIC.getCommandId());
+
+    cut.onSlashCommandInteraction(event);
+
+    verify(executorService, times(1)).execute(any());
+  }
+
+  @Test
+  void onUnknownCommand_opensNoThreads() {
     SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
     when(event.getCommandString()).thenReturn("Unknown command");
 
