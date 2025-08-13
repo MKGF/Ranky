@@ -21,7 +21,7 @@ public class RankingDto {
     return new RankingDto(ranking.getId(),
         ranking.getAccounts().stream().map(AccountDto::fromDomain).collect(
             Collectors.toList()),
-        ranking.getIsPublic());
+        ranking.isPublic());
   }
 
   public Ranking toDomain() {

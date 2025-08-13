@@ -89,7 +89,7 @@ public class RankingsController {
       try {
         Guild guild = guildsService.getGuild(guildId);
         Ranking ranking = rankingsService.get(rankingId, guild);
-        if (ranking.getIsPublic()) {
+        if (ranking.isPublic()) {
           return mapper.mapSingle(ranking);
         } else {
           return ResponseEntity.status(403).build();
