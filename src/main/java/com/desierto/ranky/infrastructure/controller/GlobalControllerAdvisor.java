@@ -25,7 +25,7 @@ public class GlobalControllerAdvisor {
         HttpStatus.UNAUTHORIZED.value(),
         ex.getMessage()
     );
-    return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
   }
 
   public static class ErrorResponse {
