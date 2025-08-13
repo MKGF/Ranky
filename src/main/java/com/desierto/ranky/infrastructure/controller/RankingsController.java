@@ -3,6 +3,7 @@ package com.desierto.ranky.infrastructure.controller;
 import static org.springframework.http.ResponseEntity.ok;
 
 import com.desierto.ranky.domain.entity.Ranking;
+import com.desierto.ranky.domain.exception.ranking.RankingNotFoundException;
 import com.desierto.ranky.domain.service.IAccountsService;
 import com.desierto.ranky.domain.service.ICreateRankingService;
 import com.desierto.ranky.domain.service.IDeleteRankingService;
@@ -11,6 +12,7 @@ import com.desierto.ranky.domain.service.IRankingsService;
 import com.desierto.ranky.infrastructure.controller.dto.AccountApi;
 import com.desierto.ranky.infrastructure.controller.dto.RankingApi;
 import com.desierto.ranky.infrastructure.dto.GuildDto;
+import com.desierto.ranky.infrastructure.exceptions.UnauthorizedException;
 import com.desierto.ranky.infrastructure.mappers.RankingsMapper;
 import com.desierto.ranky.infrastructure.service.auth.UserPowerChecker;
 import com.desierto.ranky.infrastructure.service.auth.UserSession;
@@ -92,10 +94,10 @@ public class RankingsController {
         if (ranking.isPublic()) {
           return mapper.mapSingle(ranking);
         } else {
-          return ResponseEntity.status(403).build();
+          throw new UnauthorizedException();
         }
       } catch (NumberFormatException ignored) {
-        return ResponseEntity.notFound().build();
+        throw new RankingNotFoundException(rankingId);
       }
     }
   }
