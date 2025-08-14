@@ -34,7 +34,11 @@ public class GuildsService implements IGuildsService {
   @Override
   public List<Guild> getAll(String userId) {
     loadGuilds(jda, userId);
-    return jda.getMutualGuilds(jda.retrieveUserById(userId).complete());
+    List<Guild> commonGuilds = jda.getMutualGuilds(jda.retrieveUserById(userId).complete());
+    if (commonGuilds.isEmpty()) {
+      throw new GuildNotFoundException();
+    }
+    return commonGuilds;
   }
 
   @Override

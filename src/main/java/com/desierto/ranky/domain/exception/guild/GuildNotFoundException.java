@@ -7,4 +7,8 @@ public class GuildNotFoundException extends NotFoundException {
   public GuildNotFoundException(String id) {
     super("Guild with id: " + id + " not found");
   }
+
+  public GuildNotFoundException() {
+    super("No common guilds found.");
+  }
 }
