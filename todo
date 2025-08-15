@@ -19,8 +19,8 @@ https://jda.wiki/using-jda/interactions/#select-menus-dropdowns
   + Hacer el comando ranking case insensitive DONE
 -Frontalizar la interfaz de ranky para los usuarios que no esten acostumbrados al uso de comandos DONE
   + Con esto se puede frontalizar los rankings!!! DONE
-  + Tambien podemos hacer rankings publicos WIP
+  + Tambien podemos hacer rankings publicos DONE
 -IMPORTANTE arreglar que desde el endpoint de getAll sea capaz de sacar el ranking entero en vez de fracciones del ranking DONE
--Testar los controllers con BaseIT y comprobar que todo funciona despues del refactor
--Explorar hacer rankings multiregion (o por lo menos permitir customizar la region del ranking)
--Abrir un hilo por cada cuenta para hacer las peticiones en paralelo a riot y asi no tener que esperar el resultado de cada una
+-Testar los controllers con BaseIT y comprobar que todo funciona despues del refactor DONE
+-Explorar hacer rankings multiregion (o por lo menos permitir customizar la region del ranking) TODO
+-Explorar abrir un hilo por cada cuenta para hacer las peticiones en paralelo a riot y asi no tener que esperar el resultado de cada una TODO
