@@ -23,3 +23,4 @@ https://jda.wiki/using-jda/interactions/#select-menus-dropdowns
 -IMPORTANTE arreglar que desde el endpoint de getAll sea capaz de sacar el ranking entero en vez de fracciones del ranking DONE
 -Testar los controllers con BaseIT y comprobar que todo funciona despues del refactor
 -Explorar hacer rankings multiregion (o por lo menos permitir customizar la region del ranking)
+-Abrir un hilo por cada cuenta para hacer las peticiones en paralelo a riot y asi no tener que esperar el resultado de cada una
