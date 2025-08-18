@@ -24,3 +24,5 @@ https://jda.wiki/using-jda/interactions/#select-menus-dropdowns
 -Testar los controllers con BaseIT y comprobar que todo funciona despues del refactor DONE
 -Explorar hacer rankings multiregion (o por lo menos permitir customizar la region del ranking) TODO
 -Explorar abrir un hilo por cada cuenta para hacer las peticiones en paralelo a riot y asi no tener que esperar el resultado de cada una TODO
+-Actualizar la cache con inserciones/borrados en caso de que el ranking este cacheado TODO
+-Proporcionar la opcion de forzar refresco del ranking TODO
