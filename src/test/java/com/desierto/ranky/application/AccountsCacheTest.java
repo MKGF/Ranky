@@ -1,8 +1,10 @@
 package com.desierto.ranky.application;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.desierto.ranky.application.fixtures.AccountFixtures;
 import com.desierto.ranky.domain.entity.Account;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -14,7 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-public class AccountsCacheTest {
+class AccountsCacheTest {
 
   AccountsCache cut;
 
@@ -30,7 +32,7 @@ public class AccountsCacheTest {
   }
 
   @Test
-  public void whenSave_introducesListOfAccountsAndTime() {
+  void whenSave_introducesListOfAccountsAndTime() {
     assertEquals(0, rankings.size());
     assertEquals(0, introductionTimes.size());
     cut.save("guildId", "test", List.of());
@@ -39,18 +41,18 @@ public class AccountsCacheTest {
   }
 
   @Test
-  public void whenFind_returnsList() {
+  void whenFind_returnsList() {
     cut.save("guildId", "test", List.of());
     assertTrue(cut.find("guildId", "test").isPresent());
   }
 
   @Test
-  public void whenFind_ifNoValueWasFound_returnsEmpty() {
+  void whenFind_ifNoValueWasFound_returnsEmpty() {
     assertTrue(cut.find("guildId", "test").isEmpty());
   }
 
   @Test
-  public void whenClearingCache_ifTimeIsBelowThreshold_doesNotDelete() {
+  void whenClearingCache_ifTimeIsBelowThreshold_doesNotDelete() {
     rankings.put("test", List.of());
     introductionTimes.put("test", LocalDateTime.now());
     assertEquals(rankings.size(), 1);
@@ -61,7 +63,7 @@ public class AccountsCacheTest {
   }
 
   @Test
-  public void whenClearingCache_ifTimeIsAboveThreshold_deletesListOfAccountsAndTime() {
+  void whenClearingCache_ifTimeIsAboveThreshold_deletesListOfAccountsAndTime() {
     rankings.put("test", List.of());
     introductionTimes.put("test", LocalDateTime.now().minusMinutes(20L));
     assertEquals(rankings.size(), 1);
@@ -69,5 +71,37 @@ public class AccountsCacheTest {
     cut.clearCache();
     assertEquals(rankings.size(), 0);
     assertEquals(introductionTimes.size(), 0);
+  }
+
+  @Test
+  void checksPressenceOfRanking() {
+    cut.save("guildId", "test",
+        List.of(AccountFixtures.anAccount(), AccountFixtures.anotherAccount()));
+    assertTrue(cut.containsRanking("test", "guildId"));
+    assertFalse(cut.containsRanking("anotherTest", "anotherGuildId"));
+  }
+
+  @Test
+  void whenRankingPresentInCache_ifAddAccount_thenAddsAccountToCache() {
+    Account present = AccountFixtures.anAccount();
+    Account added = AccountFixtures.anotherAccount();
+    cut.save("guildId", "test",
+        List.of(present));
+    cut.addAccountsIfRankingCached("guildId", "test", List.of(added));
+    List<Account> result = cut.find("guildId", "test").get();
+    assertTrue(result.containsAll(List.of(present, added)));
+    assertEquals(2, result.size());
+  }
+
+  @Test
+  void whenRankingPresentInCache_ifRemoveAccount_thenRemovesAccountFromCache() {
+    Account toRemove = AccountFixtures.anotherAccount();
+    List<Account> present = List.of(AccountFixtures.anAccount(), toRemove);
+    cut.save("guildId", "test",
+        present);
+    cut.removeAccountsIfRankingCached("guildId", "test", List.of(toRemove));
+    List<Account> result = cut.find("guildId", "test").get();
+    assertFalse(result.contains(toRemove));
+    assertEquals(1, result.size());
   }
 }

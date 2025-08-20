@@ -14,4 +14,11 @@ public class AccountFixtures {
         new Rank(Tier.EMERALD, Division.II, 13, Winrate.builder().wins(15).losses(11).build()));
     return account;
   }
+
+  public static Account anotherAccount() {
+    Account account = new Account("anotherId", "anotherName", "anotherTagLine");
+    account.updateRank(
+        new Rank(Tier.DIAMOND, Division.I, 1, Winrate.builder().wins(176).losses(173).build()));
+    return account;
+  }
 }

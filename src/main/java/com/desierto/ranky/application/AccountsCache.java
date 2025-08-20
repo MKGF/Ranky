@@ -62,6 +62,31 @@ public class AccountsCache {
     log.info(String.format("Removed ranking with id = %s from cache", key.toLowerCase()));
   }
 
+  public void removeAccountsIfRankingCached(String guildId, String rankingId,
+      List<Account> accounts) {
+    try {
+      String key = (guildId + ":" + rankingId).toLowerCase();
+      List<Account> existingAccounts = new ArrayList<>(rankings.get(key));
+      existingAccounts.removeIf(account -> accounts.stream().anyMatch(account::isSameAccount));
+      rankings.remove(key);
+      rankings.put(key, existingAccounts);
+      log.info(String.format("Removed account from existing cache %s", key));
+    } catch (NullPointerException ignored) {
+    }
+  }
+
+  public void addAccountsIfRankingCached(String guildId, String rankingId, List<Account> accounts) {
+    try {
+      String key = (guildId + ":" + rankingId).toLowerCase();
+      List<Account> existingAccounts = new ArrayList<>(rankings.get(key));
+      existingAccounts.addAll(accounts);
+      rankings.remove(key);
+      rankings.put(key, existingAccounts);
+      log.info(String.format("Added account to existing cache %s", key));
+    } catch (NullPointerException ignored) {
+    }
+  }
+
   @Scheduled(fixedRate = 1000 * 60 * CACHE_MINUTES)
   protected void clearCache() {
     List<String> keysToRemoveFromCache = new ArrayList<>();
@@ -75,5 +100,10 @@ public class AccountsCache {
       introductionTimes.remove(key.toLowerCase());
     });
     log.info(String.format("Cleared from accounts cache: %s", keysToRemoveFromCache));
+  }
+
+  public boolean containsRanking(String rankingId, String guildId) {
+    String key = (guildId + ":" + rankingId).toLowerCase();
+    return rankings.containsKey(key);
   }
 }

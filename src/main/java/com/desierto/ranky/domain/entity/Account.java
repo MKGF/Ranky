@@ -62,4 +62,8 @@ public class Account implements Comparable<Account> {
     this.name = gameName;
     this.tagLine = tagLine;
   }
+
+  public boolean isSameAccount(Account other) {
+    return this.getNameAndTagLine().equalsIgnoreCase(other.getNameAndTagLine());
+  }
 }
