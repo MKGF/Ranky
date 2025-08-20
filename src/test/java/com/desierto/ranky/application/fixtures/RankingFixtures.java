@@ -8,4 +8,9 @@ public class RankingFixtures {
   public static Ranking aRanking() {
     return new Ranking("rankingId", List.of(AccountFixtures.anAccount()));
   }
+
+  public static Ranking anotherRanking() {
+    return new Ranking("anotherRankingId",
+        List.of(AccountFixtures.anAccount(), AccountFixtures.anotherAccount()));
+  }
 }

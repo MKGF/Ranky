@@ -2,20 +2,28 @@ package com.desierto.ranky.infrastructure.controller;
 
 import static com.desierto.ranky.application.fixtures.GuildFixtures.aGuild;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.desierto.ranky.application.fixtures.RankingFixtures;
 import com.desierto.ranky.infrastructure.BaseIT;
+import com.desierto.ranky.infrastructure.dto.RankingDto;
 import com.desierto.ranky.infrastructure.service.auth.SessionCache;
 import com.desierto.ranky.infrastructure.service.auth.UserSession;
+import com.google.gson.Gson;
 import jakarta.servlet.http.Cookie;
 import java.util.List;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.CacheRestAction;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +62,7 @@ class RankingsControllerTest extends BaseIT {
   }
 
   @Test
-  void givenSession_whenRequestingRankings_returnsRankings() throws Exception {
+  void givenSession_whenRequestingMutualGuilds_returnsGuilds() throws Exception {
     String userId = "userId";
     String sessionId = sessionCache.generate();
     sessionCache.store(sessionId, new UserSession("token", "username", userId));
@@ -66,6 +74,21 @@ class RankingsControllerTest extends BaseIT {
         .andExpect(jsonPath("$[0].id", is("guildId")))
         .andExpect(jsonPath("$[0].name", is("guildName")))
         .andExpect(jsonPath("$[0].iconUrl", is("guildIconUrl")));
+  }
+
+  @Test
+  void givenSession_whenRequestingRankings_returnsRankings() throws Exception {
+    String userId = "userId";
+    String sessionId = sessionCache.generate();
+    Guild guild = aGuild();
+    sessionCache.store(sessionId, new UserSession("token", "username", userId));
+    mockJdaForGetRankingsCall(guild, userId);
+    Cookie cookie = new Cookie("SESSION_ID", sessionId);
+    mockMvc.perform(
+            get(String.format("/rankings/fromGuild/%s", guild.getId())).cookie(cookie)
+        ).andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].name", is("anotherRankingId")))
+        .andExpect(jsonPath("$[0].amountOfAccounts", is(2)));
   }
 
   private void mockJda(Guild guild, String userId) {
@@ -84,6 +107,27 @@ class RankingsControllerTest extends BaseIT {
     when(craUser.complete()).thenReturn(user);
     when(jda.getMutualGuilds(user)).thenReturn(List.of());
     when(jda.getGuilds()).thenReturn(List.of());
+  }
+
+  private void mockJdaForGetRankingsCall(Guild guild, String userId) {
+    User user = mock(User.class);
+    CacheRestAction<User> craUser = mock(CacheRestAction.class);
+    when(jda.retrieveUserById(userId)).thenReturn(craUser);
+    when(craUser.complete()).thenReturn(user);
+    when(jda.getMutualGuilds(user)).thenReturn(List.of(guild));
+    when(jda.getGuilds()).thenReturn(List.of(guild));
+    TextChannel textChannel = mock(TextChannel.class);
+    MessageHistory messageHistory = mock(MessageHistory.class);
+    RestAction<List<Message>> restAction = mock(RestAction.class);
+    Message message = mock(Message.class);
+    Gson gson = new Gson();
+    when(message.getContentRaw()).thenReturn(
+        gson.toJson(RankingDto.fromDomain(RankingFixtures.anotherRanking())));
+    when(restAction.complete()).thenReturn(List.of(message));
+    when(messageHistory.retrievePast(anyInt())).thenReturn(restAction);
+    when(textChannel.getHistory()).thenReturn(messageHistory);
+    when(textChannel.getName()).thenReturn("config-channel");
+    when(guild.getTextChannels()).thenReturn(List.of(textChannel));
   }
 
 }
