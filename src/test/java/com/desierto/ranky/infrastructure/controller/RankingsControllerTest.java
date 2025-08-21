@@ -62,7 +62,7 @@ class RankingsControllerTest extends BaseIT {
   void givenSession_accessIsGranted_butNoGuildIsFound() throws Exception {
     String userId = "userId";
     String sessionId = sessionCache.generate();
-    sessionCache.store(sessionId, new UserSession("token", "username", userId));
+    sessionCache.store(sessionId, new UserSession("token", "username", userId, "iconUrl"));
     mockJda(userId);
     Cookie cookie = new Cookie("SESSION_ID", sessionId);
     mockMvc.perform(
@@ -74,7 +74,7 @@ class RankingsControllerTest extends BaseIT {
   void givenSession_whenRequestingMutualGuilds_returnsGuilds() throws Exception {
     String userId = "userId";
     String sessionId = sessionCache.generate();
-    sessionCache.store(sessionId, new UserSession("token", "username", userId));
+    sessionCache.store(sessionId, new UserSession("token", "username", userId, "iconUrl"));
     mockJda(aGuild(), userId);
     Cookie cookie = new Cookie("SESSION_ID", sessionId);
     mockMvc.perform(
@@ -90,7 +90,7 @@ class RankingsControllerTest extends BaseIT {
     String userId = "userId";
     String sessionId = sessionCache.generate();
     Guild guild = aGuild();
-    sessionCache.store(sessionId, new UserSession("token", "username", userId));
+    sessionCache.store(sessionId, new UserSession("token", "username", userId, "iconUrl"));
     mockJdaForGetRankingsCall(guild, userId);
     Cookie cookie = new Cookie("SESSION_ID", sessionId);
     mockMvc.perform(
@@ -105,7 +105,7 @@ class RankingsControllerTest extends BaseIT {
     String userId = "userId";
     String sessionId = sessionCache.generate();
     Guild guild = aGuild();
-    sessionCache.store(sessionId, new UserSession("token", "username", userId));
+    sessionCache.store(sessionId, new UserSession("token", "username", userId, "iconUrl"));
     mockJdaForGetRankingsCall(guild, userId);
     mockRiot();
     Cookie cookie = new Cookie("SESSION_ID", sessionId);
