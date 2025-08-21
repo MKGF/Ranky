@@ -32,9 +32,9 @@ class RankingPublisherServiceTest {
     Guild guild = mock(Guild.class);
     when(rankingRepository.read(ranking.getId(), guild)).thenReturn(ranking);
 
-    assertFalse(ranking.isPublic());
+    assertFalse(ranking.shouldBeVisible());
     cut.publish(ranking.getId(), guild);
-    assertTrue(ranking.isPublic());
+    assertTrue(ranking.shouldBeVisible());
     verify(rankingRepository, times(1)).update(ranking, guild);
   }
 }

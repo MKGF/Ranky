@@ -91,7 +91,7 @@ public class RankingsController {
       try {
         Guild guild = guildsService.getGuild(guildId);
         Ranking ranking = rankingsService.get(rankingId, guild);
-        if (ranking.isPublic()) {
+        if (ranking.shouldBeVisible()) {
           return mapper.mapSingle(ranking);
         } else {
           throw new UnauthorizedException();

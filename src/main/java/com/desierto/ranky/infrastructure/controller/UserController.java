@@ -3,6 +3,7 @@ package com.desierto.ranky.infrastructure.controller;
 import static org.springframework.http.ResponseEntity.ok;
 
 import com.desierto.ranky.domain.service.IGuildsService;
+import com.desierto.ranky.infrastructure.controller.dto.AuthenticatedUserApi;
 import com.desierto.ranky.infrastructure.exceptions.RoleNotFoundException;
 import com.desierto.ranky.infrastructure.service.auth.UserPowerChecker;
 import com.desierto.ranky.infrastructure.service.auth.UserSession;
@@ -32,9 +33,9 @@ public class UserController {
   }
 
   @GetMapping
-  public ResponseEntity<UserSession> me(@CurrentUser UserSession session) {
+  public ResponseEntity<AuthenticatedUserApi> me(@CurrentUser UserSession session) {
     try {
-      return ok(session);
+      return ok(AuthenticatedUserApi.fromUserSession(session));
     } catch (Exception e) {
       return ResponseEntity.notFound().build();
     }

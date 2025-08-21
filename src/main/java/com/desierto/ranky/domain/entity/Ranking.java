@@ -49,8 +49,8 @@ public class Ranking {
   public void makePublic() {
     this.isPublic = true;
   }
-
-  public Boolean isPublic() {
+  
+  public Boolean shouldBeVisible() {
     return isPublic != null ? isPublic : false;
   }
 }
