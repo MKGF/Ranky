@@ -26,3 +26,5 @@ https://jda.wiki/using-jda/interactions/#select-menus-dropdowns
 -Explorar abrir un hilo por cada cuenta para hacer las peticiones en paralelo a riot y asi no tener que esperar el resultado de cada una TODO
 -Actualizar la cache con inserciones/borrados en caso de que el ranking este cacheado DONE
 -Proporcionar la opcion de forzar refresco del ranking TODO
+-Revisar por que da unauthorized cuando queremos meter una cuenta nueva a la cache TODO
+-Proveer la posibilidad de borrar una cuenta sin el tag del ranking y solicitar desambiguar con tag en caso de que haya dos que se llamen igual TODO
