@@ -15,7 +15,7 @@ public class DiscordOptionRetriever {
     return fromSlashCommandInteractionEvent(event).get(0);
   }
 
-  public List<Account> fromEventGetAccountList(SlashCommandInteractionEvent event) {
+  public List<Account> fromEventGetAccountListToAdd(SlashCommandInteractionEvent event) {
     String rawAccounts = fromSlashCommandInteractionEvent(event).get(1);
     return Arrays.stream(rawAccounts.split(",")).map(s -> {
       String[] strings = s.split("#");
@@ -23,6 +23,17 @@ public class DiscordOptionRetriever {
         event.getHook().sendMessage("Account is missing summonerName#tagLine format: " + strings[0])
             .queue();
         return new Account();
+      }
+      return new Account(strings[0], strings[1]);
+    }).collect(Collectors.toList());
+  }
+
+  public List<Account> fromEventGetAccountListToRemove(SlashCommandInteractionEvent event) {
+    String rawAccounts = fromSlashCommandInteractionEvent(event).get(1);
+    return Arrays.stream(rawAccounts.split(",")).map(s -> {
+      String[] strings = s.split("#");
+      if (strings.length == 1) {
+        return new Account(strings[0], "");
       }
       return new Account(strings[0], strings[1]);
     }).collect(Collectors.toList());

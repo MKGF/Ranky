@@ -21,4 +21,12 @@ public class AccountFixtures {
         new Rank(Tier.DIAMOND, Division.I, 1, Winrate.builder().wins(176).losses(173).build()));
     return account;
   }
+
+  public static Account getDifferentWithSameName(Account account) {
+    Account different = new Account(account.getId() + "different", account.getName(),
+        account.getTagLine() + "different");
+    different.updateRank(
+        new Rank(Tier.DIAMOND, Division.I, 1, Winrate.builder().wins(176).losses(173).build()));
+    return different;
+  }
 }

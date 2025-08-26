@@ -41,7 +41,7 @@ public class DiscordOptionRetrieverTest {
   public void onEvent_getsAccountList() {
     SlashCommandInteractionEvent event = getMockedEventWithRankingNameAndAccounts();
     assertEquals(List.of(new Account("testAcc", "EUW"), new Account("testAcc2", "EUW")),
-        cut.fromEventGetAccountList(event));
+        cut.fromEventGetAccountListToAdd(event));
   }
 
   @Test
@@ -52,7 +52,7 @@ public class DiscordOptionRetrieverTest {
     WebhookMessageCreateAction wmca = mock(WebhookMessageCreateAction.class);
     when(hook.sendMessage(anyString())).thenReturn(wmca);
     assertEquals(List.of(new Account(), new Account()),
-        cut.fromEventGetAccountList(event));
+        cut.fromEventGetAccountListToAdd(event));
     verify(wmca, times(2)).queue();
   }
 

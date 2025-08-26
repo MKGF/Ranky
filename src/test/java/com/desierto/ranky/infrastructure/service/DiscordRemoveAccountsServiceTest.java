@@ -29,7 +29,7 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-public class DiscordRemoveAccountsServiceTest {
+class DiscordRemoveAccountsServiceTest {
 
   public static final String RANKY_USER = "rankyUser";
 
@@ -51,11 +51,12 @@ public class DiscordRemoveAccountsServiceTest {
   }
 
   @Test
-  public void onExecute_withoutRankyUserRole_doesNothingAndInforms() {
+  void onExecute_withoutRankyUserRole_doesNothingAndInforms() {
     SlashCommandInteractionEvent event = getAMockedEventWithMemberWithoutRole();
     String rankingId = "A ranking";
     when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingId);
-    when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of(new Account()));
+    when(discordOptionRetriever.fromEventGetAccountListToAdd(event)).thenReturn(
+        List.of(new Account()));
 
     cut.execute(event);
 
@@ -63,12 +64,13 @@ public class DiscordRemoveAccountsServiceTest {
   }
 
   @Test
-  public void onExecute_withEventNotComingFromAGuild_doesNothingAndInforms() {
+  void onExecute_withEventNotComingFromAGuild_doesNothingAndInforms() {
     SlashCommandInteractionEvent event = getAMockedEventNotFromAGuild();
     String rankingId = "A ranking";
     Ranking ranking = new Ranking(rankingId);
     when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingId);
-    when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of(new Account()));
+    when(discordOptionRetriever.fromEventGetAccountListToAdd(event)).thenReturn(
+        List.of(new Account()));
 
     cut.execute(event);
 
@@ -76,11 +78,11 @@ public class DiscordRemoveAccountsServiceTest {
   }
 
   @Test
-  public void onExecute_withoutAccountsToRemove_doesNothing() {
+  void onExecute_withoutAccountsToRemove_doesNothing() {
     SlashCommandInteractionEvent event = getAMockedEvent();
     String rankingId = "A ranking";
     when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingId);
-    when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of());
+    when(discordOptionRetriever.fromEventGetAccountListToAdd(event)).thenReturn(List.of());
 
     cut.execute(event);
 
@@ -89,13 +91,13 @@ public class DiscordRemoveAccountsServiceTest {
   }
 
   @Test
-  public void onExecute_withAccountsToRemove_removesAccountsAndInformsInHook() {
+  void onExecute_withAccountsToRemove_removesAccountsAndInformsInHook() {
     SlashCommandInteractionEvent event = getAMockedEvent();
     String rankingId = "A ranking";
     Account BBXhadow = new Account("id", "BBXhadow", "RFF");
-    Ranking ranking = new Ranking(rankingId, List.of(BBXhadow));
     when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingId);
-    when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of(BBXhadow));
+    when(discordOptionRetriever.fromEventGetAccountListToRemove(event)).thenReturn(
+        List.of(BBXhadow));
 
     cut.execute(event);
 

@@ -2,10 +2,12 @@ package com.desierto.ranky.application;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.desierto.ranky.application.fixtures.AccountFixtures;
 import com.desierto.ranky.domain.entity.Account;
+import com.desierto.ranky.domain.exception.account.AccountCouldNotBeDesambiguatedException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -55,22 +57,22 @@ class AccountsCacheTest {
   void whenClearingCache_ifTimeIsBelowThreshold_doesNotDelete() {
     rankings.put("test", List.of());
     introductionTimes.put("test", LocalDateTime.now());
-    assertEquals(rankings.size(), 1);
-    assertEquals(introductionTimes.size(), 1);
+    assertEquals(1, rankings.size());
+    assertEquals(1, introductionTimes.size());
     cut.clearCache();
-    assertEquals(rankings.size(), 1);
-    assertEquals(introductionTimes.size(), 1);
+    assertEquals(1, rankings.size());
+    assertEquals(1, introductionTimes.size());
   }
 
   @Test
   void whenClearingCache_ifTimeIsAboveThreshold_deletesListOfAccountsAndTime() {
     rankings.put("test", List.of());
     introductionTimes.put("test", LocalDateTime.now().minusMinutes(20L));
-    assertEquals(rankings.size(), 1);
-    assertEquals(introductionTimes.size(), 1);
+    assertEquals(1, rankings.size());
+    assertEquals(1, introductionTimes.size());
     cut.clearCache();
-    assertEquals(rankings.size(), 0);
-    assertEquals(introductionTimes.size(), 0);
+    assertEquals(0, rankings.size());
+    assertEquals(0, introductionTimes.size());
   }
 
   @Test
@@ -103,5 +105,30 @@ class AccountsCacheTest {
     List<Account> result = cut.find("guildId", "test").get();
     assertFalse(result.contains(toRemove));
     assertEquals(1, result.size());
+  }
+
+  @Test
+  void whenRemovingAccountWithoutTag_removesSuccessfully() {
+    Account toRemove = AccountFixtures.anotherAccount();
+    List<Account> present = List.of(AccountFixtures.anAccount(), toRemove);
+    cut.save("guildId", "test",
+        present);
+    cut.removeAccountsIfRankingCached("guildId", "test",
+        List.of(new Account(toRemove.getName(), "")));
+    List<Account> result = cut.find("guildId", "test").get();
+    assertFalse(result.contains(toRemove));
+    assertEquals(1, result.size());
+  }
+
+  @Test
+  void whenRemovingAccountWithAnExistingSameNameAccountWithoutTag_throwsDesambiguationException() {
+    Account toRemove = AccountFixtures.anotherAccount();
+    List<Account> present = List.of(AccountFixtures.anAccount(), toRemove,
+        AccountFixtures.getDifferentWithSameName(toRemove));
+    cut.save("guildId", "test",
+        present);
+    assertThrows(AccountCouldNotBeDesambiguatedException.class,
+        () -> cut.removeAccountsIfRankingCached("guildId", "test",
+            List.of(new Account(toRemove.getName(), ""))));
   }
 }

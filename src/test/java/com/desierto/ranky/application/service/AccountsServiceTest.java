@@ -1,6 +1,7 @@
 package com.desierto.ranky.application.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -8,8 +9,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.desierto.ranky.application.AccountsCache;
+import com.desierto.ranky.application.fixtures.AccountFixtures;
 import com.desierto.ranky.domain.entity.Account;
 import com.desierto.ranky.domain.entity.Ranking;
+import com.desierto.ranky.domain.exception.account.AccountCouldNotBeDesambiguatedException;
 import com.desierto.ranky.domain.repository.RankingRepository;
 import com.desierto.ranky.domain.repository.RiotAccountRepository;
 import com.desierto.ranky.domain.valueobject.RankedMode;
@@ -61,7 +64,7 @@ class AccountsServiceTest {
   @Test
   void removesAccountsFromRanking() {
     Guild guild = mock(Guild.class);
-    Account account = new Account("id");
+    Account account = AccountFixtures.anAccount();
     Ranking ranking = new Ranking("rankingId");
     ranking.addAccount(account);
     when(guild.getId()).thenReturn("guildId");
@@ -100,7 +103,7 @@ class AccountsServiceTest {
   @Test
   void removesAccountsFromRankingWhileItsCached() {
     Guild guild = mock(Guild.class);
-    Account account = new Account("id");
+    Account account = AccountFixtures.anAccount();
     Ranking ranking = new Ranking("rankingId");
     ranking.addAccount(account);
     when(guild.getId()).thenReturn("guildId");
@@ -115,5 +118,40 @@ class AccountsServiceTest {
     verify(accountsCache, times(1)).removeAccountsIfRankingCached(guild.getId(), ranking.getId(),
         List.of(account));
     assertEquals(0, captor.getValue().getAccounts().size());
+  }
+
+  @Test
+  void removesAccountsFromRankingWithoutTag() {
+    Guild guild = mock(Guild.class);
+    Account account = AccountFixtures.anAccount();
+    Ranking ranking = new Ranking("rankingId");
+    ranking.addAccount(account);
+    when(guild.getId()).thenReturn("guildId");
+    when(rankingRepository.read("rankingId", guild)).thenReturn(ranking);
+    when(riotAccountRepository.enrichIdentification(account)).thenReturn(account);
+    when(accountsCache.containsRanking(ranking.getId(), guild.getId())).thenReturn(false);
+    cut.removeAccounts("rankingId", guild, List.of(new Account(account.getName(), "")));
+    ArgumentCaptor<Ranking> captor = ArgumentCaptor.forClass(Ranking.class);
+    verify(rankingRepository, times(1)).read("rankingId", guild);
+    verify(rankingRepository, times(1)).update(captor.capture(), eq(guild));
+    verify(riotAccountRepository, times(1)).enrichIdentification(account);
+    assertEquals(0, captor.getValue().getAccounts().size());
+  }
+
+  @Test
+  void removingAccountsFromRankingWithoutTagAndExistingSameNameAccount_throwsDesambiguationException() {
+    Guild guild = mock(Guild.class);
+    Account account = AccountFixtures.anAccount();
+    Account copy = AccountFixtures.getDifferentWithSameName(account);
+    Ranking ranking = new Ranking("rankingId");
+    ranking.addAccount(account);
+    ranking.addAccount(copy);
+    when(guild.getId()).thenReturn("guildId");
+    when(rankingRepository.read("rankingId", guild)).thenReturn(ranking);
+    when(riotAccountRepository.enrichIdentification(account)).thenReturn(account);
+    when(riotAccountRepository.enrichIdentification(copy)).thenReturn(copy);
+    when(accountsCache.containsRanking(ranking.getId(), guild.getId())).thenReturn(false);
+    assertThrows(AccountCouldNotBeDesambiguatedException.class,
+        () -> cut.removeAccounts("rankingId", guild, List.of(new Account(account.getName(), ""))));
   }
 }

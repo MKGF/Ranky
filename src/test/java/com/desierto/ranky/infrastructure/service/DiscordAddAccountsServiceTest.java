@@ -53,7 +53,8 @@ public class DiscordAddAccountsServiceTest {
     SlashCommandInteractionEvent event = getAMockedEventWithMemberWithoutRole();
     String rankingName = "A ranking";
     when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingName);
-    when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of(new Account()));
+    when(discordOptionRetriever.fromEventGetAccountListToAdd(event)).thenReturn(
+        List.of(new Account()));
 
     cut.execute(event);
 
@@ -66,7 +67,8 @@ public class DiscordAddAccountsServiceTest {
     SlashCommandInteractionEvent event = getAMockedEventNotFromAGuild();
     String rankingName = "A ranking";
     when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingName);
-    when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of(new Account()));
+    when(discordOptionRetriever.fromEventGetAccountListToAdd(event)).thenReturn(
+        List.of(new Account()));
 
     cut.execute(event);
 
@@ -79,7 +81,8 @@ public class DiscordAddAccountsServiceTest {
     SlashCommandInteractionEvent event = getAMockedEvent();
     String rankingName = "A ranking";
     when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingName);
-    when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of(new Account()));
+    when(discordOptionRetriever.fromEventGetAccountListToAdd(event)).thenReturn(
+        List.of(new Account()));
 
     cut.execute(event);
 
@@ -95,7 +98,7 @@ public class DiscordAddAccountsServiceTest {
     Account BBXhadow = new Account("BBXhadow", "RFF");
     Account enrichedBBXhadow = new Account("id", BBXhadow.getId(), BBXhadow.getTagLine());
     when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingName);
-    when(discordOptionRetriever.fromEventGetAccountList(event)).thenReturn(List.of(BBXhadow));
+    when(discordOptionRetriever.fromEventGetAccountListToAdd(event)).thenReturn(List.of(BBXhadow));
     when(accountsService.addAccounts(rankingName, event.getGuild(), List.of(BBXhadow))).thenReturn(
         new Ranking(rankingName, List.of(enrichedBBXhadow)));
 

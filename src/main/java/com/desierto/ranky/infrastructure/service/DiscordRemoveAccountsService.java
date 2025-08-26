@@ -1,9 +1,11 @@
 package com.desierto.ranky.infrastructure.service;
 
+import static com.desierto.ranky.infrastructure.utils.DiscordExceptionHandler.handleExceptionOnSlashCommandEvent;
 import static com.desierto.ranky.infrastructure.utils.DiscordMessages.COMMAND_NOT_ALLOWED;
 import static com.desierto.ranky.infrastructure.utils.DiscordMessages.EXECUTE_COMMAND_FROM_SERVER;
 
 import com.desierto.ranky.domain.entity.Account;
+import com.desierto.ranky.domain.exception.account.AccountCouldNotBeDesambiguatedException;
 import com.desierto.ranky.domain.service.IAccountsService;
 import com.desierto.ranky.infrastructure.configuration.ConfigLoader;
 import com.desierto.ranky.infrastructure.utils.DiscordOptionRetriever;
@@ -33,13 +35,18 @@ public class DiscordRemoveAccountsService {
         .anyMatch(role -> role.getName().equalsIgnoreCase(config.getRankyUserRole()))) {
       if (event.isFromGuild()) {
         String rankingId = discordOptionRetriever.fromEventGetObjectName(event);
-        List<Account> accountsToRemove = discordOptionRetriever.fromEventGetAccountList(event)
+        List<Account> accountsToRemove = discordOptionRetriever.fromEventGetAccountListToRemove(
+                event)
             .stream()
             .filter(Account::isNotEmpty)
             .toList();
         if (!accountsToRemove.isEmpty()) {
-          accountsService.removeAccounts(rankingId, event.getGuild(), accountsToRemove);
-          event.getHook().sendMessage("Accounts removed successfully!").queue();
+          try {
+            accountsService.removeAccounts(rankingId, event.getGuild(), accountsToRemove);
+            event.getHook().sendMessage("Accounts removed successfully!").queue();
+          } catch (AccountCouldNotBeDesambiguatedException e) {
+            handleExceptionOnSlashCommandEvent(e, event);
+          }
         }
       } else {
         event.getHook().sendMessage(EXECUTE_COMMAND_FROM_SERVER.getMessage()).queue();

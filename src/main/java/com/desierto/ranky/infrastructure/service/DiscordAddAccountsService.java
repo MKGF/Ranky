@@ -33,7 +33,7 @@ public class DiscordAddAccountsService {
         .anyMatch(role -> role.getName().equalsIgnoreCase(config.getRankyUserRole()))) {
       if (event.isFromGuild()) {
         String rankingName = discordOptionRetriever.fromEventGetObjectName(event);
-        List<Account> accountsToAdd = discordOptionRetriever.fromEventGetAccountList(event)
+        List<Account> accountsToAdd = discordOptionRetriever.fromEventGetAccountListToAdd(event)
             .stream()
             .filter(Account::isNotEmpty)
             .toList();

@@ -29,8 +29,13 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
   @Override
   public Account enrichIdentification(Account account) {
     try {
-      RiotAccount riotAccount = riotAccountClient.getAccountDto(account.getName(),
-          account.getTagLine());
+      RiotAccount riotAccount;
+      if (account.lacksId()) {
+        riotAccount = riotAccountClient.getAccountDto(account.getName(),
+            account.getTagLine());
+      } else {
+        riotAccount = riotAccountClient.getAccountDto(account.getId());
+      }
       String puuid = riotAccount.puuid();
       if (puuid == null) {
         return new Account(account.getName(), account.getTagLine());

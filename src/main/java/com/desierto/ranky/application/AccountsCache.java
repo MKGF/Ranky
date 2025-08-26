@@ -1,6 +1,7 @@
 package com.desierto.ranky.application;
 
 import com.desierto.ranky.domain.entity.Account;
+import com.desierto.ranky.domain.exception.account.AccountCouldNotBeDesambiguatedException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,10 +68,19 @@ public class AccountsCache {
     try {
       String key = (guildId + ":" + rankingId).toLowerCase();
       List<Account> existingAccounts = new ArrayList<>(rankings.get(key));
-      existingAccounts.removeIf(account -> accounts.stream().anyMatch(account::isSameAccount));
+      List<Account> accountsToRemove = new ArrayList<>();
+      accounts.forEach(account -> {
+        List<Account> matches = existingAccounts.stream().filter(account::isSameAccount).toList();
+        if (matches.size() > 1) {
+          throw new AccountCouldNotBeDesambiguatedException(matches.get(0));
+        } else if (matches.size() == 1) {
+          accountsToRemove.add(matches.get(0));
+        }
+      });
+      existingAccounts.removeAll(accountsToRemove);
       rankings.remove(key);
       rankings.put(key, existingAccounts);
-      log.info(String.format("Removed account from existing cache %s", key));
+      log.info(String.format("Removed accounts from existing cache %s", key));
     } catch (NullPointerException ignored) {
     }
   }

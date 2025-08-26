@@ -46,7 +46,7 @@ public class Account implements Comparable<Account> {
   }
 
   public String getNameAndTagLine() {
-    return this.name + "#" + this.tagLine;
+    return this.name + (this.tagLine == null || !this.tagLine.isEmpty() ? "#" + this.tagLine : "");
   }
 
   @Override
@@ -55,7 +55,7 @@ public class Account implements Comparable<Account> {
   }
 
   public boolean isNotEmpty() {
-    return name != null && !name.isEmpty() && tagLine != null && !tagLine.isEmpty();
+    return name != null && !name.isEmpty();
   }
 
   public void updateGameName(String gameName, String tagLine) {
@@ -64,6 +64,17 @@ public class Account implements Comparable<Account> {
   }
 
   public boolean isSameAccount(Account other) {
+    if ((this.onlyHasName() || other.onlyHasName())) {
+      return this.name.equalsIgnoreCase(other.name);
+    }
     return this.getNameAndTagLine().equalsIgnoreCase(other.getNameAndTagLine());
+  }
+
+  private boolean onlyHasName() {
+    return !this.name.isEmpty() && this.tagLine.isEmpty();
+  }
+
+  public boolean lacksId() {
+    return this.id.isEmpty();
   }
 }

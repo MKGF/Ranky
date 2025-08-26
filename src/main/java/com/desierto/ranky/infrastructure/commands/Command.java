@@ -59,7 +59,7 @@ public class Command {
     );
     ADD_ACCOUNTS = Command.of(
         "add_accounts",
-        "Adds the given accounts (being separated by a comma (',')",
+        "Adds accounts (being separated by a comma (',')",
         List.of(
             new Parameter(
                 "ranking_name",
@@ -76,7 +76,7 @@ public class Command {
     );
     REMOVE_ACCOUNTS = Command.of(
         "remove_accounts",
-        "Removes the given accounts (format: summonerName#tagLine)",
+        "Removes accounts (format: summonerName(#tagLine to desambiguate)",
         List.of(
             new Parameter(
                 "ranking_name",
@@ -86,7 +86,7 @@ public class Command {
             ),
             new Parameter(
                 "accounts",
-                "Accounts to remove from the ranking (format: summonerName#tagLine,summonerName#tagLine...)",
+                "Accounts to remove from the ranking (format: summonerName(#tagLine),summonerName(#tagLine)...)",
                 true,
                 OptionType.STRING
             )

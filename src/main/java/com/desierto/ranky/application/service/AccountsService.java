@@ -3,6 +3,7 @@ package com.desierto.ranky.application.service;
 import com.desierto.ranky.application.AccountsCache;
 import com.desierto.ranky.domain.entity.Account;
 import com.desierto.ranky.domain.entity.Ranking;
+import com.desierto.ranky.domain.exception.account.AccountCouldNotBeDesambiguatedException;
 import com.desierto.ranky.domain.repository.RankingRepository;
 import com.desierto.ranky.domain.repository.RiotAccountRepository;
 import com.desierto.ranky.domain.service.IAccountsService;
@@ -33,10 +34,11 @@ public class AccountsService implements IAccountsService {
   @Override
   public Ranking addAccounts(String rankingId, Guild guild, List<Account> accounts) {
     Ranking ranking = rankingRepository.read(rankingId, guild);
-    accounts.stream().map(this::enrich).filter(account -> !account.getId().isEmpty()).forEach(
+    List<Account> accountsWithId = accounts.stream().map(this::enrich).toList();
+    accountsWithId.stream().filter(account -> !account.getId().isEmpty()).forEach(
         ranking::addAccount);
     if (accountsCache.containsRanking(rankingId, guild.getId())) {
-      List<Account> enrichedAccounts = accounts.stream().map(
+      List<Account> enrichedAccounts = accountsWithId.stream().map(
           account -> riotAccountRepository.enrichWithRankedStats(account,
               RankedMode.RANKED_SOLO_5x5)).toList();
       accountsCache.addAccountsIfRankingCached(guild.getId(), rankingId, enrichedAccounts);
@@ -47,7 +49,17 @@ public class AccountsService implements IAccountsService {
   @Override
   public Ranking removeAccounts(String rankingId, Guild guild, List<Account> accounts) {
     Ranking ranking = rankingRepository.read(rankingId, guild);
-    accounts.stream().map(this::enrich).forEach(ranking::removeAccount);
+    List<Account> enrichedAccounts = ranking.getAccounts().stream().map(this::enrich).toList();
+    accounts.forEach(account -> {
+      List<Account> matches = enrichedAccounts.stream()
+          .filter(account1 -> account1.isSameAccount(account))
+          .toList();
+      if (matches.size() > 1) {
+        throw new AccountCouldNotBeDesambiguatedException(matches.get(0));
+      } else if (matches.size() == 1) {
+        ranking.removeAccount(matches.get(0));
+      }
+    });
     if (accountsCache.containsRanking(rankingId, guild.getId())) {
       accountsCache.removeAccountsIfRankingCached(guild.getId(), rankingId, accounts);
     }
