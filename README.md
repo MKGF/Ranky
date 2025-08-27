@@ -26,6 +26,10 @@ The deployment is automatically handled by a set of GitHub actions that will:
     2-Compile the project in a jar file named Ranky.
     3-Deploy it in AWS.
 
+## Use of Ranky
+
+If you want to use the bot, go to https://discord.com/oauth2/authorize?client_id=1005188427634966629&permissions=2952866832&scope=bot and add it to a Discord server. After that, the bot will explain it's usage when joining and every time the /help command is executed.
+
 ## License
 
 This project is licensed under the [GNU Affero General Public License v3.0](https://www.gnu.org/licenses/agpl-3.0.html) for the code.
