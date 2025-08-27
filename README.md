@@ -25,3 +25,9 @@ The deployment is automatically handled by a set of GitHub actions that will:
     1-Prepare the application-secret.properties file inside the jar file.
     2-Compile the project in a jar file named Ranky.
     3-Deploy it in AWS.
+
+## License
+
+This project is licensed under the [GNU Affero General Public License v3.0](https://www.gnu.org/licenses/agpl-3.0.html) for the code.
+
+All images, documentation, and other non-code content are licensed under the [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/).
