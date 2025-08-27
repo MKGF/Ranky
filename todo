@@ -6,7 +6,7 @@ es algo que debemos abordar nosotros para que lo unico que tengamos que hacer se
 -Crear JSON de permisos para la group policy de ranky-terraform en AWS
 -Investigar cómo dejar el fichero en app/data o suplir el contenedor de docker o dockerfile en ECR
 -Darle salida del comando al usuario cuando ocurre un error (si no se queda "Ranky está pensando..." eternamente) DONE
--Checkear si es posible ofrecer autocompletado en funcion a los rankings que ya hay en el canal TODO
+-Checkear si es posible ofrecer autocompletado en funcion a los rankings que ya hay en el canal DONE
 -Sustituir Orianna por nuestra propia implementacion de comunicacion con Riot DONE
 -Sustituir el comando de añadir cuentas con un comando que permita al usuario elegir a que ranking quiere añadir las cuentas en un dropdown menu TODO
 https://jda.wiki/using-jda/interactions/#select-menus-dropdowns
@@ -25,6 +25,6 @@ https://jda.wiki/using-jda/interactions/#select-menus-dropdowns
 -Explorar hacer rankings multiregion (o por lo menos permitir customizar la region del ranking) TODO
 -Explorar abrir un hilo por cada cuenta para hacer las peticiones en paralelo a riot y asi no tener que esperar el resultado de cada una TODO
 -Actualizar la cache con inserciones/borrados en caso de que el ranking este cacheado DONE
--Proporcionar la opcion de forzar refresco del ranking TODO
+-Proporcionar la opcion de forzar refresco del ranking DONE
 -Revisar por que da unauthorized cuando queremos meter una cuenta nueva a la cache DONE
 -Proveer la posibilidad de borrar una cuenta sin el tag del ranking y solicitar desambiguar con tag en caso de que haya dos que se llamen igual DONE
