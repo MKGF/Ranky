@@ -11,11 +11,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.desierto.ranky.application.AccountsCache;
+import com.desierto.ranky.application.fixtures.RankingFixtures;
 import com.desierto.ranky.domain.entity.Account;
 import com.desierto.ranky.domain.entity.Ranking;
 import com.desierto.ranky.domain.repository.RankingRepository;
 import com.desierto.ranky.domain.repository.RiotAccountRepository;
 import com.desierto.ranky.domain.valueobject.Rank;
+import com.desierto.ranky.domain.valueobject.RankedMode;
 import com.desierto.ranky.infrastructure.configuration.ConfigLoader;
 import com.desierto.ranky.infrastructure.utils.DiscordOptionRetriever;
 import com.desierto.ranky.infrastructure.utils.DiscordRankingFormatter;
@@ -35,7 +37,7 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-public class DiscordGetRankingServiceTest {
+class DiscordGetRankingServiceTest {
 
   DiscordGetRankingService cut;
 
@@ -68,31 +70,31 @@ public class DiscordGetRankingServiceTest {
   }
 
   @Test
-  public void onEvent_whenNotFromGuild_doesNothingAndInforms() {
+  void onEvent_whenNotFromGuild_doesNothingAndInforms() {
     SlashCommandInteractionEvent event = getAMockedEventNotFromAGuild();
     Ranking ranking = new Ranking("");
     mockDiscordRepo(ranking, event.getGuild());
-    cut.execute(event);
+    cut.execute(event, false);
 
     verify(event.getHook(), times(1)).sendMessage(EXECUTE_COMMAND_FROM_SERVER.getMessage());
   }
 
   @Test
-  public void onEvent_withSinglePageRanking_printsSinglePage() {
+  void onEvent_withSinglePageRanking_printsSinglePage() {
     SlashCommandInteractionEvent event = getAMockedEvent();
     Ranking ranking = new Ranking("id");
     mockDiscordRepo(ranking, event.getGuild());
     when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn("id");
     when(discordRankingFormatter.formatRankingEntries(any())).thenReturn("formattedRanking");
 
-    cut.execute(event);
+    cut.execute(event, false);
 
     verify(printRankingService, times(1)).printSinglePage(eq(event), eq(ranking.getId()), anyList(),
         any());
   }
 
   @Test
-  public void onEvent_withMultiPageRanking_printsMultiPage() {
+  void onEvent_withMultiPageRanking_printsMultiPage() {
     SlashCommandInteractionEvent event = getAMockedEvent();
     Ranking ranking = new Ranking("id");
     Account acc1 = new Account("id1", "name1", "tagLine1");
@@ -107,10 +109,30 @@ public class DiscordGetRankingServiceTest {
     when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn("id");
     when(discordRankingFormatter.formatRankingEntries(any())).thenReturn("formattedRanking");
 
-    cut.execute(event);
+    cut.execute(event, false);
 
     verify(printRankingService, times(1)).printMultiPage(eq(event), eq(ranking.getId()), anyList(),
         any());
+  }
+
+  @Test
+  void onEvent_withForceRefresh_skipsCacheCall() {
+    SlashCommandInteractionEvent event = getAMockedEvent();
+    Ranking ranking = RankingFixtures.aRanking();
+    mockDiscordRepo(ranking, event.getGuild());
+    when(rankingRepository.read(anyString(), any())).thenReturn(ranking);
+    when(riotAccountRepository.enrichWithRankedStats(
+        ranking.getAccounts().get(0), RankedMode.RANKED_SOLO_5x5)
+    ).thenReturn(ranking.getAccounts().get(0));
+    when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(ranking.getId());
+    when(discordRankingFormatter.formatRankingEntries(any())).thenReturn("formattedRanking");
+    when(accountsCache.find(any(), anyString())).thenReturn(
+        Optional.of(RankingFixtures.aRanking().getAccounts()));
+
+    cut.execute(event, true);
+
+    verify(riotAccountRepository, times(ranking.getAccounts().size()))
+        .enrichWithRankedStats(any(), eq(RankedMode.RANKED_SOLO_5x5));
   }
 
   private SlashCommandInteractionEvent getAMockedEventNotFromAGuild() {

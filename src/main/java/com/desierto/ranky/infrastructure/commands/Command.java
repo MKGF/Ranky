@@ -32,6 +32,8 @@ public class Command {
 
   public static final Command MAKE_PUBLIC;
 
+  public static final Command FORCE_REFRESH;
+
 
   static {
     HELP = Command.of("help",
@@ -40,21 +42,21 @@ public class Command {
         "ranking",
         "Shows information of the specified ranking",
         List.of(
-            new Parameter("name", "Name of the ranking", true, OptionType.STRING)
+            new Parameter("name", "Name of the ranking", true, OptionType.STRING, true)
         )
     );
     CREATE = Command.of(
         "create",
         "Creates a new ranking with the given name",
         List.of(
-            new Parameter("name", "Name of the ranking", true, OptionType.STRING)
+            new Parameter("name", "Name of the ranking", true, OptionType.STRING, false)
         )
     );
     DELETE = Command.of(
         "delete",
         "Deletes the specified ranking",
         List.of(
-            new Parameter("name", "Name of the ranking", true, OptionType.STRING)
+            new Parameter("name", "Name of the ranking", true, OptionType.STRING, false)
         )
     );
     ADD_ACCOUNTS = Command.of(
@@ -65,12 +67,14 @@ public class Command {
                 "ranking_name",
                 "Name of the ranking to add the accounts to",
                 true,
-                OptionType.STRING
+                OptionType.STRING,
+                false
             ),
             new Parameter("accounts",
                 "Accounts to add to the ranking (format: summonerName#tagLine,summonerName#tagLine...)",
                 true,
-                OptionType.STRING
+                OptionType.STRING,
+                false
             )
         )
     );
@@ -82,13 +86,15 @@ public class Command {
                 "ranking_name",
                 "Name of the ranking to add the accounts to",
                 true,
-                OptionType.STRING
+                OptionType.STRING,
+                false
             ),
             new Parameter(
                 "accounts",
                 "Accounts to remove from the ranking (format: summonerName(#tagLine),summonerName(#tagLine)...)",
                 true,
-                OptionType.STRING
+                OptionType.STRING,
+                false
             )
         )
     );
@@ -103,7 +109,8 @@ public class Command {
                 "guild",
                 "Guild name",
                 true,
-                OptionType.STRING
+                OptionType.STRING,
+                false
             )
         )
     );
@@ -114,7 +121,8 @@ public class Command {
                 "guild",
                 "Guild name",
                 true,
-                OptionType.STRING
+                OptionType.STRING,
+                false
             )
         )
     );
@@ -125,7 +133,8 @@ public class Command {
                 "guild",
                 "Guild name",
                 true,
-                OptionType.STRING
+                OptionType.STRING,
+                false
             )
         )
     );
@@ -133,7 +142,14 @@ public class Command {
         "make_public",
         "Makes the ranking of public access",
         List.of(
-            new Parameter("name", "Name of the ranking", true, OptionType.STRING)
+            new Parameter("name", "Name of the ranking", true, OptionType.STRING, false)
+        )
+    );
+    FORCE_REFRESH = Command.of(
+        "refresh",
+        "Shows *live* information of the specified ranking",
+        List.of(
+            new Parameter("name", "Name of the ranking", true, OptionType.STRING, true)
         )
     );
   }
@@ -164,7 +180,8 @@ public class Command {
         GET_ENROLLED_USERS.toDiscordCommand(),
         EXISTS_CONFIG_CHANNEL.toDiscordCommand(),
         RETRIEVE_CONFIG_CHANNEL_CONTENT.toDiscordCommand(),
-        MAKE_PUBLIC.toDiscordCommand()
+        MAKE_PUBLIC.toDiscordCommand(),
+        FORCE_REFRESH.toDiscordCommand()
     );
   }
 
@@ -173,7 +190,7 @@ public class Command {
     parameters.forEach(
         parameter -> command.addOption(parameter.optionType(), parameter.name(),
             parameter.description(),
-            parameter.required()));
+            parameter.required(), parameter.autoComplete()));
     log.info("INTRODUCED COMMAND: " + this);
     return command;
   }

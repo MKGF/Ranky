@@ -4,6 +4,7 @@ import static com.desierto.ranky.infrastructure.commands.Command.ADD_ACCOUNTS;
 import static com.desierto.ranky.infrastructure.commands.Command.CREATE;
 import static com.desierto.ranky.infrastructure.commands.Command.DELETE;
 import static com.desierto.ranky.infrastructure.commands.Command.EXISTS_CONFIG_CHANNEL;
+import static com.desierto.ranky.infrastructure.commands.Command.FORCE_REFRESH;
 import static com.desierto.ranky.infrastructure.commands.Command.GET_ENROLLED_USERS;
 import static com.desierto.ranky.infrastructure.commands.Command.GET_GUILDS;
 import static com.desierto.ranky.infrastructure.commands.Command.HELP;
@@ -92,7 +93,7 @@ public class RankySlashCommandListener extends ListenerAdapter {
       executorService.execute(() -> helpService.execute(event));
     }
     if (event.getCommandString().contains("/" + RANKING.getCommandId())) {
-      executorService.execute(() -> discordGetRankingService.execute(event));
+      executorService.execute(() -> discordGetRankingService.execute(event, false));
     }
     if (event.getCommandString().contains("/" + CREATE.getCommandId())) {
       executorService.execute(() -> discordCreateRankingService.execute(event));
@@ -120,6 +121,9 @@ public class RankySlashCommandListener extends ListenerAdapter {
     }
     if (event.getCommandString().contains("/" + MAKE_PUBLIC.getCommandId())) {
       executorService.execute(() -> discordRankingPublisherService.execute(event));
+    }
+    if (event.getCommandString().contains("/" + FORCE_REFRESH.getCommandId())) {
+      executorService.execute(() -> discordGetRankingService.execute(event, true));
     }
   }
 }

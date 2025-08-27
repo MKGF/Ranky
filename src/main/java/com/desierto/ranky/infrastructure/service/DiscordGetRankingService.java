@@ -59,13 +59,13 @@ public class DiscordGetRankingService {
   @Autowired
   private RankingRepository rankingRepository;
 
-  public void execute(SlashCommandInteractionEvent event) {
+  public void execute(SlashCommandInteractionEvent event, boolean forceRefresh) {
     if (event.isFromGuild()) {
       String rankingName = discordOptionRetriever.fromEventGetObjectName(event);
       try {
         Ranking ranking = rankingRepository.read(rankingName, event.getGuild());
         List<EntryDto> rankingEntries = getRankedAccountsWithProgressBarAnimation(event,
-            rankingName, ranking);
+            rankingName, ranking, forceRefresh);
         printRankingAsResponseToUserCommand(event, rankingName, rankingEntries);
       } catch (ConfigChannelNotFoundException | RankingNotFoundException e) {
         handleExceptionOnSlashCommandEvent(e, event);
@@ -90,12 +90,12 @@ public class DiscordGetRankingService {
 
   private List<EntryDto> getRankedAccountsWithProgressBarAnimation(
       SlashCommandInteractionEvent event,
-      String rankingName, Ranking ranking) {
+      String rankingName, Ranking ranking, boolean forceRefresh) {
     Optional<List<Account>> cachedAccounts = accountsCache.find(
         event.getGuild().getId(), rankingName);
     List<Account> rankingAccounts;
     Message progressBar = null;
-    if (cachedAccounts.isEmpty()) {
+    if (cachedAccounts.isEmpty() || forceRefresh) {
       progressBar = event.getHook().sendMessage(DiscordProgressBar.getProgress(0)).complete();
       rankingAccounts = getRankingEntries(ranking, event.getHook(), progressBar);
     } else {
