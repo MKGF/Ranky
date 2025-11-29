@@ -15,6 +15,8 @@ https://jda.wiki/using-jda/interactions/#select-menus-dropdowns
 -En los ToS de discord dice que no podemos mandar MDs sin permiso. Revisar si podemos enviar el mensaje de presentacion. TODO
 -Graficas que se añadan checkpoints con cada actualizacion de ranking??? TODO
 -Claimear una cuenta para que te permita imprimir tu pagina y te permita tambien resaltar tu puesto en la clasificacion TODO
+  + Al claimear una cuenta, poder solicitar tu informacion ingame con un comando /ingame sin parametros
+  + Poder consultar tus ultimas partidas con un comando /history sin parametros
 -Cuando se intenta imprimir el ranking y no se ha escrito el comando con el nombre real del ranking (como por ejemplo, todo en caps) no funciona la cache DONE
   + Hacer el comando ranking case insensitive DONE
 -Frontalizar la interfaz de ranky para los usuarios que no esten acostumbrados al uso de comandos DONE
