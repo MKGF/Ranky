@@ -10,7 +10,6 @@ import java.util.Base64;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -37,9 +36,9 @@ public class AuthenticationService {
   private final SessionCache sessionCache;
 
   @Autowired
-  public AuthenticationService(RestTemplateBuilder builder, ConfigLoader configLoader,
+  public AuthenticationService(RestTemplate restTemplate, ConfigLoader configLoader,
       SessionCache sessionCache) {
-    this.restTemplate = builder.build();
+    this.restTemplate = restTemplate;
     this.config = configLoader;
     this.sessionCache = sessionCache;
   }

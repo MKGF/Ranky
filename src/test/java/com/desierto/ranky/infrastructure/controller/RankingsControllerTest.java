@@ -33,15 +33,15 @@ import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.CacheRestAction;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 class RankingsControllerTest extends BaseIT {
 
-  @MockBean
+  @MockitoBean
   private JDA jda;
 
-  @MockBean
+  @MockitoBean
   private RestRiotAccountRepository restRiotAccountRepository;
 
   @Autowired

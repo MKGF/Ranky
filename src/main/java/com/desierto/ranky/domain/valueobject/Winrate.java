@@ -3,9 +3,9 @@ package com.desierto.ranky.domain.valueobject;
 import static java.math.BigDecimal.ZERO;
 import static java.math.BigDecimal.valueOf;
 
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
