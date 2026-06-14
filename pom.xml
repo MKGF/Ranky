@@ -3,31 +3,39 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <build>
     <finalName>Ranky</finalName>
     <plugins>
       <plugin>
-        <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <configuration>
           <mainClass>com.desierto.ranky.infrastructure.Ranky</mainClass>
         </configuration>
+        <groupId>org.springframework.boot</groupId>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
           <release>${java.version}</release>
         </configuration>
+        <groupId>org.apache.maven.plugins</groupId>
       </plugin>
     </plugins>
   </build>
+
   <groupId>com.desierto</groupId>
   <artifactId>Ranky</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>Ranky</name>
-  <description>Ranky is a bot to create custom League of Legend SoloQ rankings.
-  </description>
+  <description>Ranky is a bot to create custom League of Legend SoloQ rankings.</description>
+
+  <parent>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <groupId>org.springframework.boot</groupId>
+    <relativePath/>
+    <version>4.0.7</version>
+  </parent>
 
   <dependencies>
     <dependency>
@@ -89,13 +97,6 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
-  <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>4.0.7</version>
-    <relativePath/> <!-- lookup parent from repository -->
-  </parent>
 
   <properties>
     <java.version>24</java.version>
