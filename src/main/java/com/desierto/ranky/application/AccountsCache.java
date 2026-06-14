@@ -41,7 +41,7 @@ public class AccountsCache {
     }
     rankings.put(key.toLowerCase(), accounts);
     introductionTimes.put(key.toLowerCase(), LocalDateTime.now());
-    log.info(String.format("Introduced accounts in cache with id %s", key.toLowerCase()));
+    log.info("Introduced accounts in cache with id {}", key.toLowerCase());
   }
 
   public Optional<List<Account>> find(String guildId, String rankingId) {
@@ -49,7 +49,7 @@ public class AccountsCache {
     Optional<List<Account>> optionalAccounts;
     try {
       optionalAccounts = Optional.of(rankings.get(key.toLowerCase()));
-      log.info(String.format("Retrieved accounts from cache for id %s", key.toLowerCase()));
+      log.info("Retrieved accounts from cache for id {}", key.toLowerCase());
     } catch (NullPointerException ignored) {
       optionalAccounts = Optional.empty();
     }
@@ -60,7 +60,7 @@ public class AccountsCache {
     String key = guildId + ":" + rankingId;
     rankings.remove(key);
     introductionTimes.remove(key);
-    log.info(String.format("Removed ranking with id = %s from cache", key.toLowerCase()));
+    log.info("Removed ranking with id = {} from cache", key.toLowerCase());
   }
 
   public void removeAccountsIfRankingCached(String guildId, String rankingId,
@@ -80,7 +80,7 @@ public class AccountsCache {
       existingAccounts.removeAll(accountsToRemove);
       rankings.remove(key);
       rankings.put(key, existingAccounts);
-      log.info(String.format("Removed accounts from existing cache %s", key));
+      log.info("Removed accounts from existing cache {}", key);
     } catch (NullPointerException ignored) {
     }
   }
@@ -92,7 +92,7 @@ public class AccountsCache {
       existingAccounts.addAll(accounts);
       rankings.remove(key);
       rankings.put(key, existingAccounts);
-      log.info(String.format("Added account to existing cache %s", key));
+      log.info("Added account to existing cache {}", key);
     } catch (NullPointerException ignored) {
     }
   }
@@ -109,7 +109,7 @@ public class AccountsCache {
       rankings.remove(key.toLowerCase());
       introductionTimes.remove(key.toLowerCase());
     });
-    log.info(String.format("Cleared from accounts cache: %s", keysToRemoveFromCache));
+    log.info("Cleared from accounts cache: {}", keysToRemoveFromCache);
   }
 
   public boolean containsRanking(String rankingId, String guildId) {
