@@ -8,17 +8,19 @@
     <finalName>Ranky</finalName>
     <plugins>
       <plugin>
+        <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <configuration>
           <mainClass>com.desierto.ranky.infrastructure.Ranky</mainClass>
         </configuration>
-        <groupId>org.springframework.boot</groupId>
       </plugin>
       <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
           <release>${java.version}</release>
         </configuration>
+        <artifactId>maven-compiler-plugin</artifactId>
         <groupId>org.apache.maven.plugins</groupId>
       </plugin>
     </plugins>
@@ -59,12 +61,15 @@
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <version>${lombok.version}</version>
-      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <artifactId>spring-boot-webmvc-test</artifactId>
+      <groupId>org.springframework.boot</groupId>
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
