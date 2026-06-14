@@ -34,10 +34,10 @@ jobs:
           cache: maven
 
       - name: Test with Maven
-        run: mvn clean test
+        run: ./mvnw clean test
         
       - name: Build with Maven
-        run: mvn clean package
+        run: ./mvnw clean package
 
       - name: Set up SSH key
         env:
