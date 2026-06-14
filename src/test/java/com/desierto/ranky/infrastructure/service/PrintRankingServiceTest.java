@@ -2,6 +2,7 @@ package com.desierto.ranky.infrastructure.service;
 
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -15,12 +16,14 @@ import net.dv8tion.jda.api.events.GenericEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(SpringExtension.class)
-public class PrintRankingServiceTest {
+@ExtendWith(MockitoExtension.class)
+class PrintRankingServiceTest {
 
+  @InjectMocks
   PrintRankingService cut;
 
   @Mock
@@ -30,16 +33,15 @@ public class PrintRankingServiceTest {
   DiscordRankingFormatter discordRankingFormatter;
 
   @BeforeEach
-  public void setup() {
-    cut = new PrintRankingService(config, discordRankingFormatter);
-    when(discordRankingFormatter.footer()).thenReturn("");
-    when(discordRankingFormatter.title(anyString())).thenReturn("");
-    when(discordRankingFormatter.title(anyString(), anyString())).thenReturn("");
-    when(config.getAccountLimit()).thenReturn(2);
+  void setFormatterUp() {
+    lenient().when(discordRankingFormatter.footer()).thenReturn("");
+    lenient().when(discordRankingFormatter.title(anyString())).thenReturn("");
+    lenient().when(discordRankingFormatter.title(anyString(), anyString())).thenReturn("");
+    lenient().when(config.getAccountLimit()).thenReturn(1);
   }
 
   @Test
-  public void whenSinglePageIsCalled_usesFunctionPrint() {
+  void whenSinglePageIsCalled_usesFunctionPrint() {
     GenericEvent event = mock(GenericEvent.class);
     when(discordRankingFormatter.formatRankingEntries(anyList())).thenReturn("formatted");
     SinglePagePrintingFunction function = mock(SinglePagePrintingFunction.class);
@@ -50,7 +52,7 @@ public class PrintRankingServiceTest {
   }
 
   @Test
-  public void whenMultiPageIsCalled_usesAllPrintingMethodsFromFunction() {
+  void whenMultiPageIsCalled_usesAllPrintingMethodsFromFunction() {
     GenericEvent event = mock(GenericEvent.class);
     EntryDto entry1 = mock(EntryDto.class);
     EntryDto entry2 = mock(EntryDto.class);
@@ -62,9 +64,8 @@ public class PrintRankingServiceTest {
     cut.printMultiPage(event, "rankingName", List.of(entry1, entry2, entry3, entry4), function);
 
     verify(function, times(1)).printBeginning(event, "formatted");
-    verify(function, times(1)).printGeneric(event, "formatted");
+    verify(function, times(3)).printGeneric(event, "formatted");
     verify(function, times(1)).printEnding(event, "formatted");
-
   }
 
 }

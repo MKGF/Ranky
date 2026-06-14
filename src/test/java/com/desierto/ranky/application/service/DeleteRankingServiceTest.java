@@ -8,13 +8,13 @@ import static org.mockito.Mockito.when;
 import com.desierto.ranky.application.AccountsCache;
 import com.desierto.ranky.domain.repository.RankingRepository;
 import net.dv8tion.jda.api.entities.Guild;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class DeleteRankingServiceTest {
 
   @Mock
@@ -23,15 +23,11 @@ class DeleteRankingServiceTest {
   @Mock
   AccountsCache accountsCache;
 
+  @InjectMocks
   DeleteRankingService cut;
 
-  @BeforeEach
-  public void setUp() {
-    cut = new DeleteRankingService(rankingRepository, accountsCache);
-  }
-
   @Test
-  public void deletesFromRepoAndCache() {
+  void deletesFromRepoAndCache() {
     Guild guild = mock(Guild.class);
     when(guild.getId()).thenReturn("guildId");
     cut.execute("id", guild);

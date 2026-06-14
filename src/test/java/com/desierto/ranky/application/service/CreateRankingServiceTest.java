@@ -7,27 +7,23 @@ import static org.mockito.Mockito.verify;
 import com.desierto.ranky.domain.entity.Ranking;
 import com.desierto.ranky.domain.repository.RankingRepository;
 import net.dv8tion.jda.api.entities.Guild;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(SpringExtension.class)
-public class CreateRankingServiceTest {
+@ExtendWith(MockitoExtension.class)
+class CreateRankingServiceTest {
 
   @Mock
   RankingRepository rankingRepository;
 
+  @InjectMocks
   CreateRankingService cut;
 
-  @BeforeEach
-  public void setUp() {
-    cut = new CreateRankingService(rankingRepository);
-  }
-
   @Test
-  public void creates() {
+  void creates() {
     String rankingId = "ranking";
     Guild guild = mock(Guild.class);
     cut.execute(rankingId, guild);

@@ -1,6 +1,7 @@
 package com.desierto.ranky.infrastructure.service;
 
 import static com.desierto.ranky.domain.utils.FileReader.read;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -12,16 +13,17 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 @TestInstance(Lifecycle.PER_CLASS)
 public class WelcomeGuildServiceTest {
 
@@ -30,18 +32,19 @@ public class WelcomeGuildServiceTest {
   private static final String NON_RIOT_ENDORSEMENT_MESSAGE = "nonRiotEndorsementMessage";
   private static final EmbedBuilder EMBED_MESSAGE_BUILDER = new EmbedBuilder().setDescription(
       EMBED_MESSAGE);
+  @InjectMocks
   WelcomeGuildService cut;
   @Mock
   ConfigLoader config;
 
-  @BeforeAll
-  public void setUp() {
-    cut = new WelcomeGuildService(config);
-    when(config.getPathToGuildPresentationMessage()).thenReturn(PATH_TO_MESSAGE_TO_GUILD_TXT);
+  @BeforeEach
+  void setPathToGuildPresentationMessage() {
+    lenient().when(config.getPathToGuildPresentationMessage())
+        .thenReturn(PATH_TO_MESSAGE_TO_GUILD_TXT);
   }
 
   @Test
-  public void onExecute_withFullyQualifiedGuildForWelcomeMessage_sendsMessageInSystemChannel() {
+  void onExecute_withFullyQualifiedGuildForWelcomeMessage_sendsMessageInSystemChannel() {
     Guild guild = buildGuildWithAllRelevantChannelsForWelcomeMessage();
     String welcomeMessage = String.format(read(
             PATH_TO_MESSAGE_TO_GUILD_TXT),
@@ -61,7 +64,7 @@ public class WelcomeGuildServiceTest {
   }
 
   @Test
-  public void onExecute_withGuildWithoutSystemChannelForWelcomeMessage_sendsMessageInDefaultChannel() {
+  void onExecute_withGuildWithoutSystemChannelForWelcomeMessage_sendsMessageInDefaultChannel() {
     Guild guild = buildGuildWithoutSystemChannel();
     String welcomeMessage = String.format(read(
             PATH_TO_MESSAGE_TO_GUILD_TXT),
@@ -81,7 +84,7 @@ public class WelcomeGuildServiceTest {
   }
 
   @Test
-  public void onExecute_withGuildWithoutSystemNorDefaultChannelsForWelcomeMessage_sendsMessageInFirstMessage() {
+  void onExecute_withGuildWithoutSystemNorDefaultChannelsForWelcomeMessage_sendsMessageInFirstMessage() {
     Guild guild = buildGuildWithoutSystemChannelAndDefaultChannel();
     String welcomeMessage = String.format(read(
             PATH_TO_MESSAGE_TO_GUILD_TXT),
@@ -101,7 +104,7 @@ public class WelcomeGuildServiceTest {
   }
 
   @Test
-  public void onExecute_withGuildWithoutChannelsForWelcomeMessage_doesNothing() {
+  void onExecute_withGuildWithoutChannelsForWelcomeMessage_doesNothing() {
     Guild guild = Mockito.mock(Guild.class);
 
     cut.execute(guild, EMBED_MESSAGE, NON_RIOT_ENDORSEMENT_MESSAGE);
@@ -117,8 +120,8 @@ public class WelcomeGuildServiceTest {
     TextChannel firstChannel = Mockito.mock(TextChannel.class);
 
     when(guild.getSystemChannel()).thenReturn(systemChannel);
-    when(guild.getDefaultChannel()).thenReturn(defaultGuildChannelUnion);
-    when(defaultGuildChannelUnion.asTextChannel()).thenReturn(defaultChannel);
+    lenient().when(guild.getDefaultChannel()).thenReturn(defaultGuildChannelUnion);
+    lenient().when(defaultGuildChannelUnion.asTextChannel()).thenReturn(defaultChannel);
     when(guild.getTextChannels()).thenReturn(List.of(firstChannel));
 
     return guild;

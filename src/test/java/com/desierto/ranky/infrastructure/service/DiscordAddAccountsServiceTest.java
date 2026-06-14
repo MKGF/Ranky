@@ -5,6 +5,7 @@ import static com.desierto.ranky.infrastructure.utils.DiscordMessages.EXECUTE_CO
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -24,13 +25,16 @@ import net.dv8tion.jda.api.requests.restaction.WebhookMessageCreateAction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(SpringExtension.class)
-public class DiscordAddAccountsServiceTest {
+@ExtendWith(MockitoExtension.class)
+class DiscordAddAccountsServiceTest {
 
   public static final String RANKY_USER = "rankyUser";
+
+  @InjectMocks
   DiscordAddAccountsService cut;
 
   @Mock
@@ -43,18 +47,13 @@ public class DiscordAddAccountsServiceTest {
   IAccountsService accountsService;
 
   @BeforeEach
-  public void setUp() {
-    cut = new DiscordAddAccountsService(config, discordOptionRetriever, accountsService);
-    when(config.getRankyUserRole()).thenReturn(RANKY_USER);
+  void setUserRoleUp() {
+    lenient().when(config.getRankyUserRole()).thenReturn(RANKY_USER);
   }
 
   @Test
-  public void onExecute_withoutRankyUserRole_doesNothingAndInforms() {
+  void onExecute_withoutRankyUserRole_doesNothingAndInforms() {
     SlashCommandInteractionEvent event = getAMockedEventWithMemberWithoutRole();
-    String rankingName = "A ranking";
-    when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingName);
-    when(discordOptionRetriever.fromEventGetAccountListToAdd(event)).thenReturn(
-        List.of(new Account()));
 
     cut.execute(event);
 
@@ -63,12 +62,8 @@ public class DiscordAddAccountsServiceTest {
   }
 
   @Test
-  public void onExecute_withEventNotComingFromAGuild_doesNothingAndInforms() {
+  void onExecute_withEventNotComingFromAGuild_doesNothingAndInforms() {
     SlashCommandInteractionEvent event = getAMockedEventNotFromAGuild();
-    String rankingName = "A ranking";
-    when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingName);
-    when(discordOptionRetriever.fromEventGetAccountListToAdd(event)).thenReturn(
-        List.of(new Account()));
 
     cut.execute(event);
 
@@ -77,7 +72,7 @@ public class DiscordAddAccountsServiceTest {
   }
 
   @Test
-  public void onExecute_withEmptyAccountList_doesNothing() {
+  void onExecute_withEmptyAccountList_doesNothing() {
     SlashCommandInteractionEvent event = getAMockedEvent();
     String rankingName = "A ranking";
     when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingName);
@@ -91,10 +86,9 @@ public class DiscordAddAccountsServiceTest {
   }
 
   @Test
-  public void onExecute_withEnrichedWithIdAccountList_addsAccountToTheRankingAndInformsInHook() {
+  void onExecute_withEnrichedWithIdAccountList_addsAccountToTheRankingAndInformsInHook() {
     SlashCommandInteractionEvent event = getAMockedEvent();
     String rankingName = "A ranking";
-    Ranking ranking = new Ranking(rankingName);
     Account BBXhadow = new Account("BBXhadow", "RFF");
     Account enrichedBBXhadow = new Account("id", BBXhadow.getId(), BBXhadow.getTagLine());
     when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(rankingName);
@@ -144,9 +138,9 @@ public class DiscordAddAccountsServiceTest {
     when(event.isFromGuild()).thenReturn(true);
     when(event.getHook()).thenReturn(hook);
     when(event.getMember()).thenReturn(member);
-    when(member.getRoles()).thenReturn(List.of(role));
+    lenient().when(member.getRoles()).thenReturn(List.of(role));
     when(role.getName()).thenReturn(RANKY_USER);
-    when(hook.sendMessage(anyString())).thenReturn(wmca);
+    lenient().when(hook.sendMessage(anyString())).thenReturn(wmca);
     return event;
   }
 }

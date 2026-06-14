@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -33,12 +34,14 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class DiscordGetRankingServiceTest {
 
+  @InjectMocks
   DiscordGetRankingService cut;
 
   @Mock
@@ -63,10 +66,8 @@ class DiscordGetRankingServiceTest {
   RankingRepository rankingRepository;
 
   @BeforeEach
-  public void setUp() {
-    cut = new DiscordGetRankingService(config, discordOptionRetriever, riotAccountRepository,
-        discordRankingFormatter, accountsCache, printRankingService, rankingRepository);
-    when(config.getAccountLimit()).thenReturn(1);
+  void setAccountLimitUp() {
+    lenient().when(config.getAccountLimit()).thenReturn(1);
   }
 
   @Test
@@ -85,7 +86,6 @@ class DiscordGetRankingServiceTest {
     Ranking ranking = new Ranking("id");
     mockDiscordRepo(ranking, event.getGuild());
     when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn("id");
-    when(discordRankingFormatter.formatRankingEntries(any())).thenReturn("formattedRanking");
 
     cut.execute(event, false);
 
@@ -107,7 +107,8 @@ class DiscordGetRankingServiceTest {
     when(accountsCache.find(anyString(), anyString())).thenReturn(
         Optional.of(ranking.getAccounts()));
     when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn("id");
-    when(discordRankingFormatter.formatRankingEntries(any())).thenReturn("formattedRanking");
+    lenient().when(discordRankingFormatter.formatRankingEntries(any()))
+        .thenReturn("formattedRanking");
 
     cut.execute(event, false);
 
@@ -125,7 +126,6 @@ class DiscordGetRankingServiceTest {
         ranking.getAccounts().get(0), RankedMode.RANKED_SOLO_5x5)
     ).thenReturn(ranking.getAccounts().get(0));
     when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(ranking.getId());
-    when(discordRankingFormatter.formatRankingEntries(any())).thenReturn("formattedRanking");
     when(accountsCache.find(any(), anyString())).thenReturn(
         Optional.of(RankingFixtures.aRanking().getAccounts()));
 
@@ -154,22 +154,22 @@ class DiscordGetRankingServiceTest {
     Message message = mock(Message.class);
     MessageEditAction mea = mock(MessageEditAction.class);
     MessageCreateData mcd = mock(MessageCreateData.class);
-    when(hook.getInteraction()).thenReturn(interaction);
+    lenient().when(hook.getInteraction()).thenReturn(interaction);
     when(event.isFromGuild()).thenReturn(true);
     when(event.getGuild()).thenReturn(guild);
-    when(interaction.getGuild()).thenReturn(guild);
+    lenient().when(interaction.getGuild()).thenReturn(guild);
     when(guild.getId()).thenReturn("guildId");
-    when(event.getHook()).thenReturn(hook);
-    when(hook.sendMessage(anyString())).thenReturn(wmca);
-    when(hook.sendMessage(eq(mcd))).thenReturn(wmca);
-    when(wmca.complete()).thenReturn(message);
-    when(message.editMessage(anyString())).thenReturn(mea);
-    when(mea.complete()).thenReturn(message);
+    lenient().when(event.getHook()).thenReturn(hook);
+    lenient().when(hook.sendMessage(anyString())).thenReturn(wmca);
+    lenient().when(hook.sendMessage(eq(mcd))).thenReturn(wmca);
+    lenient().when(wmca.complete()).thenReturn(message);
+    lenient().when(message.editMessage(anyString())).thenReturn(mea);
+    lenient().when(mea.complete()).thenReturn(message);
     return event;
   }
 
   private void mockDiscordRepo(Ranking ranking, Guild guild) {
-    when(rankingRepository.update(ranking, guild)).thenReturn(ranking);
-    when(rankingRepository.read(ranking.getId(), guild)).thenReturn(ranking);
+    lenient().when(rankingRepository.update(ranking, guild)).thenReturn(ranking);
+    lenient().when(rankingRepository.read(ranking.getId(), guild)).thenReturn(ranking);
   }
 }

@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -33,13 +34,15 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(SpringExtension.class)
-public class RankyButtonClickListenerTest {
+@ExtendWith(MockitoExtension.class)
+class RankyButtonClickListenerTest {
 
+  @InjectMocks
   RankyButtonClickListener cut;
 
   @Mock
@@ -57,26 +60,18 @@ public class RankyButtonClickListenerTest {
   @Mock
   PrintRankingService printRankingService;
 
-
   @BeforeEach
-  public void setUp() {
-    cut = new RankyButtonClickListener(
-        bot,
-        accountsCache,
-        config,
-        discordRankingFormatter,
-        printRankingService
-    );
-    when(discordRankingFormatter.title(anyString())).thenReturn("");
-    when(discordRankingFormatter.title(anyString(), anyString())).thenReturn("");
-    when(discordRankingFormatter.footer()).thenReturn("");
-    when(config.getAccountLimit()).thenReturn(1);
+  void mockFormatterAndConfig() {
+    lenient().when(discordRankingFormatter.title(anyString())).thenReturn("");
+    lenient().when(discordRankingFormatter.title(anyString(), anyString())).thenReturn("");
+    lenient().when(discordRankingFormatter.footer()).thenReturn("");
+    lenient().when(config.getAccountLimit()).thenReturn(1);
   }
 
 
   //Case we want to print a page
   @Test
-  public void onPageButtonPressedEvent_resendMessageToChannel() {
+  void onPageButtonPressedEvent_resendMessageToChannel() {
     ButtonInteractionEvent event = getPageButtonInteractionEvent();
 
     cut.onButtonInteraction(event);
@@ -87,7 +82,7 @@ public class RankyButtonClickListenerTest {
 
   //Case we want to print a final page
   @Test
-  public void onFinalPageButtonPressedEvent_resendMessageToChannel() {
+  void onFinalPageButtonPressedEvent_resendMessageToChannel() {
     ButtonInteractionEvent event = getFinalPageButtonInteractionEvent();
 
     cut.onButtonInteraction(event);
@@ -98,7 +93,7 @@ public class RankyButtonClickListenerTest {
 
   //Case we want to print a whole single paged ranking
   @Test
-  public void onShareRankingButtonPressedEvent_printsSinglePage() {
+  void onShareRankingButtonPressedEvent_printsSinglePage() {
     ButtonInteractionEvent event = getSpecificRankingButtonInteractionEvent();
     Account account = new Account("name", "tagLine");
     account.updateRank(Rank.unranked());
@@ -114,7 +109,7 @@ public class RankyButtonClickListenerTest {
 
   //Case we want to print a whole several paged ranking
   @Test
-  public void onShareRankingButtonPressedEvent_printsMultiPage() {
+  void onShareRankingButtonPressedEvent_printsMultiPage() {
     ButtonInteractionEvent event = getSpecificRankingButtonInteractionEvent();
     Account account1 = new Account("name1", "tagLine1");
     Account account2 = new Account("name2", "tagLine2");
@@ -193,12 +188,12 @@ public class RankyButtonClickListenerTest {
     String expected = "expected";
     User user = mock(User.class);
     when(guild.getId()).thenReturn("guildId");
-    when(event.getUser()).thenReturn(user);
-    when(user.getAsMention()).thenReturn("mention");
-    when(event.getChannel()).thenReturn(channel);
-    when(event.getMessage()).thenReturn(message);
-    when(message.getContentRaw()).thenReturn(expected);
-    when(channel.sendMessage(anyString())).thenReturn(mca);
+    lenient().when(event.getUser()).thenReturn(user);
+    lenient().when(user.getAsMention()).thenReturn("mention");
+    lenient().when(event.getChannel()).thenReturn(channel);
+    lenient().when(event.getMessage()).thenReturn(message);
+    lenient().when(message.getContentRaw()).thenReturn(expected);
+    lenient().when(channel.sendMessage(anyString())).thenReturn(mca);
     when(event.reply(anyString())).thenReturn(rca);
     when(rca.setEphemeral(anyBoolean())).thenReturn(rca);
     when(event.getButton()).thenReturn(button);

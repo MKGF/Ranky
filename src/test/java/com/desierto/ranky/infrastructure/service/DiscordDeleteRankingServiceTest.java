@@ -5,6 +5,7 @@ import static com.desierto.ranky.infrastructure.utils.DiscordMessages.EXECUTE_CO
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -22,20 +23,19 @@ import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageCreateAction;
 import net.dv8tion.jda.api.utils.data.DataObject;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(SpringExtension.class)
-@TestInstance(Lifecycle.PER_CLASS)
-public class DiscordDeleteRankingServiceTest {
+@ExtendWith(MockitoExtension.class)
+class DiscordDeleteRankingServiceTest {
 
   private static final String RANKY_USER = "rankyUser";
 
+  @InjectMocks
   DiscordDeleteRankingService cut;
 
   @Mock
@@ -44,14 +44,13 @@ public class DiscordDeleteRankingServiceTest {
   @Mock
   IDeleteRankingService deleteRankingService;
 
-  @BeforeAll
-  public void setUp() {
-    cut = new DiscordDeleteRankingService(config, deleteRankingService);
-    when(config.getRankyUserRole()).thenReturn(RANKY_USER);
+  @BeforeEach
+  void setUp() {
+    lenient().when(config.getRankyUserRole()).thenReturn(RANKY_USER);
   }
 
   @Test
-  public void onEvent_withMemberWithoutRole_doNothing() {
+  void onEvent_withMemberWithoutRole_doNothing() {
     SlashCommandInteractionEvent event = mock(SlashCommandInteractionEvent.class);
     Member member = mock(Member.class);
     InteractionHook hook = mock(InteractionHook.class);
@@ -65,7 +64,7 @@ public class DiscordDeleteRankingServiceTest {
   }
 
   @Test
-  public void onNonGuildEvent_doNothing() {
+  void onNonGuildEvent_doNothing() {
     SlashCommandInteractionEvent event = mock(SlashCommandInteractionEvent.class);
     Member member = mock(Member.class);
     Role role = mock(Role.class);
@@ -81,7 +80,7 @@ public class DiscordDeleteRankingServiceTest {
   }
 
   @Test
-  public void onEvent_deletesRankingAndInformsInHook() {
+  void onEvent_deletesRankingAndInformsInHook() {
     SlashCommandInteractionEvent event = getMockedEvent();
     String rankingId = "Test";
     when(deleteRankingService.execute(rankingId, event.getGuild())).thenReturn(true);
@@ -91,7 +90,7 @@ public class DiscordDeleteRankingServiceTest {
   }
 
   @Test
-  public void onEvent_whenDeleteWasNotSuccessful_throwsException() {
+  void onEvent_whenDeleteWasNotSuccessful_throwsException() {
     SlashCommandInteractionEvent event = getMockedEvent();
     String rankingId = "Test";
     when(deleteRankingService.execute(rankingId, event.getGuild())).thenReturn(false);

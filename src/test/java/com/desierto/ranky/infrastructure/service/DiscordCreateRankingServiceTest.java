@@ -4,6 +4,7 @@ import static com.desierto.ranky.infrastructure.utils.DiscordMessages.COMMAND_NO
 import static com.desierto.ranky.infrastructure.utils.DiscordMessages.EXECUTE_COMMAND_FROM_SERVER;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -25,13 +26,16 @@ import net.dv8tion.jda.api.utils.data.DataObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(SpringExtension.class)
-public class DiscordCreateRankingServiceTest {
+@ExtendWith(MockitoExtension.class)
+class DiscordCreateRankingServiceTest {
 
   private static final String RANKY_USER = "rankyUser";
+
+  @InjectMocks
   DiscordCreateRankingService cut;
 
   @Mock
@@ -44,10 +48,8 @@ public class DiscordCreateRankingServiceTest {
   ICreateRankingService createRankingService;
 
   @BeforeEach
-  public void setUp() {
-    cut = new DiscordCreateRankingService(config, discordOptionRetriever,
-        createRankingService);
-    when(config.getRankyUserRole()).thenReturn(RANKY_USER);
+  void setUp() {
+    lenient().when(config.getRankyUserRole()).thenReturn(RANKY_USER);
   }
 
   @Test
@@ -101,9 +103,9 @@ public class DiscordCreateRankingServiceTest {
     Guild guild = mock(Guild.class);
     InteractionHook hook = mock(InteractionHook.class);
     WebhookMessageCreateAction wmca = mock(WebhookMessageCreateAction.class);
-    when(event.isFromGuild()).thenReturn(true);
+    lenient().when(event.isFromGuild()).thenReturn(true);
     when(event.getGuild()).thenReturn(guild);
-    when(event.getOptions()).thenReturn(
+    lenient().when(event.getOptions()).thenReturn(
         List.of(new OptionMapping(
                 getParameter(),
                 null,

@@ -18,14 +18,14 @@ import com.desierto.ranky.domain.repository.RiotAccountRepository;
 import com.desierto.ranky.domain.valueobject.RankedMode;
 import java.util.List;
 import net.dv8tion.jda.api.entities.Guild;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class AccountsServiceTest {
 
   @Mock
@@ -37,12 +37,8 @@ class AccountsServiceTest {
   @Mock
   AccountsCache accountsCache;
 
+  @InjectMocks
   AccountsService cut;
-
-  @BeforeEach
-  public void setUp() {
-    cut = new AccountsService(rankingRepository, accountsCache, riotAccountRepository);
-  }
 
   @Test
   void addsAccountsToRanking() {
@@ -146,11 +142,9 @@ class AccountsServiceTest {
     Ranking ranking = new Ranking("rankingId");
     ranking.addAccount(account);
     ranking.addAccount(copy);
-    when(guild.getId()).thenReturn("guildId");
     when(rankingRepository.read("rankingId", guild)).thenReturn(ranking);
     when(riotAccountRepository.enrichIdentification(account)).thenReturn(account);
     when(riotAccountRepository.enrichIdentification(copy)).thenReturn(copy);
-    when(accountsCache.containsRanking(ranking.getId(), guild.getId())).thenReturn(false);
     assertThrows(AccountCouldNotBeDesambiguatedException.class,
         () -> cut.removeAccounts("rankingId", guild, List.of(new Account(account.getName(), ""))));
   }

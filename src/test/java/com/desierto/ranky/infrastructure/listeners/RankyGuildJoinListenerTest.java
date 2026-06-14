@@ -3,6 +3,7 @@ package com.desierto.ranky.infrastructure.listeners;
 import static com.desierto.ranky.domain.utils.FileReader.read;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -23,16 +24,17 @@ import net.dv8tion.jda.api.requests.restaction.CacheRestAction;
 import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import net.dv8tion.jda.api.requests.restaction.RoleAction;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 @TestInstance(Lifecycle.PER_CLASS)
 public class RankyGuildJoinListenerTest {
 
@@ -40,6 +42,8 @@ public class RankyGuildJoinListenerTest {
   public static final String CONFIG_CHANNEL = "configChannel";
   public static final String PATH_TO_EMBED_MESSAGE_TXT = "src/main/resources/config/onGuildJoinEmbedMessage.txt";
   public static final String PATH_TO_NON_RIOT_ENDORSEMENT_MESSAGE_TXT = "src/main/resources/config/nonRiotEndorsementMessage.txt";
+
+  @InjectMocks
   RankyGuildJoinListener cut;
 
   @Mock
@@ -62,8 +66,8 @@ public class RankyGuildJoinListenerTest {
   String nonRiotEndorsementMessage;
 
 
-  @BeforeAll
-  public void setUp() {
+  @BeforeEach
+  void setUp() {
     when(config.getConfigChannel()).thenReturn(CONFIG_CHANNEL);
     when(config.getRankyUserRole()).thenReturn(RANKY_USER_ROLE);
     when(config.getPathToNonRiotEndorsementMessage()).thenReturn(
@@ -77,8 +81,6 @@ public class RankyGuildJoinListenerTest {
         config.getRankingLimit());
     nonRiotEndorsementMessage = read(
         PATH_TO_NON_RIOT_ENDORSEMENT_MESSAGE_TXT);
-    cut = new RankyGuildJoinListener(config, bot, welcomeGuildService, welcomeOwnerService,
-        botStatusUpdaterService);
   }
 
   @Test
@@ -170,10 +172,10 @@ public class RankyGuildJoinListenerTest {
     when(user.getName()).thenReturn("Lirex");
     when(guild.createTextChannel(anyString())).thenReturn(channelAction);
     when(channelAction.clearPermissionOverrides()).thenReturn(channelAction);
-    doNothing().when(channelAction).queue();
-    when(guild.createRole()).thenReturn(roleAction);
-    when(roleAction.setName(anyString())).thenReturn(roleAction);
-    doNothing().when(roleAction).queue();
+    lenient().doNothing().when(channelAction).queue();
+    lenient().when(guild.createRole()).thenReturn(roleAction);
+    lenient().when(roleAction.setName(anyString())).thenReturn(roleAction);
+    lenient().doNothing().when(roleAction).queue();
     when(guild.getRoles()).thenReturn(List.of(role));
     when(role.getName()).thenReturn(RANKY_USER_ROLE);
     return event;
@@ -194,9 +196,9 @@ public class RankyGuildJoinListenerTest {
     when(restAction.complete()).thenReturn(member);
     when(member.getUser()).thenReturn(user);
     when(user.getName()).thenReturn("Lirex");
-    when(guild.createTextChannel(anyString())).thenReturn(channelAction);
-    when(channelAction.clearPermissionOverrides()).thenReturn(channelAction);
-    doNothing().when(channelAction).queue();
+    lenient().when(guild.createTextChannel(anyString())).thenReturn(channelAction);
+    lenient().when(channelAction.clearPermissionOverrides()).thenReturn(channelAction);
+    lenient().doNothing().when(channelAction).queue();
     when(guild.createRole()).thenReturn(roleAction);
     when(roleAction.setName(anyString())).thenReturn(roleAction);
     doNothing().when(roleAction).queue();

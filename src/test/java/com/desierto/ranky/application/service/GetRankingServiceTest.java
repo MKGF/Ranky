@@ -20,13 +20,13 @@ import com.desierto.ranky.domain.repository.RiotAccountRepository;
 import java.util.List;
 import java.util.Optional;
 import net.dv8tion.jda.api.entities.Guild;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class GetRankingServiceTest {
 
   @Mock
@@ -38,15 +38,11 @@ class GetRankingServiceTest {
   @Mock
   AccountsCache accountsCache;
 
+  @InjectMocks
   RankingsService cut;
 
-  @BeforeEach
-  public void setUp() {
-    cut = new RankingsService(rankingRepository, riotAccountRepository, accountsCache);
-  }
-
   @Test
-  public void retrievesFromCache() {
+  void retrievesFromCache() {
     String rankingId = "ranking";
     Guild guild = mock(Guild.class);
     Account account = Account.builder().build();
@@ -61,7 +57,7 @@ class GetRankingServiceTest {
   }
 
   @Test
-  public void whenCacheEmptyRetrievesFromRiot() {
+  void whenCacheEmptyRetrievesFromRiot() {
     String rankingId = "ranking";
     Guild guild = mock(Guild.class);
     Account account = Account.builder().build();

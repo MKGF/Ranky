@@ -2,6 +2,7 @@ package com.desierto.ranky.infrastructure.service;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -11,29 +12,30 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.requests.restaction.CacheRestAction;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 @TestInstance(Lifecycle.PER_CLASS)
 public class WelcomeOwnerServiceTest {
 
   private static final String EMBED_MESSAGE = "embedMessage";
   private static final String NON_RIOT_ENDORSEMENT_MESSAGE = "nonRiotEndorsementMessage";
+  @InjectMocks
   WelcomeOwnerService cut;
   @Mock
   ConfigLoader config;
 
-  @BeforeAll
-  public void setUp() {
-    cut = new WelcomeOwnerService(config);
-    when(config.getPathToOwnerPresentationMessage()).thenReturn("");
+  @BeforeEach
+  void configurePathToPresentationMessage() {
+    lenient().when(config.getPathToOwnerPresentationMessage()).thenReturn("");
   }
 
   @Test

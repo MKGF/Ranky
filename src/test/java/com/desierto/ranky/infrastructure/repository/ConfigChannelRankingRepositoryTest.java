@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -29,9 +30,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 public class ConfigChannelRankingRepositoryTest {
 
   public static final String CONFIG_CHANNEL = "configChannel";
@@ -42,21 +43,21 @@ public class ConfigChannelRankingRepositoryTest {
   Gson gson;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     gson = new Gson();
-    when(config.getRankingLimit()).thenReturn(RANKING_LIMIT);
-    when(config.getConfigChannel()).thenReturn(CONFIG_CHANNEL);
-    when(config.getAccountLimit()).thenReturn(10);
+    lenient().when(config.getRankingLimit()).thenReturn(RANKING_LIMIT);
+    lenient().when(config.getConfigChannel()).thenReturn(CONFIG_CHANNEL);
+    lenient().when(config.getAccountLimit()).thenReturn(10);
   }
 
   @Test
-  public void onCreateRepo_whenNoConfigChannel_throwsException() {
+  void onCreateRepo_whenNoConfigChannel_throwsException() {
     Guild guild = mock(Guild.class);
     assertThrows(ConfigChannelNotFoundException.class, () -> fromGuild(guild));
   }
 
   @Test
-  public void onCreateRepo_withConfigChannel_createsSuccessfully() {
+  void onCreateRepo_withConfigChannel_createsSuccessfully() {
     Guild guild = mock(Guild.class);
     TextChannel configChannel = mock(TextChannel.class);
     when(configChannel.getName()).thenReturn(CONFIG_CHANNEL);
@@ -65,7 +66,7 @@ public class ConfigChannelRankingRepositoryTest {
   }
 
   @Test
-  public void onCreateRanking_whenRankingAlreadyExists_throwsException() {
+  void onCreateRanking_whenRankingAlreadyExists_throwsException() {
     String jsonRanking = "{\"id\":\"Test\",\"accounts\":[]}";
     Guild guild = mock(Guild.class);
     TextChannel configChannel = mock(TextChannel.class);
@@ -85,7 +86,7 @@ public class ConfigChannelRankingRepositoryTest {
   }
 
   @Test
-  public void onCreateRanking_whenRankingDoesNotExist_createsSuccessfully() {
+  void onCreateRanking_whenRankingDoesNotExist_createsSuccessfully() {
     String jsonRanking = "{\"id\":\"Test\",\"accounts\":[]}";
     Guild guild = mock(Guild.class);
     TextChannel configChannel = mock(TextChannel.class);
@@ -108,7 +109,7 @@ public class ConfigChannelRankingRepositoryTest {
   }
 
   @Test
-  public void onUpdateRanking_updatesSuccessfully() {
+  void onUpdateRanking_updatesSuccessfully() {
     String jsonRanking = "{\"id\":\"Test\",\"accounts\":[]}";
     Guild guild = mock(Guild.class);
     TextChannel configChannel = mock(TextChannel.class);
@@ -137,7 +138,7 @@ public class ConfigChannelRankingRepositoryTest {
   }
 
   @Test
-  public void onUpdateRanking_whenRankingDoesNotExist_throwsException() {
+  void onUpdateRanking_whenRankingDoesNotExist_throwsException() {
     Guild guild = mock(Guild.class);
     TextChannel configChannel = mock(TextChannel.class);
     MessageHistory history = mock(MessageHistory.class);
@@ -155,7 +156,7 @@ public class ConfigChannelRankingRepositoryTest {
   }
 
   @Test
-  public void onRead_whenRankingDoesNotExist_throwsException() {
+  void onRead_whenRankingDoesNotExist_throwsException() {
     Guild guild = mock(Guild.class);
     TextChannel configChannel = mock(TextChannel.class);
     MessageHistory history = mock(MessageHistory.class);
@@ -173,7 +174,7 @@ public class ConfigChannelRankingRepositoryTest {
   }
 
   @Test
-  public void onRead_whenRankingExists_returnsRanking() {
+  void onRead_whenRankingExists_returnsRanking() {
     String jsonRanking = "{\"id\":\"Test\",\"accounts\":[{\"id\": \"id\"}]}";
     Guild guild = mock(Guild.class);
     TextChannel configChannel = mock(TextChannel.class);
@@ -194,7 +195,7 @@ public class ConfigChannelRankingRepositoryTest {
   }
 
   @Test
-  public void onDeleteRanking_deletesSuccessfully() {
+  void onDeleteRanking_deletesSuccessfully() {
     String jsonRanking = "{\"id\":\"Test\",\"accounts\":[{\"id\": \"id\", \"name\": \"name\", \"tagLine\": \"tagLine\"}]}";
     Guild guild = mock(Guild.class);
     TextChannel configChannel = mock(TextChannel.class);
@@ -217,7 +218,7 @@ public class ConfigChannelRankingRepositoryTest {
   }
 
   @Test
-  public void onDeleteRanking_whenRankingDoesNotExist_throwsException() {
+  void onDeleteRanking_whenRankingDoesNotExist_throwsException() {
     Guild guild = mock(Guild.class);
     TextChannel configChannel = mock(TextChannel.class);
     MessageHistory history = mock(MessageHistory.class);
