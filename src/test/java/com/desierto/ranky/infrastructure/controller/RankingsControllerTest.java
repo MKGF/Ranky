@@ -121,7 +121,8 @@ class RankingsControllerTest extends BaseIT {
         .andExpect(jsonPath("accounts[0].tagLine", is(expected.getTagLine())))
         .andExpect(jsonPath("accounts[0].rank.tier", is(expected.getRank().getTier().name())))
         .andExpect(
-            jsonPath("accounts[0].rank.division", is(expected.getRank().getDivision().name())))
+            jsonPath("accounts[0].rank.division",
+                is(expected.getRank().getDivision().name() + " ")))
         .andExpect(
             jsonPath("accounts[0].rank.leaguePoints", is(expected.getRank().getLeaguePoints())))
         .andExpect(jsonPath("accounts[0].rank.winrate.wins",
