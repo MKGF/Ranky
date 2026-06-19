@@ -11,7 +11,10 @@ import com.desierto.ranky.infrastructure.clients.RiotAccountClient;
 import com.desierto.ranky.infrastructure.clients.RiotLeagueClient;
 import com.desierto.ranky.infrastructure.dto.riot.League;
 import com.desierto.ranky.infrastructure.dto.riot.RiotAccount;
+import jakarta.annotation.PostConstruct;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -24,6 +27,20 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
   private final RiotAccountClient riotAccountClient;
 
   private final RiotLeagueClient riotLeagueClient;
+
+  private final ExecutorService executorService;
+
+  @PostConstruct
+  private void warmUpFeignClient() {
+    try {
+      Account account = enrichIdentification(
+          Account.builder().name("MaikyG").tagLine("EUW2").build());
+      enrichWithRankedStats(account, RankedMode.RANKED_SOLO_5x5);
+    } catch (Exception ignored) {
+    } finally {
+      log.info("WARM UP COMPLETE");
+    }
+  }
 
 
   @Override
@@ -55,7 +72,7 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
       League leagueEntry = leagues.stream()
           .filter(league -> league.queueType().equals(rankedMode.name())).findFirst()
           .orElseThrow(NullPointerException::new);
-      log.debug("Got ranked stats for account: " + account.getNameAndTagLine());
+      log.info("Got ranked stats for account: " + account.getNameAndTagLine());
       account.updateRank(
           leagueEntry != null ?
               new Rank(
@@ -75,4 +92,21 @@ public class RestRiotAccountRepository implements RiotAccountRepository {
     return account;
   }
 
+  @Override
+  public List<Account> enrichAccountsWithRankedStats(List<Account> accounts,
+      RankedMode rankedMode) {
+    List<CompletableFuture<Account>> futures = accounts.stream()
+        .map(account ->
+            CompletableFuture.supplyAsync(
+                    () -> enrichWithRankedStats(account, rankedMode),
+                    executorService
+                )
+                .exceptionally(ex -> account)
+        )
+        .toList();
+
+    return futures.stream()
+        .map(CompletableFuture::join)
+        .toList();
+  }
 }

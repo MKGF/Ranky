@@ -10,7 +10,6 @@ import com.desierto.ranky.domain.repository.RiotAccountRepository;
 import com.desierto.ranky.domain.service.IRankingsService;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.Guild;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,10 +42,8 @@ public class RankingsService implements IRankingsService {
     Optional<List<Account>> cachedAccounts = accountsCache.find(
         guild.getId(), rankingId);
     if (cachedAccounts.isEmpty()) {
-      List<Account> enrichedAccounts = ranking.getAccounts().stream()
-          .map(account -> riotAccountRepository.enrichWithRankedStats(account, RANKED_SOLO_5x5))
-          .collect(
-              Collectors.toList());
+      List<Account> enrichedAccounts = riotAccountRepository.enrichAccountsWithRankedStats(
+          ranking.getAccounts(), RANKED_SOLO_5x5);
       ranking.setAccounts(enrichedAccounts);
       accountsCache.save(guild.getId(), rankingId, enrichedAccounts);
     } else {

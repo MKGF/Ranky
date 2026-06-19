@@ -21,6 +21,7 @@ import com.desierto.ranky.infrastructure.utils.DiscordProgressBar;
 import com.desierto.ranky.infrastructure.utils.DiscordRankingFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -38,26 +38,21 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class DiscordGetRankingService {
 
-  @Autowired
-  private ConfigLoader config;
+  private final ConfigLoader config;
 
-  @Autowired
-  private DiscordOptionRetriever discordOptionRetriever;
+  private final DiscordOptionRetriever discordOptionRetriever;
 
-  @Autowired
-  private RiotAccountRepository riotAccountRepository;
+  private final RiotAccountRepository riotAccountRepository;
 
-  @Autowired
-  private DiscordRankingFormatter discordRankingFormatter;
+  private final DiscordRankingFormatter discordRankingFormatter;
 
-  @Autowired
-  private AccountsCache accountsCache;
+  private final AccountsCache accountsCache;
 
-  @Autowired
-  private PrintRankingService printRankingService;
+  private final PrintRankingService printRankingService;
 
-  @Autowired
-  private RankingRepository rankingRepository;
+  private final RankingRepository rankingRepository;
+
+  private final ExecutorService executorService;
 
   public void execute(SlashCommandInteractionEvent event, boolean forceRefresh) {
     if (event.isFromGuild()) {
@@ -88,21 +83,13 @@ public class DiscordGetRankingService {
     }
   }
 
-  private List<EntryDto> getRankedAccountsWithProgressBarAnimation(
-      SlashCommandInteractionEvent event,
-      String rankingName, Ranking ranking, boolean forceRefresh) {
-    Optional<List<Account>> cachedAccounts = accountsCache.find(
-        event.getGuild().getId(), rankingName);
-    List<Account> rankingAccounts;
-    Message progressBar = null;
-    if (cachedAccounts.isEmpty() || forceRefresh) {
-      progressBar = event.getHook().sendMessage(DiscordProgressBar.getProgress(0)).complete();
-      rankingAccounts = getRankingEntries(ranking, event.getHook(), progressBar);
-    } else {
-      rankingAccounts = cachedAccounts.get();
-    }
-    return toEntryDtos(rankingAccounts,
-        Optional.ofNullable(progressBar));
+  @Deprecated
+  private static void updateProgressBar(Message progressBar, AtomicInteger indexForEnrichment,
+      int numberOfAccounts) {
+    progressBar.editMessage(
+            DiscordProgressBar.getProgress(
+                (indexForEnrichment.getAndIncrement() * 100 / numberOfAccounts) / 2))
+        .complete();
   }
 
   private static SinglePagePrintingFunction getSinglePagePrintingFunction() {
@@ -149,16 +136,36 @@ public class DiscordGetRankingService {
     };
   }
 
-  private List<EntryDto> toEntryDtos(List<Account> rankingAccounts, Optional<Message> progressBar) {
+  @Deprecated
+  private static void updateProgressBar(List<Account> rankingAccounts,
+      Optional<Message> progressBar,
+      AtomicInteger index) {
+    progressBar.ifPresent(message -> message.editMessage(
+            DiscordProgressBar.getProgress(
+                50 + (index.get() * 100 / rankingAccounts.size()) / 2))
+        .complete());
+  }
+
+  private List<EntryDto> getRankedAccountsWithProgressBarAnimation(
+      SlashCommandInteractionEvent event,
+      String rankingName, Ranking ranking, boolean forceRefresh) {
+    Optional<List<Account>> cachedAccounts = accountsCache.find(
+        event.getGuild().getId(), rankingName);
+    List<Account> rankingAccounts;
+    if (cachedAccounts.isEmpty() || forceRefresh) {
+      rankingAccounts = getRankingEntries(ranking, event.getHook());
+    } else {
+      rankingAccounts = cachedAccounts.get();
+    }
+    return toEntryDtos(rankingAccounts);
+  }
+
+  private List<EntryDto> toEntryDtos(List<Account> rankingAccounts) {
     AtomicInteger index = new AtomicInteger(1);
     return rankingAccounts.stream()
         .sorted()
         .map(account -> {
-              progressBar.ifPresent(message -> message.editMessage(
-                      DiscordProgressBar.getProgress(
-                          50 + (index.get() * 100 / rankingAccounts.size()) / 2))
-                  .complete());
-              return new EntryDto(
+          return new EntryDto(
                   index.getAndIncrement(),
                   account.getName(),
                   emojiFromTier(account.getRank().getTier()),
@@ -173,17 +180,9 @@ public class DiscordGetRankingService {
         .toList();
   }
 
-  private List<Account> getRankingEntries(Ranking ranking, InteractionHook hook,
-      Message progressBar) {
-    AtomicInteger indexForEnrichment = new AtomicInteger(1);
-    int numberOfAccounts = ranking.getAccounts().size();
-    List<Account> accounts = ranking.getAccounts().stream().map(account -> {
-      progressBar.editMessage(
-              DiscordProgressBar.getProgress(
-                  (indexForEnrichment.getAndIncrement() * 100 / numberOfAccounts) / 2))
-          .complete();
-      return riotAccountRepository.enrichWithRankedStats(account, RANKED_SOLO_5x5);
-    }).toList();
+  private List<Account> getRankingEntries(Ranking ranking, InteractionHook hook) {
+    List<Account> accounts = riotAccountRepository.enrichAccountsWithRankedStats(
+        ranking.getAccounts(), RANKED_SOLO_5x5);
 
     accountsCache.save(hook.getInteraction().getGuild().getId(), ranking.getId(), accounts);
 

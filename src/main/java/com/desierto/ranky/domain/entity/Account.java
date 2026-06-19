@@ -75,6 +75,6 @@ public class Account implements Comparable<Account> {
   }
 
   public boolean lacksId() {
-    return this.id.isEmpty();
+    return this.id == null || this.id.isEmpty();
   }
 }
