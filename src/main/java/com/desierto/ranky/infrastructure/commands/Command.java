@@ -16,7 +16,8 @@ import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 public class Command {
 
   public static final Command HELP;
-  public static final Command RANKING;
+  public static final Command SOLOQ;
+  public static final Command FLEXQ;
   public static final Command CREATE;
   public static final Command DELETE;
   public static final Command ADD_ACCOUNTS;
@@ -38,9 +39,16 @@ public class Command {
   static {
     HELP = Command.of("help",
         "Shows a detailed explanation of the possibilites of Ranky", emptyList());
-    RANKING = Command.of(
-        "ranking",
-        "Shows information of the specified ranking",
+    SOLOQ = Command.of(
+        "soloq",
+        "Shows soloQ information of the specified ranking",
+        List.of(
+            new Parameter("name", "Name of the ranking", true, OptionType.STRING, true)
+        )
+    );
+    FLEXQ = Command.of(
+        "flexq",
+        "Shows flexQ information of the specified ranking",
         List.of(
             new Parameter("name", "Name of the ranking", true, OptionType.STRING, true)
         )
@@ -149,7 +157,9 @@ public class Command {
         "refresh",
         "Shows *live* information of the specified ranking",
         List.of(
-            new Parameter("name", "Name of the ranking", true, OptionType.STRING, true)
+            new Parameter("name", "Name of the ranking", true, OptionType.STRING, true),
+            new Parameter("queue_type", "Queue type (solo or flex, default: solo)", false,
+                OptionType.STRING, false)
         )
     );
   }
@@ -170,8 +180,10 @@ public class Command {
   }
 
   public static List<SlashCommandData> getDiscordCommands() {
-    return List.of(HELP.toDiscordCommand(),
-        RANKING.toDiscordCommand(),
+    return List.of(
+        HELP.toDiscordCommand(),
+        SOLOQ.toDiscordCommand(),
+        FLEXQ.toDiscordCommand(),
         CREATE.toDiscordCommand(),
         DELETE.toDiscordCommand(),
         ADD_ACCOUNTS.toDiscordCommand(),

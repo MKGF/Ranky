@@ -6,11 +6,13 @@ import static com.desierto.ranky.infrastructure.utils.DiscordRankingToEmojiMappe
 
 import com.desierto.ranky.application.AccountsCache;
 import com.desierto.ranky.domain.entity.Account;
+import com.desierto.ranky.domain.valueobject.RankedMode;
 import com.desierto.ranky.infrastructure.configuration.ConfigLoader;
 import com.desierto.ranky.infrastructure.dto.EntryDto;
 import com.desierto.ranky.infrastructure.service.MultiPagePrintingFunction;
 import com.desierto.ranky.infrastructure.service.PrintRankingService;
 import com.desierto.ranky.infrastructure.service.SinglePagePrintingFunction;
+import com.desierto.ranky.infrastructure.utils.DiscordOptionRetriever;
 import com.desierto.ranky.infrastructure.utils.DiscordRankingFormatter;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.NotNull;
@@ -49,6 +51,9 @@ public class RankyButtonClickListener extends ListenerAdapter {
   @Autowired
   private PrintRankingService printRankingService;
 
+  @Autowired
+  private DiscordOptionRetriever discordOptionRetriever;
+
   @PostConstruct
   private void postConstruct() {
     bot.addEventListener(this);
@@ -80,9 +85,10 @@ public class RankyButtonClickListener extends ListenerAdapter {
       }
       event.reply("Shared successfully").setEphemeral(true).queue();
     } else { //Case for whole rankings to be made public
-      String rankingName = event.getButton().getId();
+      String rankingName = discordOptionRetriever.fromButtonEventGetRankingName(event);
+      RankedMode rankedMode = discordOptionRetriever.fromButtonEventGetRankedMode(event);
       Optional<List<Account>> accounts = accountsCache.find(
-          event.getGuild().getId(), rankingName);
+          event.getGuild().getId(), rankingName, rankedMode);
       if (accounts.isPresent()) {
         List<EntryDto> rankingEntries = toEntryDtos(accounts.get());
         if (rankingEntries.size() <= config.getAccountLimit()) {
@@ -90,7 +96,7 @@ public class RankyButtonClickListener extends ListenerAdapter {
               getSinglePagePrintingFunction(rankingName));
         } else {
           printRankingService.printMultiPage(event, "", rankingEntries,
-              getMultiPagePrintingFunction(rankingName));
+              getMultiPagePrintingFunction(rankingName), null);
         }
         event.reply("Shared successfully").setEphemeral(true).queue();
       } else {
@@ -135,7 +141,8 @@ public class RankyButtonClickListener extends ListenerAdapter {
       }
 
       @Override
-      public void printEnding(GenericEvent genericEvent, String formattedRanking) {
+      public void printEnding(GenericEvent genericEvent, String formattedRanking,
+          RankedMode ignored) {
         ButtonInteractionEvent specificEvent = (ButtonInteractionEvent) genericEvent;
         MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
         messageBuilder.addContent(

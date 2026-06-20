@@ -9,12 +9,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest(
-    classes = TestConfig.class,
-    properties = {
-        "spring.autoconfigure.exclude="
-            + "org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration,"
-            + "org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration"
-    }
+    classes = TestConfig.class
 )
 @AutoConfigureMockMvc
 @ActiveProfiles("test")

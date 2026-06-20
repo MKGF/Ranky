@@ -12,4 +12,12 @@ public enum RankedMode {
   public String getRankedMode() {
     return rankedMode;
   }
+
+  public static RankedMode fromQueueType(String queueType) {
+    return RANKED_FLEX_SR.rankedMode.equals(queueType) ? RANKED_FLEX_SR : RANKED_SOLO_5x5;
+  }
+
+  public String formatForDiscordButton() {
+    return "|" + rankedMode;
+  }
 }

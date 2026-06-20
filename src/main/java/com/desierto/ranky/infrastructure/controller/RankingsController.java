@@ -79,18 +79,41 @@ public class RankingsController {
 
   }
 
-  @GetMapping("/fromGuild/{guildId}/ranking/{ranking}")
-  public ResponseEntity<Ranking> getRanking(@CurrentUser UserSession session,
+  @GetMapping("/fromGuild/{guildId}/soloQ/{ranking}")
+  public ResponseEntity<Ranking> getSoloQ(@CurrentUser UserSession session,
       @PathVariable String guildId, @PathVariable("ranking") String rankingId) {
-    log.info("Entered getRanking");
+    log.info("Entered getSoloQ");
     log.info("Session: {}", session);
     if (session != null) {
       return mapper.mapSingle(
-          rankingsService.get(rankingId, guildsService.get(guildId, session.userId())));
+          rankingsService.soloQ(rankingId, guildsService.get(guildId, session.userId())));
     } else {
       try {
         Guild guild = guildsService.getGuild(guildId);
-        Ranking ranking = rankingsService.get(rankingId, guild);
+        Ranking ranking = rankingsService.soloQ(rankingId, guild);
+        if (ranking.shouldBeVisible()) {
+          return mapper.mapSingle(ranking);
+        } else {
+          throw new UnauthorizedException();
+        }
+      } catch (NumberFormatException ignored) {
+        throw new RankingNotFoundException(rankingId);
+      }
+    }
+  }
+
+  @GetMapping("/fromGuild/{guildId}/flexQ/{ranking}")
+  public ResponseEntity<Ranking> getFlexQ(@CurrentUser UserSession session,
+      @PathVariable String guildId, @PathVariable("ranking") String rankingId) {
+    log.info("Entered getFlexQ");
+    log.info("Session: {}", session);
+    if (session != null) {
+      return mapper.mapSingle(
+          rankingsService.flexQ(rankingId, guildsService.get(guildId, session.userId())));
+    } else {
+      try {
+        Guild guild = guildsService.getGuild(guildId);
+        Ranking ranking = rankingsService.flexQ(rankingId, guild);
         if (ranking.shouldBeVisible()) {
           return mapper.mapSingle(ranking);
         } else {

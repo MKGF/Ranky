@@ -1,5 +1,6 @@
 package com.desierto.ranky.application;
 
+import static com.desierto.ranky.domain.valueobject.RankedMode.RANKED_SOLO_5x5;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -22,65 +23,72 @@ class AccountsCacheTest {
 
   AccountsCache cut;
 
-  private Map<String, List<Account>> rankings;
+  private Map<String, List<Account>> rankingsSoloQ;
 
-  private Map<String, LocalDateTime> introductionTimes;
+  private Map<String, LocalDateTime> introductionTimesSoloQ;
+
+  private Map<String, List<Account>> rankingsFlexQ;
+
+  private Map<String, LocalDateTime> introductionTimesFlexQ;
 
   @BeforeEach
-  public void setup() {
-    rankings = new HashMap<>();
-    introductionTimes = new HashMap<>();
-    cut = new AccountsCache(rankings, introductionTimes);
+  void setup() {
+    rankingsSoloQ = new HashMap<>();
+    introductionTimesSoloQ = new HashMap<>();
+    rankingsFlexQ = new HashMap<>();
+    introductionTimesFlexQ = new HashMap<>();
+    cut = new AccountsCache(rankingsSoloQ, introductionTimesSoloQ, rankingsFlexQ,
+        introductionTimesFlexQ);
   }
 
   @Test
   void whenSave_introducesListOfAccountsAndTime() {
-    assertEquals(0, rankings.size());
-    assertEquals(0, introductionTimes.size());
-    cut.save("guildId", "test", List.of());
-    assertEquals(1, rankings.size());
-    assertEquals(1, introductionTimes.size());
+    assertEquals(0, rankingsSoloQ.size());
+    assertEquals(0, introductionTimesSoloQ.size());
+    cut.save("guildId", "test", List.of(), RANKED_SOLO_5x5);
+    assertEquals(1, rankingsSoloQ.size());
+    assertEquals(1, introductionTimesSoloQ.size());
   }
 
   @Test
   void whenFind_returnsList() {
-    cut.save("guildId", "test", List.of());
-    assertTrue(cut.find("guildId", "test").isPresent());
+    cut.save("guildId", "test", List.of(), RANKED_SOLO_5x5);
+    assertTrue(cut.find("guildId", "test", RANKED_SOLO_5x5).isPresent());
   }
 
   @Test
   void whenFind_ifNoValueWasFound_returnsEmpty() {
-    assertTrue(cut.find("guildId", "test").isEmpty());
+    assertTrue(cut.find("guildId", "test", RANKED_SOLO_5x5).isEmpty());
   }
 
   @Test
   void whenClearingCache_ifTimeIsBelowThreshold_doesNotDelete() {
-    rankings.put("test", List.of());
-    introductionTimes.put("test", LocalDateTime.now());
-    assertEquals(1, rankings.size());
-    assertEquals(1, introductionTimes.size());
+    rankingsSoloQ.put("test", List.of());
+    introductionTimesSoloQ.put("test", LocalDateTime.now());
+    assertEquals(1, rankingsSoloQ.size());
+    assertEquals(1, introductionTimesSoloQ.size());
     cut.clearCache();
-    assertEquals(1, rankings.size());
-    assertEquals(1, introductionTimes.size());
+    assertEquals(1, rankingsSoloQ.size());
+    assertEquals(1, introductionTimesSoloQ.size());
   }
 
   @Test
   void whenClearingCache_ifTimeIsAboveThreshold_deletesListOfAccountsAndTime() {
-    rankings.put("test", List.of());
-    introductionTimes.put("test", LocalDateTime.now().minusMinutes(20L));
-    assertEquals(1, rankings.size());
-    assertEquals(1, introductionTimes.size());
+    rankingsSoloQ.put("test", List.of());
+    introductionTimesSoloQ.put("test", LocalDateTime.now().minusMinutes(20L));
+    assertEquals(1, rankingsSoloQ.size());
+    assertEquals(1, introductionTimesSoloQ.size());
     cut.clearCache();
-    assertEquals(0, rankings.size());
-    assertEquals(0, introductionTimes.size());
+    assertEquals(0, rankingsSoloQ.size());
+    assertEquals(0, introductionTimesSoloQ.size());
   }
 
   @Test
   void checksPressenceOfRanking() {
     cut.save("guildId", "test",
-        List.of(AccountFixtures.anAccount(), AccountFixtures.anotherAccount()));
-    assertTrue(cut.containsRanking("test", "guildId"));
-    assertFalse(cut.containsRanking("anotherTest", "anotherGuildId"));
+        List.of(AccountFixtures.anAccount(), AccountFixtures.anotherAccount()), RANKED_SOLO_5x5);
+    assertTrue(cut.containsSoloQRanking("test", "guildId"));
+    assertFalse(cut.containsSoloQRanking("anotherTest", "anotherGuildId"));
   }
 
   @Test
@@ -88,9 +96,9 @@ class AccountsCacheTest {
     Account present = AccountFixtures.anAccount();
     Account added = AccountFixtures.anotherAccount();
     cut.save("guildId", "test",
-        List.of(present));
-    cut.addAccountsIfRankingCached("guildId", "test", List.of(added));
-    List<Account> result = cut.find("guildId", "test").get();
+        List.of(present), RANKED_SOLO_5x5);
+    cut.addAccountsIfRankingCached("guildId", "test", List.of(added), List.of());
+    List<Account> result = cut.find("guildId", "test", RANKED_SOLO_5x5).get();
     assertTrue(result.containsAll(List.of(present, added)));
     assertEquals(2, result.size());
   }
@@ -100,9 +108,9 @@ class AccountsCacheTest {
     Account toRemove = AccountFixtures.anotherAccount();
     List<Account> present = List.of(AccountFixtures.anAccount(), toRemove);
     cut.save("guildId", "test",
-        present);
+        present, RANKED_SOLO_5x5);
     cut.removeAccountsIfRankingCached("guildId", "test", List.of(toRemove));
-    List<Account> result = cut.find("guildId", "test").get();
+    List<Account> result = cut.find("guildId", "test", RANKED_SOLO_5x5).get();
     assertFalse(result.contains(toRemove));
     assertEquals(1, result.size());
   }
@@ -112,10 +120,10 @@ class AccountsCacheTest {
     Account toRemove = AccountFixtures.anotherAccount();
     List<Account> present = List.of(AccountFixtures.anAccount(), toRemove);
     cut.save("guildId", "test",
-        present);
+        present, RANKED_SOLO_5x5);
     cut.removeAccountsIfRankingCached("guildId", "test",
         List.of(new Account(toRemove.getName(), "")));
-    List<Account> result = cut.find("guildId", "test").get();
+    List<Account> result = cut.find("guildId", "test", RANKED_SOLO_5x5).get();
     assertFalse(result.contains(toRemove));
     assertEquals(1, result.size());
   }
@@ -126,7 +134,7 @@ class AccountsCacheTest {
     List<Account> present = List.of(AccountFixtures.anAccount(), toRemove,
         AccountFixtures.getDifferentWithSameName(toRemove));
     cut.save("guildId", "test",
-        present);
+        present, RANKED_SOLO_5x5);
     assertThrows(AccountCouldNotBeDesambiguatedException.class,
         () -> cut.removeAccountsIfRankingCached("guildId", "test",
             List.of(new Account(toRemove.getName(), ""))));

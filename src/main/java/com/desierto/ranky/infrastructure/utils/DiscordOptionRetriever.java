@@ -1,10 +1,12 @@
 package com.desierto.ranky.infrastructure.utils;
 
 import com.desierto.ranky.domain.entity.Account;
+import com.desierto.ranky.domain.valueobject.RankedMode;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +15,14 @@ public class DiscordOptionRetriever {
 
   public String fromEventGetObjectName(SlashCommandInteractionEvent event) {
     return fromSlashCommandInteractionEvent(event).get(0);
+  }
+
+  public String fromEventGetSecondObjectName(SlashCommandInteractionEvent event) {
+    try {
+      return fromSlashCommandInteractionEvent(event).get(1);
+    } catch (Exception ignored) {
+      return "";
+    }
   }
 
   public List<Account> fromEventGetAccountListToAdd(SlashCommandInteractionEvent event) {
@@ -42,5 +52,14 @@ public class DiscordOptionRetriever {
   private static List<String> fromSlashCommandInteractionEvent(SlashCommandInteractionEvent event) {
     return event.getOptions().stream().map(OptionMapping::getAsString).collect(
         Collectors.toList());
+  }
+
+  public String fromButtonEventGetRankingName(ButtonInteractionEvent event) {
+    return event.getButton().getId().split("\\|")[0];
+  }
+
+
+  public RankedMode fromButtonEventGetRankedMode(ButtonInteractionEvent event) {
+    return RankedMode.fromQueueType(event.getButton().getId().split("\\|")[1]);
   }
 }

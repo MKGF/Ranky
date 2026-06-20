@@ -1,5 +1,6 @@
 package com.desierto.ranky.infrastructure.listeners;
 
+import static com.desierto.ranky.domain.valueobject.RankedMode.RANKED_SOLO_5x5;
 import static com.desierto.ranky.infrastructure.utils.DiscordButtons.FINAL_PAGE;
 import static com.desierto.ranky.infrastructure.utils.DiscordButtons.PAGE;
 import static org.mockito.ArgumentMatchers.any;
@@ -18,6 +19,7 @@ import com.desierto.ranky.domain.valueobject.Rank;
 import com.desierto.ranky.infrastructure.configuration.ConfigLoader;
 import com.desierto.ranky.infrastructure.dto.EntryDto;
 import com.desierto.ranky.infrastructure.service.PrintRankingService;
+import com.desierto.ranky.infrastructure.utils.DiscordOptionRetriever;
 import com.desierto.ranky.infrastructure.utils.DiscordRankingFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -60,6 +62,9 @@ class RankyButtonClickListenerTest {
   @Mock
   PrintRankingService printRankingService;
 
+  @Mock
+  DiscordOptionRetriever discordOptionRetriever;
+
   @BeforeEach
   void mockFormatterAndConfig() {
     lenient().when(discordRankingFormatter.title(anyString())).thenReturn("");
@@ -97,7 +102,10 @@ class RankyButtonClickListenerTest {
     ButtonInteractionEvent event = getSpecificRankingButtonInteractionEvent();
     Account account = new Account("name", "tagLine");
     account.updateRank(Rank.unranked());
-    when(accountsCache.find(anyString(), anyString())).thenReturn(Optional.of(List.of(account)));
+    when(accountsCache.find(anyString(), anyString(), any())).thenReturn(
+        Optional.of(List.of(account)));
+    when(discordOptionRetriever.fromButtonEventGetRankingName(event)).thenReturn("specificId");
+    when(discordOptionRetriever.fromButtonEventGetRankedMode(event)).thenReturn(RANKED_SOLO_5x5);
     EntryDto entry = new EntryDto(1, "name", "<:Unranked:1248786000533262419>", "   ", 0, "0", "0",
         "0.00");
 
@@ -115,8 +123,10 @@ class RankyButtonClickListenerTest {
     Account account2 = new Account("name2", "tagLine2");
     account1.updateRank(Rank.unranked());
     account2.updateRank(Rank.unranked());
-    when(accountsCache.find(anyString(), anyString())).thenReturn(
+    when(accountsCache.find(anyString(), anyString(), any())).thenReturn(
         Optional.of(List.of(account1, account2)));
+    when(discordOptionRetriever.fromButtonEventGetRankingName(event)).thenReturn("specificId");
+    when(discordOptionRetriever.fromButtonEventGetRankedMode(event)).thenReturn(RANKED_SOLO_5x5);
     EntryDto entry1 = new EntryDto(1, "name1", "<:Unranked:1248786000533262419>", "   ", 0, "0",
         "0",
         "0.00");
@@ -127,7 +137,7 @@ class RankyButtonClickListenerTest {
     cut.onButtonInteraction(event);
 
     verify(printRankingService, times(1)).printMultiPage(eq(event), eq(""),
-        eq(List.of(entry1, entry2)), any());
+        eq(List.of(entry1, entry2)), any(), eq(null));
   }
 
   @NotNull

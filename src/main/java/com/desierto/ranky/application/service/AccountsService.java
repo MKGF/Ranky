@@ -8,6 +8,7 @@ import com.desierto.ranky.domain.repository.RankingRepository;
 import com.desierto.ranky.domain.repository.RiotAccountRepository;
 import com.desierto.ranky.domain.service.IAccountsService;
 import com.desierto.ranky.domain.valueobject.RankedMode;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -37,12 +38,21 @@ public class AccountsService implements IAccountsService {
     List<Account> accountsWithId = accounts.stream().map(this::enrich).toList();
     accountsWithId.stream().filter(account -> !account.getId().isEmpty()).forEach(
         ranking::addAccount);
-    if (accountsCache.containsRanking(rankingId, guild.getId())) {
-      List<Account> enrichedAccounts = accountsWithId.stream().map(
+    List<Account> enrichedSoloQAccounts = new ArrayList<>();
+    List<Account> enrichedFlexQAccounts = new ArrayList<>();
+    if (accountsCache.containsSoloQRanking(rankingId, guild.getId())) {
+      enrichedSoloQAccounts.addAll(accountsWithId.stream().map(
           account -> riotAccountRepository.enrichWithRankedStats(account,
-              RankedMode.RANKED_SOLO_5x5)).toList();
-      accountsCache.addAccountsIfRankingCached(guild.getId(), rankingId, enrichedAccounts);
+              RankedMode.RANKED_SOLO_5x5)).toList());
     }
+    if (accountsCache.containsFlexQRanking(rankingId, guild.getId())) {
+      enrichedFlexQAccounts.addAll(accountsWithId.stream().map(
+          account -> riotAccountRepository.enrichWithRankedStats(account,
+              RankedMode.RANKED_FLEX_SR)).toList());
+    }
+    accountsCache.addAccountsIfRankingCached(guild.getId(), rankingId, enrichedSoloQAccounts,
+        enrichedFlexQAccounts);
+
     return rankingRepository.update(ranking, guild);
   }
 
@@ -60,7 +70,7 @@ public class AccountsService implements IAccountsService {
         ranking.removeAccount(matches.get(0));
       }
     });
-    if (accountsCache.containsRanking(rankingId, guild.getId())) {
+    if (accountsCache.containsSoloQRanking(rankingId, guild.getId())) {
       accountsCache.removeAccountsIfRankingCached(guild.getId(), rankingId, accounts);
     }
     return rankingRepository.update(ranking, guild);

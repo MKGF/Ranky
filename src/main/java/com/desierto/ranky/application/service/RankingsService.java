@@ -1,5 +1,6 @@
 package com.desierto.ranky.application.service;
 
+import static com.desierto.ranky.domain.valueobject.RankedMode.RANKED_FLEX_SR;
 import static com.desierto.ranky.domain.valueobject.RankedMode.RANKED_SOLO_5x5;
 
 import com.desierto.ranky.application.AccountsCache;
@@ -10,7 +11,6 @@ import com.desierto.ranky.domain.repository.RiotAccountRepository;
 import com.desierto.ranky.domain.service.IRankingsService;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import net.dv8tion.jda.api.entities.Guild;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,17 +38,31 @@ public class RankingsService implements IRankingsService {
   }
 
   @Override
-  public Ranking get(String rankingId, Guild guild) {
+  public Ranking soloQ(String rankingId, Guild guild) {
     Ranking ranking = rankingRepository.read(rankingId, guild);
     Optional<List<Account>> cachedAccounts = accountsCache.find(
-        guild.getId(), rankingId);
+        guild.getId(), rankingId, RANKED_SOLO_5x5);
     if (cachedAccounts.isEmpty()) {
-      List<Account> enrichedAccounts = ranking.getAccounts().stream()
-          .map(account -> riotAccountRepository.enrichWithRankedStats(account, RANKED_SOLO_5x5))
-          .collect(
-              Collectors.toList());
+      List<Account> enrichedAccounts = riotAccountRepository.enrichAccountsWithRankedStats(
+          ranking.getAccounts(), RANKED_SOLO_5x5);
       ranking.setAccounts(enrichedAccounts);
-      accountsCache.save(guild.getId(), rankingId, enrichedAccounts);
+      accountsCache.save(guild.getId(), rankingId, enrichedAccounts, RANKED_SOLO_5x5);
+    } else {
+      ranking.setAccounts(cachedAccounts.get());
+    }
+    return ranking;
+  }
+
+  @Override
+  public Ranking flexQ(String rankingId, Guild guild) {
+    Ranking ranking = rankingRepository.read(rankingId, guild);
+    Optional<List<Account>> cachedAccounts = accountsCache.find(
+        guild.getId(), rankingId, RANKED_FLEX_SR);
+    if (cachedAccounts.isEmpty()) {
+      List<Account> enrichedAccounts = riotAccountRepository.enrichAccountsWithRankedStats(
+          ranking.getAccounts(), RANKED_FLEX_SR);
+      ranking.setAccounts(enrichedAccounts);
+      accountsCache.save(guild.getId(), rankingId, enrichedAccounts, RANKED_FLEX_SR);
     } else {
       ranking.setAccounts(cachedAccounts.get());
     }
