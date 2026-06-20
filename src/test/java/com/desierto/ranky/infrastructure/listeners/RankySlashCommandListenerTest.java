@@ -8,9 +8,9 @@ import static com.desierto.ranky.infrastructure.commands.Command.GET_ENROLLED_US
 import static com.desierto.ranky.infrastructure.commands.Command.GET_GUILDS;
 import static com.desierto.ranky.infrastructure.commands.Command.HELP;
 import static com.desierto.ranky.infrastructure.commands.Command.MAKE_PUBLIC;
-import static com.desierto.ranky.infrastructure.commands.Command.RANKING;
 import static com.desierto.ranky.infrastructure.commands.Command.REMOVE_ACCOUNTS;
 import static com.desierto.ranky.infrastructure.commands.Command.RETRIEVE_CONFIG_CHANNEL_CONTENT;
+import static com.desierto.ranky.infrastructure.commands.Command.SOLOQ;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doNothing;
@@ -29,6 +29,7 @@ import com.desierto.ranky.infrastructure.service.admin.ConfigChannelChecker;
 import com.desierto.ranky.infrastructure.service.admin.ConfigChannelContentRetriever;
 import com.desierto.ranky.infrastructure.service.admin.EnrolledUsersRetriever;
 import com.desierto.ranky.infrastructure.service.admin.GuildRetriever;
+import com.desierto.ranky.infrastructure.utils.DiscordOptionRetriever;
 import java.util.concurrent.ExecutorService;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -84,6 +85,9 @@ class RankySlashCommandListenerTest {
   DiscordRankingPublisherService discordRankingPublisherService;
 
   @Mock
+  DiscordOptionRetriever discordOptionRetriever;
+
+  @Mock
   ExecutorService executorService;
 
 
@@ -101,6 +105,7 @@ class RankySlashCommandListenerTest {
         configChannelChecker,
         configChannelContentRetriever,
         discordRankingPublisherService,
+        discordOptionRetriever,
         executorService,
         bot
     );
@@ -130,7 +135,7 @@ class RankySlashCommandListenerTest {
   @Test
   void onRankingCommand_opensThread() {
     SlashCommandInteractionEvent event = getSlashCommandInteractionEvent();
-    when(event.getCommandString()).thenReturn("/" + RANKING.getCommandId());
+    when(event.getCommandString()).thenReturn("/" + SOLOQ.getCommandId());
 
     cut.onSlashCommandInteraction(event);
 

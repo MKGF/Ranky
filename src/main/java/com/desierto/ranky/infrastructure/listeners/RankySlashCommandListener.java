@@ -1,17 +1,20 @@
 package com.desierto.ranky.infrastructure.listeners;
 
+import static com.desierto.ranky.domain.valueobject.RankedMode.RANKED_FLEX_SR;
+import static com.desierto.ranky.domain.valueobject.RankedMode.RANKED_SOLO_5x5;
 import static com.desierto.ranky.infrastructure.commands.Command.ADD_ACCOUNTS;
 import static com.desierto.ranky.infrastructure.commands.Command.CREATE;
 import static com.desierto.ranky.infrastructure.commands.Command.DELETE;
 import static com.desierto.ranky.infrastructure.commands.Command.EXISTS_CONFIG_CHANNEL;
+import static com.desierto.ranky.infrastructure.commands.Command.FLEXQ;
 import static com.desierto.ranky.infrastructure.commands.Command.FORCE_REFRESH;
 import static com.desierto.ranky.infrastructure.commands.Command.GET_ENROLLED_USERS;
 import static com.desierto.ranky.infrastructure.commands.Command.GET_GUILDS;
 import static com.desierto.ranky.infrastructure.commands.Command.HELP;
 import static com.desierto.ranky.infrastructure.commands.Command.MAKE_PUBLIC;
-import static com.desierto.ranky.infrastructure.commands.Command.RANKING;
 import static com.desierto.ranky.infrastructure.commands.Command.REMOVE_ACCOUNTS;
 import static com.desierto.ranky.infrastructure.commands.Command.RETRIEVE_CONFIG_CHANNEL_CONTENT;
+import static com.desierto.ranky.infrastructure.commands.Command.SOLOQ;
 
 import com.desierto.ranky.infrastructure.service.DiscordAddAccountsService;
 import com.desierto.ranky.infrastructure.service.DiscordCreateRankingService;
@@ -24,6 +27,7 @@ import com.desierto.ranky.infrastructure.service.admin.ConfigChannelChecker;
 import com.desierto.ranky.infrastructure.service.admin.ConfigChannelContentRetriever;
 import com.desierto.ranky.infrastructure.service.admin.EnrolledUsersRetriever;
 import com.desierto.ranky.infrastructure.service.admin.GuildRetriever;
+import com.desierto.ranky.infrastructure.utils.DiscordOptionRetriever;
 import jakarta.annotation.PostConstruct;
 import java.util.concurrent.ExecutorService;
 import lombok.AllArgsConstructor;
@@ -68,6 +72,10 @@ public class RankySlashCommandListener extends ListenerAdapter {
   private DiscordRankingPublisherService discordRankingPublisherService;
 
   @Autowired
+  private DiscordOptionRetriever discordOptionRetriever;
+
+
+  @Autowired
   private ExecutorService executorService;
 
   @Autowired
@@ -92,8 +100,12 @@ public class RankySlashCommandListener extends ListenerAdapter {
     if (event.getCommandString().contains("/" + HELP.getCommandId())) {
       executorService.execute(() -> helpService.execute(event));
     }
-    if (event.getCommandString().contains("/" + RANKING.getCommandId())) {
-      executorService.execute(() -> discordGetRankingService.execute(event, false));
+    if (event.getCommandString().contains("/" + SOLOQ.getCommandId())) {
+      executorService.execute(
+          () -> discordGetRankingService.execute(event, false, RANKED_SOLO_5x5));
+    }
+    if (event.getCommandString().contains("/" + FLEXQ.getCommandId())) {
+      executorService.execute(() -> discordGetRankingService.execute(event, false, RANKED_FLEX_SR));
     }
     if (event.getCommandString().contains("/" + CREATE.getCommandId())) {
       executorService.execute(() -> discordCreateRankingService.execute(event));
@@ -123,7 +135,14 @@ public class RankySlashCommandListener extends ListenerAdapter {
       executorService.execute(() -> discordRankingPublisherService.execute(event));
     }
     if (event.getCommandString().contains("/" + FORCE_REFRESH.getCommandId())) {
-      executorService.execute(() -> discordGetRankingService.execute(event, true));
+      String queueType = discordOptionRetriever.fromEventGetSecondObjectName(event);
+      if (queueType.contains("flex")) {
+        executorService.execute(
+            () -> discordGetRankingService.execute(event, true, RANKED_FLEX_SR));
+      } else {
+        executorService.execute(
+            () -> discordGetRankingService.execute(event, true, RANKED_SOLO_5x5));
+      }
     }
   }
 }

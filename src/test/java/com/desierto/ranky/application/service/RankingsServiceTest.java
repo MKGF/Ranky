@@ -17,6 +17,7 @@ import com.desierto.ranky.application.fixtures.RankingFixtures;
 import com.desierto.ranky.domain.entity.Ranking;
 import com.desierto.ranky.domain.repository.RankingRepository;
 import com.desierto.ranky.domain.repository.RiotAccountRepository;
+import com.desierto.ranky.domain.valueobject.RankedMode;
 import java.util.List;
 import java.util.Optional;
 import net.dv8tion.jda.api.entities.Guild;
@@ -42,41 +43,42 @@ class RankingsServiceTest {
   private RankingsService cut;
 
   @Test
-  void getAllGuilds_callsRepository() {
+  void soloQAllGuilds_callsRepository() {
     cut.getAll(mock(Guild.class));
     verify(rankingRepository, times(1)).findAll(any());
   }
 
   @Test
-  void getGuild_callsRepo_and_retrievesAccountInfoFromRiot() {
+  void soloQGuild_callsRepo_and_retrievesAccountInfoFromRiot() {
     String rankingId = "rankingId";
     Guild guild = mock(Guild.class);
     Ranking ranking = RankingFixtures.aRanking();
     when(guild.getId()).thenReturn("guildId");
     when(rankingRepository.read(rankingId, guild)).thenReturn(ranking);
-    when(accountsCache.find(guild.getId(), rankingId)).thenReturn(Optional.empty());
+    when(accountsCache.find(guild.getId(), rankingId, RANKED_SOLO_5x5)).thenReturn(
+        Optional.empty());
     when(riotAccountRepository.enrichAccountsWithRankedStats(anyList(),
         eq(RANKED_SOLO_5x5))).thenReturn(
         List.of(AccountFixtures.anAccount()));
 
-    assertEquals(cut.get(rankingId, guild), ranking);
+    assertEquals(cut.soloQ(rankingId, guild), ranking);
 
     verify(accountsCache, times(1)).save(guild.getId(), rankingId,
-        List.of(AccountFixtures.anAccount()));
+        List.of(AccountFixtures.anAccount()), RankedMode.RANKED_SOLO_5x5);
   }
 
   @Test
-  void getGuild_callsRepo_and_interactsWithCache() {
+  void soloQGuild_callsRepo_and_interactsWithCache() {
     String rankingId = "rankingId";
     Guild guild = mock(Guild.class);
     when(guild.getId()).thenReturn("guildId");
     when(rankingRepository.read(rankingId, guild)).thenReturn(RankingFixtures.aRanking());
-    when(accountsCache.find(guild.getId(), rankingId)).thenReturn(
+    when(accountsCache.find(guild.getId(), rankingId, RANKED_SOLO_5x5)).thenReturn(
         Optional.of(List.of(AccountFixtures.anAccount())));
 
-    assertEquals(cut.get(rankingId, guild), RankingFixtures.aRanking());
+    assertEquals(cut.soloQ(rankingId, guild), RankingFixtures.aRanking());
 
     verify(accountsCache, never()).save(guild.getId(), rankingId,
-        List.of(AccountFixtures.anAccount()));
+        List.of(AccountFixtures.anAccount()), RankedMode.RANKED_SOLO_5x5);
   }
 }

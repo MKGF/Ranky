@@ -1,6 +1,8 @@
 package com.desierto.ranky.infrastructure.controller;
 
 import static com.desierto.ranky.application.fixtures.GuildFixtures.aGuild;
+import static com.desierto.ranky.domain.valueobject.RankedMode.RANKED_FLEX_SR;
+import static com.desierto.ranky.domain.valueobject.RankedMode.RANKED_SOLO_5x5;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -101,17 +103,48 @@ class RankingsControllerTest extends BaseIT {
   }
 
   @Test
-  void givenSession_whenRequestingSpecificRanking_returnsRanking() throws Exception {
+  void givenSession_whenRequestingSpecificSoloQRanking_returnsRanking() throws Exception {
     String userId = "userId";
     String sessionId = sessionCache.generate();
     Guild guild = aGuild();
     sessionCache.store(sessionId, new UserSession("token", "username", userId, "iconUrl"));
     mockJdaForGetRankingsCall(guild, userId);
-    mockRiot();
+    mockRiot(RANKED_SOLO_5x5);
     Cookie cookie = new Cookie("SESSION_ID", sessionId);
     Account expected = AccountFixtures.anAccount();
     mockMvc.perform(
-            get(String.format("/rankings/fromGuild/%s/ranking/%s", guild.getId(),
+            get(String.format("/rankings/fromGuild/%s/soloQ/%s", guild.getId(),
+                "rankingId")).cookie(cookie)
+        ).andExpect(status().isOk())
+        .andExpect(jsonPath("id", is("rankingId")))
+        .andExpect(jsonPath("isPublic", is(false)))
+        .andExpect(jsonPath("accounts[0].id", is(expected.getId())))
+        .andExpect(jsonPath("accounts[0].name", is(expected.getName())))
+        .andExpect(jsonPath("accounts[0].tagLine", is(expected.getTagLine())))
+        .andExpect(jsonPath("accounts[0].rank.tier", is(expected.getRank().getTier().name())))
+        .andExpect(
+            jsonPath("accounts[0].rank.division",
+                is(expected.getRank().getDivision().name() + " ")))
+        .andExpect(
+            jsonPath("accounts[0].rank.leaguePoints", is(expected.getRank().getLeaguePoints())))
+        .andExpect(jsonPath("accounts[0].rank.winrate.wins",
+            is(expected.getRank().getWinrate().getWins())))
+        .andExpect(jsonPath("accounts[0].rank.winrate.losses",
+            is(expected.getRank().getWinrate().getLosses())));
+  }
+
+  @Test
+  void givenSession_whenRequestingSpecificFlexQRanking_returnsRanking() throws Exception {
+    String userId = "userId";
+    String sessionId = sessionCache.generate();
+    Guild guild = aGuild();
+    sessionCache.store(sessionId, new UserSession("token", "username", userId, "iconUrl"));
+    mockJdaForGetRankingsCall(guild, userId);
+    mockRiot(RANKED_FLEX_SR);
+    Cookie cookie = new Cookie("SESSION_ID", sessionId);
+    Account expected = AccountFixtures.anAccount();
+    mockMvc.perform(
+            get(String.format("/rankings/fromGuild/%s/flexQ/%s", guild.getId(),
                 "rankingId")).cookie(cookie)
         ).andExpect(status().isOk())
         .andExpect(jsonPath("id", is("rankingId")))
@@ -170,9 +203,9 @@ class RankingsControllerTest extends BaseIT {
     when(guild.getTextChannels()).thenReturn(List.of(textChannel));
   }
 
-  private void mockRiot() {
+  private void mockRiot(RankedMode rankedMode) {
     when(restRiotAccountRepository.enrichAccountsWithRankedStats(anyList(),
-        eq(RankedMode.RANKED_SOLO_5x5))).thenReturn(List.of(AccountFixtures.anAccount()));
+        eq(rankedMode))).thenReturn(List.of(AccountFixtures.anAccount()));
   }
 
 }

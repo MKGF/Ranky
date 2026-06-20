@@ -30,3 +30,4 @@ https://jda.wiki/using-jda/interactions/#select-menus-dropdowns
 -Proporcionar la opcion de forzar refresco del ranking DONE
 -Revisar por que da unauthorized cuando queremos meter una cuenta nueva a la cache DONE
 -Proveer la posibilidad de borrar una cuenta sin el tag del ranking y solicitar desambiguar con tag en caso de que haya dos que se llamen igual DONE
+-Acordarse de probar e2e el cambio entre flex y solo, desde los listeners hasta la cache, la funcionalidad esta WIP aun y hay que ver como pasar la informacion de si el ranking es de flex o de solo a traves del boton

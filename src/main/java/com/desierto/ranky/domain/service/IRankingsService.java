@@ -8,5 +8,7 @@ public interface IRankingsService {
 
   List<Ranking> getAll(Guild guild);
 
-  Ranking get(String rankingId, Guild guild);
+  Ranking soloQ(String rankingId, Guild guild);
+
+  Ranking flexQ(String rankingId, Guild guild);
 }

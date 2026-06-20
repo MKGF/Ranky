@@ -1,5 +1,6 @@
 package com.desierto.ranky.infrastructure.service;
 
+import com.desierto.ranky.domain.valueobject.RankedMode;
 import com.desierto.ranky.infrastructure.configuration.ConfigLoader;
 import com.desierto.ranky.infrastructure.dto.EntryDto;
 import com.desierto.ranky.infrastructure.utils.DiscordRankingFormatter;
@@ -30,7 +31,9 @@ public class PrintRankingService {
 
   public void printMultiPage(GenericEvent event, String title,
       List<EntryDto> rankingEntries,
-      MultiPagePrintingFunction function) {
+      MultiPagePrintingFunction function,
+      RankedMode rankedMode
+  ) {
     int numberOfEntries = rankingEntries.size();
     int numberOfFractions = numberOfEntries / config.getAccountLimit() + 1;
 
@@ -51,7 +54,7 @@ public class PrintRankingService {
       } else if (i != fractions.size() - 1) {
         function.printGeneric(event, finalRanking);
       } else {
-        function.printEnding(event, finalRanking);
+        function.printEnding(event, finalRanking, rankedMode);
       }
     }
   }

@@ -1,5 +1,6 @@
 package com.desierto.ranky.infrastructure.service;
 
+import static com.desierto.ranky.domain.valueobject.RankedMode.RANKED_SOLO_5x5;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
@@ -61,11 +62,12 @@ class PrintRankingServiceTest {
     when(discordRankingFormatter.formatRankingEntries(anyList())).thenReturn("formatted");
     MultiPagePrintingFunction function = mock(MultiPagePrintingFunction.class);
 
-    cut.printMultiPage(event, "rankingName", List.of(entry1, entry2, entry3, entry4), function);
+    cut.printMultiPage(event, "rankingName", List.of(entry1, entry2, entry3, entry4), function,
+        RANKED_SOLO_5x5);
 
     verify(function, times(1)).printBeginning(event, "formatted");
     verify(function, times(3)).printGeneric(event, "formatted");
-    verify(function, times(1)).printEnding(event, "formatted");
+    verify(function, times(1)).printEnding(event, "formatted", RANKED_SOLO_5x5);
   }
 
 }
