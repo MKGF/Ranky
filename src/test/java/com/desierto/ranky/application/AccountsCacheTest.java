@@ -87,8 +87,8 @@ class AccountsCacheTest {
   void checksPressenceOfRanking() {
     cut.save("guildId", "test",
         List.of(AccountFixtures.anAccount(), AccountFixtures.anotherAccount()), RANKED_SOLO_5x5);
-    assertTrue(cut.containsRanking("test", "guildId"));
-    assertFalse(cut.containsRanking("anotherTest", "anotherGuildId"));
+    assertTrue(cut.containsSoloQRanking("test", "guildId"));
+    assertFalse(cut.containsSoloQRanking("anotherTest", "anotherGuildId"));
   }
 
   @Test
@@ -97,7 +97,7 @@ class AccountsCacheTest {
     Account added = AccountFixtures.anotherAccount();
     cut.save("guildId", "test",
         List.of(present), RANKED_SOLO_5x5);
-    cut.addAccountsIfRankingCached("guildId", "test", List.of(added));
+    cut.addAccountsIfRankingCached("guildId", "test", List.of(added), List.of());
     List<Account> result = cut.find("guildId", "test", RANKED_SOLO_5x5).get();
     assertTrue(result.containsAll(List.of(present, added)));
     assertEquals(2, result.size());

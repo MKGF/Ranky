@@ -96,53 +96,91 @@ public class AccountsCache {
       List<Account> accounts) {
     try {
       String key = (guildId + ":" + rankingId).toLowerCase();
-      List<Account> existingAccounts = new ArrayList<>(rankingsSoloQ.get(key));
-      List<Account> accountsToRemove = new ArrayList<>();
+      List<Account> existingSoloQAccounts = new ArrayList<>(rankingsSoloQ.get(key));
+      List<Account> existingFlexQAccounts = new ArrayList<>(rankingsFlexQ.get(key));
+      List<Account> soloQAccountsToRemove = new ArrayList<>();
+      List<Account> flexQAccountsToRemove = new ArrayList<>();
       accounts.forEach(account -> {
-        List<Account> matches = existingAccounts.stream().filter(account::isSameAccount).toList();
+        List<Account> matches = existingSoloQAccounts.stream().filter(account::isSameAccount)
+            .toList();
         if (matches.size() > 1) {
           throw new AccountCouldNotBeDesambiguatedException(matches.get(0));
         } else if (matches.size() == 1) {
-          accountsToRemove.add(matches.get(0));
+          soloQAccountsToRemove.add(matches.get(0));
+        }
+        matches = existingFlexQAccounts.stream().filter(account::isSameAccount).toList();
+        if (matches.size() > 1) {
+          throw new AccountCouldNotBeDesambiguatedException(matches.get(0));
+        } else if (matches.size() == 1) {
+          flexQAccountsToRemove.add(matches.get(0));
         }
       });
-      existingAccounts.removeAll(accountsToRemove);
+      existingSoloQAccounts.removeAll(soloQAccountsToRemove);
+      existingFlexQAccounts.removeAll(flexQAccountsToRemove);
       rankingsSoloQ.remove(key);
-      rankingsSoloQ.put(key, existingAccounts);
+      rankingsSoloQ.put(key, existingSoloQAccounts);
+      rankingsFlexQ.remove(key);
+      rankingsFlexQ.put(key, existingFlexQAccounts);
       log.info("Removed accounts from existing cache {}", key);
     } catch (NullPointerException ignored) {
     }
   }
 
-  public void addAccountsIfRankingCached(String guildId, String rankingId, List<Account> accounts) {
+  public void addAccountsIfRankingCached(String guildId, String rankingId,
+      List<Account> soloQAccounts, List<Account> flexQAccounts) {
     try {
       String key = (guildId + ":" + rankingId).toLowerCase();
-      List<Account> existingAccounts = new ArrayList<>(rankingsSoloQ.get(key));
-      existingAccounts.addAll(accounts);
-      rankingsSoloQ.remove(key);
-      rankingsSoloQ.put(key, existingAccounts);
-      log.info("Added account to existing cache {}", key);
+      if (!soloQAccounts.isEmpty()) {
+        List<Account> existingSoloQAccounts = new ArrayList<>(rankingsSoloQ.get(key));
+        existingSoloQAccounts.addAll(soloQAccounts);
+        rankingsSoloQ.remove(key);
+        rankingsSoloQ.put(key, existingSoloQAccounts);
+      }
+      if (!flexQAccounts.isEmpty()) {
+        List<Account> existingFlexQAccounts = new ArrayList<>(rankingsSoloQ.get(key));
+        existingFlexQAccounts.addAll(flexQAccounts);
+        rankingsFlexQ.remove(key);
+        rankingsFlexQ.put(key, existingFlexQAccounts);
+      }
+      log.info("Added accounts to existing cache {}", key);
     } catch (NullPointerException ignored) {
     }
   }
 
   @Scheduled(fixedRate = 1000 * 60 * CACHE_MINUTES)
   protected void clearCache() {
-    List<String> keysToRemoveFromCache = new ArrayList<>();
+    List<String> soloQKeysToRemoveFromCache = new ArrayList<>();
     introductionTimesSoloQ.forEach((key, time) -> {
       if (LocalDateTime.now().isAfter(time.plusMinutes(CACHE_MINUTES))) {
-        keysToRemoveFromCache.add(key.toLowerCase());
+        soloQKeysToRemoveFromCache.add(key.toLowerCase());
       }
     });
-    keysToRemoveFromCache.forEach(key -> {
+    soloQKeysToRemoveFromCache.forEach(key -> {
       rankingsSoloQ.remove(key.toLowerCase());
       introductionTimesSoloQ.remove(key.toLowerCase());
     });
-    log.info("Cleared from accounts cache: {}", keysToRemoveFromCache);
+    log.info("Cleared from soloQ accounts cache: {}", soloQKeysToRemoveFromCache);
+
+    List<String> flexQKeysToRemoveFromCache = new ArrayList<>();
+    introductionTimesFlexQ.forEach((key, time) -> {
+      if (LocalDateTime.now().isAfter(time.plusMinutes(CACHE_MINUTES))) {
+        flexQKeysToRemoveFromCache.add(key.toLowerCase());
+      }
+    });
+    soloQKeysToRemoveFromCache.forEach(key -> {
+      rankingsFlexQ.remove(key.toLowerCase());
+      introductionTimesFlexQ.remove(key.toLowerCase());
+    });
+    log.info("Cleared from flexQ accounts cache: {}", flexQKeysToRemoveFromCache);
   }
 
-  public boolean containsRanking(String rankingId, String guildId) {
+  public boolean containsSoloQRanking(String rankingId, String guildId) {
     String key = (guildId + ":" + rankingId).toLowerCase();
     return rankingsSoloQ.containsKey(key);
+  }
+
+  public boolean containsFlexQRanking(String rankingId, String guildId) {
+    String key = (guildId + ":" + rankingId).toLowerCase();
+    return rankingsFlexQ.containsKey(key);
   }
 }

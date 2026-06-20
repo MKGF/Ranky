@@ -48,7 +48,7 @@ class AccountsServiceTest {
     when(guild.getId()).thenReturn("guildId");
     when(rankingRepository.read("rankingId", guild)).thenReturn(ranking);
     when(riotAccountRepository.enrichIdentification(account)).thenReturn(account);
-    when(accountsCache.containsRanking(ranking.getId(), guild.getId())).thenReturn(false);
+    when(accountsCache.containsSoloQRanking(ranking.getId(), guild.getId())).thenReturn(false);
     cut.addAccounts("rankingId", guild, List.of(account));
     ArgumentCaptor<Ranking> captor = ArgumentCaptor.forClass(Ranking.class);
     verify(rankingRepository, times(1)).read("rankingId", guild);
@@ -66,7 +66,7 @@ class AccountsServiceTest {
     when(guild.getId()).thenReturn("guildId");
     when(rankingRepository.read("rankingId", guild)).thenReturn(ranking);
     when(riotAccountRepository.enrichIdentification(account)).thenReturn(account);
-    when(accountsCache.containsRanking(ranking.getId(), guild.getId())).thenReturn(false);
+    when(accountsCache.containsSoloQRanking(ranking.getId(), guild.getId())).thenReturn(false);
     cut.removeAccounts("rankingId", guild, List.of(account));
     ArgumentCaptor<Ranking> captor = ArgumentCaptor.forClass(Ranking.class);
     verify(rankingRepository, times(1)).read("rankingId", guild);
@@ -83,7 +83,7 @@ class AccountsServiceTest {
     when(guild.getId()).thenReturn("guildId");
     when(rankingRepository.read("rankingId", guild)).thenReturn(ranking);
     when(riotAccountRepository.enrichIdentification(account)).thenReturn(account);
-    when(accountsCache.containsRanking(ranking.getId(), guild.getId())).thenReturn(true);
+    when(accountsCache.containsSoloQRanking(ranking.getId(), guild.getId())).thenReturn(true);
     when(riotAccountRepository.enrichWithRankedStats(account,
         RankedMode.RANKED_SOLO_5x5)).thenReturn(account);
     cut.addAccounts("rankingId", guild, List.of(account));
@@ -92,7 +92,7 @@ class AccountsServiceTest {
     verify(rankingRepository, times(1)).update(captor.capture(), eq(guild));
     verify(riotAccountRepository, times(1)).enrichIdentification(account);
     verify(accountsCache, times(1)).addAccountsIfRankingCached(guild.getId(), ranking.getId(),
-        List.of(account));
+        List.of(account), List.of());
     assertEquals(1, captor.getValue().getAccounts().size());
   }
 
@@ -105,7 +105,7 @@ class AccountsServiceTest {
     when(guild.getId()).thenReturn("guildId");
     when(rankingRepository.read("rankingId", guild)).thenReturn(ranking);
     when(riotAccountRepository.enrichIdentification(account)).thenReturn(account);
-    when(accountsCache.containsRanking(ranking.getId(), guild.getId())).thenReturn(true);
+    when(accountsCache.containsSoloQRanking(ranking.getId(), guild.getId())).thenReturn(true);
     cut.removeAccounts("rankingId", guild, List.of(account));
     ArgumentCaptor<Ranking> captor = ArgumentCaptor.forClass(Ranking.class);
     verify(rankingRepository, times(1)).read("rankingId", guild);
@@ -125,7 +125,7 @@ class AccountsServiceTest {
     when(guild.getId()).thenReturn("guildId");
     when(rankingRepository.read("rankingId", guild)).thenReturn(ranking);
     when(riotAccountRepository.enrichIdentification(account)).thenReturn(account);
-    when(accountsCache.containsRanking(ranking.getId(), guild.getId())).thenReturn(false);
+    when(accountsCache.containsSoloQRanking(ranking.getId(), guild.getId())).thenReturn(false);
     cut.removeAccounts("rankingId", guild, List.of(new Account(account.getName(), "")));
     ArgumentCaptor<Ranking> captor = ArgumentCaptor.forClass(Ranking.class);
     verify(rankingRepository, times(1)).read("rankingId", guild);
