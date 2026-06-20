@@ -96,8 +96,10 @@ public class AccountsCache {
       List<Account> accounts) {
     try {
       String key = (guildId + ":" + rankingId).toLowerCase();
-      List<Account> existingSoloQAccounts = new ArrayList<>(rankingsSoloQ.get(key));
-      List<Account> existingFlexQAccounts = new ArrayList<>(rankingsFlexQ.get(key));
+      List<Account> existingSoloQAccounts = new ArrayList<>(
+          rankingsSoloQ.get(key) != null ? rankingsSoloQ.get(key) : List.of());
+      List<Account> existingFlexQAccounts = new ArrayList<>(
+          rankingsFlexQ.get(key) != null ? rankingsFlexQ.get(key) : List.of());
       List<Account> soloQAccountsToRemove = new ArrayList<>();
       List<Account> flexQAccountsToRemove = new ArrayList<>();
       accounts.forEach(account -> {
@@ -137,7 +139,7 @@ public class AccountsCache {
         rankingsSoloQ.put(key, existingSoloQAccounts);
       }
       if (!flexQAccounts.isEmpty()) {
-        List<Account> existingFlexQAccounts = new ArrayList<>(rankingsSoloQ.get(key));
+        List<Account> existingFlexQAccounts = new ArrayList<>(rankingsFlexQ.get(key));
         existingFlexQAccounts.addAll(flexQAccounts);
         rankingsFlexQ.remove(key);
         rankingsFlexQ.put(key, existingFlexQAccounts);
