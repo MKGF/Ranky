@@ -122,9 +122,6 @@ class DiscordGetRankingServiceTest {
     Ranking ranking = RankingFixtures.aRanking();
     mockDiscordRepo(ranking, event.getGuild());
     when(rankingRepository.read(anyString(), any())).thenReturn(ranking);
-    when(riotAccountRepository.enrichWithRankedStats(
-        ranking.getAccounts().get(0), RankedMode.RANKED_SOLO_5x5)
-    ).thenReturn(ranking.getAccounts().get(0));
     when(discordOptionRetriever.fromEventGetObjectName(event)).thenReturn(ranking.getId());
     when(accountsCache.find(any(), anyString())).thenReturn(
         Optional.of(RankingFixtures.aRanking().getAccounts()));
@@ -132,7 +129,7 @@ class DiscordGetRankingServiceTest {
     cut.execute(event, true);
 
     verify(riotAccountRepository, times(ranking.getAccounts().size()))
-        .enrichWithRankedStats(any(), eq(RankedMode.RANKED_SOLO_5x5));
+        .enrichAccountsWithRankedStats(anyList(), eq(RankedMode.RANKED_SOLO_5x5));
   }
 
   private SlashCommandInteractionEvent getAMockedEventNotFromAGuild() {

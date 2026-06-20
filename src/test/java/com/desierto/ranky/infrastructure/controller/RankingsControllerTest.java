@@ -2,8 +2,8 @@ package com.desierto.ranky.infrastructure.controller;
 
 import static com.desierto.ranky.application.fixtures.GuildFixtures.aGuild;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -171,8 +171,8 @@ class RankingsControllerTest extends BaseIT {
   }
 
   private void mockRiot() {
-    when(restRiotAccountRepository.enrichWithRankedStats(any(),
-        eq(RankedMode.RANKED_SOLO_5x5))).thenReturn(AccountFixtures.anAccount());
+    when(restRiotAccountRepository.enrichAccountsWithRankedStats(anyList(),
+        eq(RankedMode.RANKED_SOLO_5x5))).thenReturn(List.of(AccountFixtures.anAccount()));
   }
 
 }

@@ -17,15 +17,12 @@ import com.desierto.ranky.infrastructure.configuration.ConfigLoader;
 import com.desierto.ranky.infrastructure.dto.EntryDto;
 import com.desierto.ranky.infrastructure.exceptions.ConfigChannelNotFoundException;
 import com.desierto.ranky.infrastructure.utils.DiscordOptionRetriever;
-import com.desierto.ranky.infrastructure.utils.DiscordProgressBar;
 import com.desierto.ranky.infrastructure.utils.DiscordRankingFormatter;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
@@ -52,14 +49,12 @@ public class DiscordGetRankingService {
 
   private final RankingRepository rankingRepository;
 
-  private final ExecutorService executorService;
-
   public void execute(SlashCommandInteractionEvent event, boolean forceRefresh) {
     if (event.isFromGuild()) {
       String rankingName = discordOptionRetriever.fromEventGetObjectName(event);
       try {
         Ranking ranking = rankingRepository.read(rankingName, event.getGuild());
-        List<EntryDto> rankingEntries = getRankedAccountsWithProgressBarAnimation(event,
+        List<EntryDto> rankingEntries = getRankedAccounts(event,
             rankingName, ranking, forceRefresh);
         printRankingAsResponseToUserCommand(event, rankingName, rankingEntries);
       } catch (ConfigChannelNotFoundException | RankingNotFoundException e) {
@@ -81,15 +76,6 @@ public class DiscordGetRankingService {
       printRankingService.printMultiPage(event, rankingName, rankingEntries,
           getMultiPagePrintingFunction(rankingName));
     }
-  }
-
-  @Deprecated
-  private static void updateProgressBar(Message progressBar, AtomicInteger indexForEnrichment,
-      int numberOfAccounts) {
-    progressBar.editMessage(
-            DiscordProgressBar.getProgress(
-                (indexForEnrichment.getAndIncrement() * 100 / numberOfAccounts) / 2))
-        .complete();
   }
 
   private static SinglePagePrintingFunction getSinglePagePrintingFunction() {
@@ -136,17 +122,7 @@ public class DiscordGetRankingService {
     };
   }
 
-  @Deprecated
-  private static void updateProgressBar(List<Account> rankingAccounts,
-      Optional<Message> progressBar,
-      AtomicInteger index) {
-    progressBar.ifPresent(message -> message.editMessage(
-            DiscordProgressBar.getProgress(
-                50 + (index.get() * 100 / rankingAccounts.size()) / 2))
-        .complete());
-  }
-
-  private List<EntryDto> getRankedAccountsWithProgressBarAnimation(
+  private List<EntryDto> getRankedAccounts(
       SlashCommandInteractionEvent event,
       String rankingName, Ranking ranking, boolean forceRefresh) {
     Optional<List<Account>> cachedAccounts = accountsCache.find(
@@ -164,18 +140,17 @@ public class DiscordGetRankingService {
     AtomicInteger index = new AtomicInteger(1);
     return rankingAccounts.stream()
         .sorted()
-        .map(account -> {
-          return new EntryDto(
-                  index.getAndIncrement(),
-                  account.getName(),
-                  emojiFromTier(account.getRank().getTier()),
-                  account.getRank().getDivision().toString(),
-                  account.getRank().getLeaguePoints(),
-                  account.getRank().getWinrate().getWins().toString(),
-                  account.getRank().getWinrate().getLosses().toString(),
-                  account.getRank().getWinrate().getPercentage().toString()
-              );
-            }
+        .map(account ->
+            new EntryDto(
+                index.getAndIncrement(),
+                account.getName(),
+                emojiFromTier(account.getRank().getTier()),
+                account.getRank().getDivision().toString(),
+                account.getRank().getLeaguePoints(),
+                account.getRank().getWinrate().getWins().toString(),
+                account.getRank().getWinrate().getLosses().toString(),
+                account.getRank().getWinrate().getPercentage().toString()
+            )
         )
         .toList();
   }
@@ -183,9 +158,7 @@ public class DiscordGetRankingService {
   private List<Account> getRankingEntries(Ranking ranking, InteractionHook hook) {
     List<Account> accounts = riotAccountRepository.enrichAccountsWithRankedStats(
         ranking.getAccounts(), RANKED_SOLO_5x5);
-
     accountsCache.save(hook.getInteraction().getGuild().getId(), ranking.getId(), accounts);
-
     return accounts;
   }
 }

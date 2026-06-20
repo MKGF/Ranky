@@ -3,6 +3,7 @@ package com.desierto.ranky.application.service;
 import static com.desierto.ranky.domain.valueobject.RankedMode.RANKED_SOLO_5x5;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -13,6 +14,7 @@ import static org.mockito.Mockito.when;
 import com.desierto.ranky.application.AccountsCache;
 import com.desierto.ranky.application.fixtures.AccountFixtures;
 import com.desierto.ranky.application.fixtures.RankingFixtures;
+import com.desierto.ranky.domain.entity.Ranking;
 import com.desierto.ranky.domain.repository.RankingRepository;
 import com.desierto.ranky.domain.repository.RiotAccountRepository;
 import java.util.List;
@@ -49,13 +51,15 @@ class RankingsServiceTest {
   void getGuild_callsRepo_and_retrievesAccountInfoFromRiot() {
     String rankingId = "rankingId";
     Guild guild = mock(Guild.class);
+    Ranking ranking = RankingFixtures.aRanking();
     when(guild.getId()).thenReturn("guildId");
-    when(rankingRepository.read(rankingId, guild)).thenReturn(RankingFixtures.aRanking());
+    when(rankingRepository.read(rankingId, guild)).thenReturn(ranking);
     when(accountsCache.find(guild.getId(), rankingId)).thenReturn(Optional.empty());
-    when(riotAccountRepository.enrichWithRankedStats(any(), eq(RANKED_SOLO_5x5))).thenReturn(
-        AccountFixtures.anAccount());
+    when(riotAccountRepository.enrichAccountsWithRankedStats(anyList(),
+        eq(RANKED_SOLO_5x5))).thenReturn(
+        List.of(AccountFixtures.anAccount()));
 
-    assertEquals(cut.get(rankingId, guild), RankingFixtures.aRanking());
+    assertEquals(cut.get(rankingId, guild), ranking);
 
     verify(accountsCache, times(1)).save(guild.getId(), rankingId,
         List.of(AccountFixtures.anAccount()));

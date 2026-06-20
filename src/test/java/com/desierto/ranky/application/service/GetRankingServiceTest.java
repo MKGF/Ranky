@@ -65,12 +65,14 @@ class GetRankingServiceTest {
     Ranking ranking = new Ranking(rankingId);
     ranking.addAccount(account);
     when(rankingRepository.read(rankingId, guild)).thenReturn(ranking);
-    when(riotAccountRepository.enrichWithRankedStats(account, RANKED_SOLO_5x5)).thenReturn(account);
+    when(riotAccountRepository.enrichAccountsWithRankedStats(List.of(account),
+        RANKED_SOLO_5x5)).thenReturn(List.of(account));
     when(accountsCache.find(guild.getId(), rankingId)).thenReturn(
         Optional.empty());
     assertEquals(cut.get(rankingId, guild).getAccounts().get(0), account);
     verify(accountsCache, times(1)).save(anyString(), anyString(), anyList());
-    verify(riotAccountRepository, times(1)).enrichWithRankedStats(any(), eq(RANKED_SOLO_5x5));
+    verify(riotAccountRepository, times(1)).enrichAccountsWithRankedStats(anyList(),
+        eq(RANKED_SOLO_5x5));
   }
 
 }
