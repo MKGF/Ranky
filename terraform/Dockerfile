@@ -1,5 +1,5 @@
 # Using base image from OpenJDK
-FROM openjdk:17-jdk
+FROM eclipse-temurin:24-jdk
 
 # Creating /app /classes directory
 RUN mkdir -p /app/classes
