@@ -48,27 +48,42 @@ public class DiscordBotInitializer {
       WelcomeOwnerService welcomeOwnerService;
       if (!guildHasRankyUserRole(config, guild)) {
         isNew = true;
-        guild.createRole().setName(config.getRankyUserRole()).queue();
-        log.info(String.format("Server: %s has no role. Creating it...", guild.getName()));
+        try {
+          log.info(String.format("Server: %s has no role. Creating it...", guild.getName()));
+          guild.createRole().setName(config.getRankyUserRole()).complete();
+        } catch (Exception e) {
+          log.info("Could not create the role in guild {}", guild.getName());
+          log.info("Exception: {}", e.getMessage());
+        }
       }
       if (!guildHasConfigChannel(config, guild)) {
         isNew = true;
-        guild.createTextChannel(config.getConfigChannel()).clearPermissionOverrides().queue();
-        log.info(String.format("Server: %s has config channel. Creating it...", guild.getName()));
+        try {
+          log.info(
+              String.format("Server: %s has no config channel. Creating it...", guild.getName()));
+          guild.createTextChannel(config.getConfigChannel()).clearPermissionOverrides().complete();
+        } catch (Exception e) {
+          log.info("Could not create the config channel in guild {}", guild.getName());
+          log.info("Exception: {}", e.getMessage());
+        }
       }
       if (isNew) {
-        welcomeGuildService = context.getBean(WelcomeGuildService.class);
-        welcomeOwnerService = context.getBean(WelcomeOwnerService.class);
-        Member owner = guild.retrieveOwner().complete();
-        String welcomeEmbedMessage = String.format(read(
-                PATH_TO_EMBED_MESSAGE_TXT),
-            config.getRankyUserRole(),
-            config.getConfigChannel(),
-            config.getRankingLimit());
-        String nonRiotEndorsementMessage = read(
-            PATH_TO_NON_RIOT_ENDORSEMENT_MESSAGE_TXT);
-        welcomeGuildService.execute(guild, welcomeEmbedMessage, nonRiotEndorsementMessage);
-        welcomeOwnerService.execute(guild, owner, welcomeEmbedMessage, nonRiotEndorsementMessage);
+        try {
+          welcomeGuildService = context.getBean(WelcomeGuildService.class);
+          welcomeOwnerService = context.getBean(WelcomeOwnerService.class);
+          Member owner = guild.retrieveOwner().complete();
+          String welcomeEmbedMessage = String.format(read(
+                  PATH_TO_EMBED_MESSAGE_TXT),
+              config.getRankyUserRole(),
+              config.getConfigChannel(),
+              config.getRankingLimit());
+          String nonRiotEndorsementMessage = read(
+              PATH_TO_NON_RIOT_ENDORSEMENT_MESSAGE_TXT);
+          welcomeGuildService.execute(guild, welcomeEmbedMessage, nonRiotEndorsementMessage);
+          welcomeOwnerService.execute(guild, owner, welcomeEmbedMessage, nonRiotEndorsementMessage);
+        } catch (Exception e) {
+          log.info("Could not welcome myself. Exception: {}", e.getMessage());
+        }
       }
     });
 
