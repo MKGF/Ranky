@@ -6,63 +6,63 @@ resource "aws_instance" "ranky-ec2" {
   key_name      = aws_key_pair.ranky-ec2-keypair.key_name
 
   user_data = <<-EOF
-#!/bin/bash
-set -e
+  #!/bin/bash
+  set -e
 
-yum update -y
+  yum update -y
 
-# Docker
-yum install -y docker
-systemctl enable docker
-systemctl start docker
+  # Docker
+  yum install -y docker
+  systemctl enable docker
+  systemctl start docker
 
-sleep 5
+  sleep 5
 
-# AWS CLI
-yum install -y awscli
+  # AWS CLI
+  yum install -y awscli
 
-# NGINX
-yum install -y nginx
-systemctl enable nginx
-systemctl start nginx
+  # NGINX
+  yum install -y nginx
+  systemctl enable nginx
+  systemctl start nginx
 
-# Certbot
-sleep 20
-yum install -y certbot python3-certbot-nginx
+  # Certbot
+  sleep 20
+  yum install -y certbot python3-certbot-nginx
 
-# ECR login
-aws ecr get-login-password --region eu-west-2 \
-| docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/ranky-repo
+  # ECR login
+  aws ecr get-login-password --region eu-west-2 \
+  | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/ranky-repo
 
-# Pull image
-docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/ranky-repo:latest
+  # Pull image
+  docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/ranky-repo:latest
 
-# Run container SOLO LOCAL
-docker run -d \
-  --name ranky-app \
-  -p 127.0.0.1:8080:8080 \
-  --restart always \
-  ${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/ranky-repo:latest
+  # Run container SOLO LOCAL
+  docker run -d \
+    --name ranky-app \
+    -p 127.0.0.1:8080:8080 \
+    --restart always \
+    ${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/ranky-repo:latest
 
-# NGINX reverse proxy
-cat > /etc/nginx/conf.d/ranky.conf <<'EOF'
-server {
-    listen 80;
-    server_name api.ranky.top;
+  # NGINX reverse proxy (Cambiado a EON para evitar conflictos)
+  cat > /etc/nginx/conf.d/ranky.conf <<'EON'
+  server {
+      listen 80;
+      server_name api.ranky.top;
 
-    location / {
-        proxy_pass http://127.0.0.1:8080;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    }
-}
-EOF
+      location / {
+          proxy_pass http://127.0.0.1:8080;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      }
+  }
+  EON
 
-nginx -t && systemctl restart nginx
+  nginx -t && systemctl restart nginx
 
-# Certbot (HTTPS)
-certbot --nginx -d api.ranky.top --non-interactive --agree-tos -m mikel.garin@ranky.top
+  # Certbot (HTTPS)
+  certbot --nginx -d api.ranky.top --non-interactive --agree-tos -m mikel.garin@ranky.top
   EOF
 
   iam_instance_profile = aws_iam_instance_profile.ranky-ec2-profile.name
