@@ -32,17 +32,17 @@ resource "aws_instance" "ranky-ec2" {
 
   # ECR login
   aws ecr get-login-password --region eu-west-2 \
-  | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/ranky-repo
+  | docker login --username AWS --password-stdin ${var.AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/ranky-repo
 
   # Pull image
-  docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/ranky-repo:latest
+  docker pull ${var.AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/ranky-repo:latest
 
   # Run container SOLO LOCAL
   docker run -d \
     --name ranky-app \
     -p 127.0.0.1:8080:8080 \
     --restart always \
-    ${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/ranky-repo:latest
+    ${var.AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/ranky-repo:latest
 
   # NGINX reverse proxy (Cambiado a EON para evitar conflictos)
   cat > /etc/nginx/conf.d/ranky.conf <<'EON'
