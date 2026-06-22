@@ -62,11 +62,19 @@ jobs:
         run: |
           aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-west-2.amazonaws.com
 
-      - name: Create S3 bucket for terraform.tfstate
+      - name: Create S3 bucket for terraform.tfstate (if not exists)
         run: |
           BUCKET_NAME=ranky-bot-s3
-          FILE_PATH=terraform/terraform.tfstate
-          aws s3api create-bucket --bucket $BUCKET_NAME --region eu-west-2 --create-bucket-configuration LocationConstraint=eu-west-2
+          
+          if aws s3api head-bucket --bucket "$BUCKET_NAME" 2>/dev/null; then
+            echo "El bucket $BUCKET_NAME ya existe y eres el propietario. Skipeando creación..."
+          else
+            echo "El bucket no existe o no tienes acceso. Intentando crearlo..."
+            aws s3api create-bucket \
+              --bucket "$BUCKET_NAME" \
+              --region eu-west-2 \
+              --create-bucket-configuration LocationConstraint=eu-west-2
+          fi
 
       - name: Terraform Init
         run: terraform init
