@@ -6,22 +6,64 @@ resource "aws_instance" "ranky-ec2" {
   key_name      = aws_key_pair.ranky-ec2-keypair.key_name
 
   user_data = <<-EOF
-              #!/bin/bash
-              sudo yum update -y
-              sudo yum install docker -y
-              sudo systemctl start docker
-              sudo systemctl enable docker
+#!/bin/bash
+set -e
 
-              # Autenticarse con ECR
-              aws ecr get-login-password --region eu-west-2 | sudo docker login --username AWS --password-stdin ${var.AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/ranky-repo
+yum update -y
 
+# Docker
+yum install -y docker
+systemctl enable docker
+systemctl start docker
 
-              # Tirar la imagen desde ECR
-              sudo docker pull ${var.AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/ranky-repo:latest
+sleep 5
 
-              # Ejecutar la imagen
-              sudo docker run -d -p 8080:8080 --name ranky-app ${var.AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/ranky-repo:latest
-              EOF
+# AWS CLI
+yum install -y awscli
+
+# NGINX
+yum install -y nginx
+systemctl enable nginx
+systemctl start nginx
+
+# Certbot
+sleep 20
+yum install -y certbot python3-certbot-nginx
+
+# ECR login
+aws ecr get-login-password --region eu-west-2 \
+| docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/ranky-repo
+
+# Pull image
+docker pull ${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/ranky-repo:latest
+
+# Run container SOLO LOCAL
+docker run -d \
+  --name ranky-app \
+  -p 127.0.0.1:8080:8080 \
+  --restart always \
+  ${AWS_ACCOUNT_ID}.dkr.ecr.eu-west-2.amazonaws.com/ranky-repo:latest
+
+# NGINX reverse proxy
+cat > /etc/nginx/conf.d/ranky.conf <<'EOF'
+server {
+    listen 80;
+    server_name api.ranky.top;
+
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+EOF
+
+nginx -t && systemctl restart nginx
+
+# Certbot (HTTPS)
+certbot --nginx -d api.ranky.top --non-interactive --agree-tos -m mikel.garin@ranky.top
+  EOF
 
   iam_instance_profile = aws_iam_instance_profile.ranky-ec2-profile.name
 
