@@ -27,7 +27,8 @@ public class WebSecurityConfig {
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/auth/**").permitAll()
-            .requestMatchers("/rankings/fromGuild/*/ranking/*").permitAll()
+            .requestMatchers("/rankings/fromGuild/*/soloQ/*", "/rankings/fromGuild/*/flexQ/*")
+            .permitAll()
             .anyRequest().authenticated()
         )
         .addFilterBefore(sessionAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
