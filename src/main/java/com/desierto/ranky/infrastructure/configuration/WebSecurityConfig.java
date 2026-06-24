@@ -4,6 +4,7 @@ import com.desierto.ranky.infrastructure.service.auth.SessionAuthenticationFilte
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -25,6 +26,7 @@ public class WebSecurityConfig {
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     return http
         .csrf(AbstractHttpConfigurer::disable)
+        .cors(Customizer.withDefaults())
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/auth/**").permitAll()
             .requestMatchers("/rankings/fromGuild/*/soloQ/*", "/rankings/fromGuild/*/flexQ/*")

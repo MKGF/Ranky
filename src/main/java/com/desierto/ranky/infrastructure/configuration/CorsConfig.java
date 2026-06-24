@@ -14,7 +14,11 @@ public class CorsConfig {
       @Override
       public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-            .allowedOrigins("https://ranky.top")
+            .allowedOrigins(
+                "https://ranky.top",
+                "https://www.ranky.top",
+                "https://api.ranky.top"
+            )
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
             .allowCredentials(true)
             .allowedHeaders("*");
