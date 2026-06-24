@@ -4,6 +4,7 @@ import com.desierto.ranky.infrastructure.configuration.ConfigLoader;
 import com.desierto.ranky.infrastructure.service.auth.AuthenticationService;
 import com.desierto.ranky.infrastructure.service.auth.UserSession;
 import com.desierto.ranky.infrastructure.web.annotation.CurrentUser;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
@@ -43,10 +44,19 @@ public class AuthenticationController {
   }
 
   @GetMapping("/logout")
-  public void logout(HttpServletResponse response, @CurrentUser UserSession userSession)
+  public void logout(HttpServletRequest request, HttpServletResponse response,
+      @CurrentUser UserSession userSession)
       throws IOException {
     log.info("Logging out {}", userSession);
     authenticationService.remove(userSession);
+
+    // If logout is invoked via fetch/XHR, avoid redirecting to frontend URL to prevent CORS failures.
+    String fetchMode = request.getHeader("Sec-Fetch-Mode");
+    if ("cors".equalsIgnoreCase(fetchMode)) {
+      response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+      return;
+    }
+
     response.sendRedirect(config.getRankyHomepage());
   }
 }
