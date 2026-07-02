@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -147,7 +148,8 @@ public class RankingsController {
 
   @PostMapping("/forGuild/{guildId}/forRanking/{ranking}/add")
   public ResponseEntity<Ranking> addAccounts(@CurrentUser UserSession session,
-      @PathVariable String guildId, @PathVariable String ranking, List<AccountApi> accounts) {
+      @PathVariable String guildId, @PathVariable String ranking,
+      @RequestBody List<AccountApi> accounts) {
     log.info("Entered addAccounts");
     log.info("Session: {}", session.toString());
     Guild guild = guildsService.get(guildId, session.userId());
@@ -158,7 +160,8 @@ public class RankingsController {
 
   @PostMapping("/forGuild/{guildId}/forRanking/{ranking}/remove")
   public ResponseEntity<Ranking> removeAccounts(@CurrentUser UserSession session,
-      @PathVariable String guildId, @PathVariable String ranking, List<AccountApi> accounts) {
+      @PathVariable String guildId, @PathVariable String ranking,
+      @RequestBody List<AccountApi> accounts) {
     log.info("Entered removeAccounts");
     log.info("Session: {}", session.toString());
     Guild guild = guildsService.get(guildId, session.userId());

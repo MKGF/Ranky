@@ -3,16 +3,20 @@ package com.desierto.ranky.infrastructure.controller;
 import static com.desierto.ranky.application.fixtures.GuildFixtures.aGuild;
 import static com.desierto.ranky.domain.valueobject.RankedMode.RANKED_FLEX_SR;
 import static com.desierto.ranky.domain.valueobject.RankedMode.RANKED_SOLO_5x5;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.desierto.ranky.application.AccountsCache;
 import com.desierto.ranky.application.fixtures.AccountFixtures;
 import com.desierto.ranky.application.fixtures.RankingFixtures;
 import com.desierto.ranky.domain.entity.Account;
@@ -27,14 +31,20 @@ import jakarta.servlet.http.Cookie;
 import java.util.List;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.api.requests.restaction.AuditableRestAction;
 import net.dv8tion.jda.api.requests.restaction.CacheRestAction;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -51,6 +61,14 @@ class RankingsControllerTest extends BaseIT {
 
   @Autowired
   private MockMvc mockMvc;
+
+  @Autowired
+  private AccountsCache accountsCache;
+
+  @BeforeEach
+  void clearAccountsCache() {
+    accountsCache.delete("rankingid", "guildid");
+  }
 
 
   @Test
@@ -164,6 +182,63 @@ class RankingsControllerTest extends BaseIT {
             is(expected.getRank().getWinrate().getLosses())));
   }
 
+  @Test
+  void givenSession_whenAddingAccountsWithJsonBody_returnsUpdatedRanking() throws Exception {
+    String userId = "userId";
+    String sessionId = sessionCache.generate();
+    Guild guild = mock(Guild.class);
+    sessionCache.store(sessionId, new UserSession("token", "username", userId, "iconUrl"));
+    mockJdaForRankingMutationCall(guild, userId, RankingFixtures.aRanking());
+    when(restRiotAccountRepository.enrichIdentification(any(Account.class))).thenAnswer(
+        invocation -> {
+          Account account = invocation.getArgument(0);
+          return new Account("newId", account.getName(), account.getTagLine());
+        });
+    Cookie cookie = new Cookie("SESSION_ID", sessionId);
+
+    mockMvc.perform(post(String.format("/rankings/forGuild/%s/forRanking/%s/add", guild.getId(),
+            "rankingId")).cookie(cookie)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                [{"name":"summoner","tagLine":"EUW"}]
+                """))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("id", is("rankingId")))
+        .andExpect(jsonPath("accounts", hasSize(2)))
+        .andExpect(jsonPath("accounts[1].id", is("newId")))
+        .andExpect(jsonPath("accounts[1].name", is("summoner")))
+        .andExpect(jsonPath("accounts[1].tagLine", is("EUW")));
+  }
+
+  @Test
+  void givenSession_whenRemovingAccountsWithLegacyTagBody_returnsUpdatedRanking()
+      throws Exception {
+    String userId = "userId";
+    String sessionId = sessionCache.generate();
+    Guild guild = mock(Guild.class);
+    sessionCache.store(sessionId, new UserSession("token", "username", userId, "iconUrl"));
+    mockJdaForRankingMutationCall(guild, userId, RankingFixtures.aRanking());
+    when(restRiotAccountRepository.enrichIdentification(any(Account.class))).thenAnswer(
+        invocation -> {
+          Account account = invocation.getArgument(0);
+          if (!account.lacksId()) {
+            return AccountFixtures.anAccount();
+          }
+          return new Account("id", account.getName(), account.getTagLine());
+        });
+    Cookie cookie = new Cookie("SESSION_ID", sessionId);
+
+    mockMvc.perform(post(String.format("/rankings/forGuild/%s/forRanking/%s/remove",
+            guild.getId(), "rankingId")).cookie(cookie)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                [{"name":"name","tag":"tagLine"}]
+                """))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("id", is("rankingId")))
+        .andExpect(jsonPath("accounts", hasSize(0)));
+  }
+
   private void mockJda(Guild guild, String userId) {
     User user = mock(User.class);
     CacheRestAction<User> craUser = mock(CacheRestAction.class);
@@ -200,6 +275,40 @@ class RankingsControllerTest extends BaseIT {
     when(messageHistory.retrievePast(anyInt())).thenReturn(restAction);
     when(textChannel.getHistory()).thenReturn(messageHistory);
     when(textChannel.getName()).thenReturn("config-channel");
+    when(guild.getTextChannels()).thenReturn(List.of(textChannel));
+  }
+
+  private void mockJdaForRankingMutationCall(Guild guild, String userId,
+      com.desierto.ranky.domain.entity.Ranking ranking) {
+    User user = mock(User.class);
+    CacheRestAction<User> craUser = mock(CacheRestAction.class);
+    CacheRestAction<Member> craMember = mock(CacheRestAction.class);
+    Member member = mock(Member.class);
+    Role role = mock(Role.class);
+    TextChannel textChannel = mock(TextChannel.class);
+    MessageHistory messageHistory = mock(MessageHistory.class);
+    RestAction<List<Message>> restAction = mock(RestAction.class);
+    Message message = mock(Message.class);
+    MessageCreateAction messageCreateAction = mock(MessageCreateAction.class);
+    AuditableRestAction<Void> deleteAction = mock(AuditableRestAction.class);
+    Gson gson = new Gson();
+    when(guild.getId()).thenReturn("guildId");
+    when(jda.retrieveUserById(userId)).thenReturn(craUser);
+    when(craUser.complete()).thenReturn(user);
+    when(jda.getMutualGuilds(user)).thenReturn(List.of(guild));
+    when(jda.getGuilds()).thenReturn(List.of(guild));
+    when(guild.retrieveMemberById(userId)).thenReturn(craMember);
+    when(craMember.complete()).thenReturn(member);
+    when(member.getRoles()).thenReturn(List.of(role));
+    when(role.getName()).thenReturn("Ranky user");
+    when(message.getContentRaw()).thenReturn(gson.toJson(RankingDto.fromDomain(ranking)));
+    when(restAction.complete()).thenReturn(List.of(message));
+    when(messageHistory.retrievePast(anyInt())).thenReturn(restAction);
+    when(textChannel.getHistory()).thenReturn(messageHistory);
+    when(textChannel.getName()).thenReturn("config-channel");
+    when(textChannel.sendMessage(org.mockito.ArgumentMatchers.anyString())).thenReturn(
+        messageCreateAction);
+    when(message.delete()).thenReturn(deleteAction);
     when(guild.getTextChannels()).thenReturn(List.of(textChannel));
   }
 
