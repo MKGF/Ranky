@@ -147,23 +147,23 @@ public class RankingsController {
 
   @PostMapping("/forGuild/{guildId}/forRanking/{ranking}/add")
   public ResponseEntity<Ranking> addAccounts(@CurrentUser UserSession session,
-      @PathVariable String guildId, @PathVariable String rankingId, List<AccountApi> accounts) {
+      @PathVariable String guildId, @PathVariable String ranking, List<AccountApi> accounts) {
     log.info("Entered addAccounts");
     log.info("Session: {}", session.toString());
     Guild guild = guildsService.get(guildId, session.userId());
     userPowerChecker.check(session, guild);
-    return mapper.mapSingle(accountsService.addAccounts(rankingId, guild,
+    return mapper.mapSingle(accountsService.addAccounts(ranking, guild,
         accounts.stream().map(AccountApi::toDomain).toList()));
   }
 
   @PostMapping("/forGuild/{guildId}/forRanking/{ranking}/remove")
   public ResponseEntity<Ranking> removeAccounts(@CurrentUser UserSession session,
-      @PathVariable String guildId, @PathVariable String rankingId, List<AccountApi> accounts) {
+      @PathVariable String guildId, @PathVariable String ranking, List<AccountApi> accounts) {
     log.info("Entered removeAccounts");
     log.info("Session: {}", session.toString());
     Guild guild = guildsService.get(guildId, session.userId());
     userPowerChecker.check(session, guild);
-    return mapper.mapSingle(accountsService.removeAccounts(rankingId, guild,
+    return mapper.mapSingle(accountsService.removeAccounts(ranking, guild,
         accounts.stream().map(AccountApi::toDomain).toList()));
   }
 }
