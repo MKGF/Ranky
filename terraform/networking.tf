@@ -63,27 +63,31 @@ resource "aws_security_group" "ranky-sg-ec2" {
   name        = "ranky-sg"
   description = "Security group for ranky ec2"
 
-  vpc_id = aws_vpc.ranky-vpc.id 
+  vpc_id = aws_vpc.ranky-vpc.id
 
+  # SSH
   ingress {
-    from_port = 22
-    to_port = 22
-    protocol = "tcp"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  # HTTP (certbot)
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  # HTTPS (Nginx + certbot final)
   ingress {
-    from_port   = 8080
-    to_port     = 8080
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
 
   egress {
     from_port   = 0
@@ -92,7 +96,11 @@ resource "aws_security_group" "ranky-sg-ec2" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  depends_on = [ 
+  tags = {
+    Name = "ranky-sg-ec2"
+  }
+
+  depends_on = [
     aws_vpc.ranky-vpc
   ]
 }
